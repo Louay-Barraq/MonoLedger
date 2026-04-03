@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Ledger - Players</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#5b4b00",
+                        "error-container": "#9f0519",
+                        "on-primary-container": "#004f24",
+                        "on-tertiary-container": "#001429",
+                        "secondary-fixed-dim": "#efc900",
+                        "on-surface": "#ffffff",
+                        "on-primary": "#005d2c",
+                        "error-dim": "#d7383b",
+                        "inverse-primary": "#006e35",
+                        "background": "#0e0e0e",
+                        "surface-container": "#1a1a1a",
+                        "inverse-surface": "#fcf9f8",
+                        "on-secondary-fixed": "#453900",
+                        "primary": "#3fff8b",
+                        "secondary-container": "#705d00",
+                        "tertiary-fixed": "#70b5ff",
+                        "primary-fixed": "#3fff8b",
+                        "surface-tint": "#3fff8b",
+                        "tertiary": "#44a5ff",
+                        "surface-dim": "#0e0e0e",
+                        "surface-bright": "#2c2c2c",
+                        "surface-container-low": "#131313",
+                        "primary-container": "#13ea79",
+                        "on-tertiary-fixed": "#001930",
+                        "tertiary-fixed-dim": "#4ca8ff",
+                        "primary-dim": "#24f07e",
+                        "surface": "#0e0e0e",
+                        "on-error": "#490006",
+                        "surface-container-lowest": "#000000",
+                        "primary-fixed-dim": "#24f07e",
+                        "on-tertiary-fixed-variant": "#003b67",
+                        "secondary": "#ffd709",
+                        "outline-variant": "#484847",
+                        "error": "#ff716c",
+                        "on-background": "#ffffff",
+                        "on-error-container": "#ffa8a3",
+                        "surface-container-highest": "#262626",
+                        "surface-container-high": "#20201f",
+                        "secondary-fixed": "#ffd709",
+                        "outline": "#767575",
+                        "on-primary-fixed-variant": "#006832",
+                        "tertiary-container": "#2498f5",
+                        "secondary-dim": "#efc900",
+                        "on-secondary-fixed-variant": "#665500",
+                        "on-surface-variant": "#adaaaa",
+                        "tertiary-dim": "#3aa2ff",
+                        "surface-variant": "#262626",
+                        "inverse-on-surface": "#565555",
+                        "on-secondary-container": "#fff7e6",
+                        "on-primary-fixed": "#004820",
+                        "on-tertiary": "#002442"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-6 h-20 w-full z-50 bg-[#0E0E0E]">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#20201F] transition-colors active:scale-95 duration-100 text-[#3FFF8B]">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-xl text-[#3FFF8B]">Players</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-[#3FFF8B] text-[#004820] font-bold px-4 py-1.5 rounded-full text-sm hover:opacity-90 active:scale-95 transition-all">
+                Invite
+            </button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#20201F] transition-colors active:scale-95 duration-100 text-[#3FFF8B]">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-1 px-6 pb-32 max-w-2xl mx-auto w-full space-y-6 overflow-y-auto no-scrollbar">
+<!-- Room Code Bento Card -->
+<section class="grid grid-cols-1 gap-4">
+<div class="bg-surface-container-low rounded-3xl p-6 relative overflow-hidden group active:scale-[0.98] transition-transform duration-200">
+<div class="flex flex-col items-center justify-center py-4">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">Room Code</span>
+<span class="font-headline text-6xl font-extrabold text-primary tracking-tighter">5045</span>
+<div class="flex items-center gap-2 mt-4 px-4 py-2 bg-surface-container-high rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="share">share</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Tap to share link</span>
+</div>
+</div>
+<!-- Tactical detail decoration -->
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-4xl" data-icon="qr_code_2">qr_code_2</span>
+</div>
+</div>
+<!-- The Bank Card -->
+<div class="bg-surface-container-high rounded-3xl p-5 flex items-center justify-between border-l-4 border-secondary">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface">The Bank</h3>
+<p class="font-body text-sm text-on-surface-variant">Unlimited reserves</p>
+</div>
+</div>
+<div class="text-secondary opacity-80">
+<span class="material-symbols-outlined text-4xl" data-icon="all_inclusive">all_inclusive</span>
+</div>
+</div>
+</section>
+<!-- Player List Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-2">
+<h2 class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Active Players (2)</h2>
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<!-- Current User Card -->
+<div class="bg-surface-container-low p-1 rounded-[2rem] border border-primary/20">
+<div class="bg-surface-container-high rounded-[1.8rem] p-5 flex items-center justify-between shadow-xl">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="User Avatar" class="w-12 h-12 rounded-2xl object-cover bg-primary/20 p-1" data-alt="Profile avatar for current user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_Dnt9uB1URoQn320GKFA8Va6qop7QDH7zqLCp870oG4u93sUAeoJFF2hjqFNiqlrYC4oiMIafj60whpa98QuVIoeT45_0CPkZ-27idzdPymsbPpVopBqDWv1RtIUmMU-vyjxTqY7y3NgxCzpXCZnZ6rPIUC39judPtP5XXYO249I3fithOx3wEyvIshe-wGw7f7VCobljODUhdWWKUVrQgwP5GflnCCvhjXQuUSV_R-3Z8SRUS_LfPCbwrNSl5zcajl26gCRUPw-W"/>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary text-on-primary rounded-full flex items-center justify-center border-2 border-surface-container-high">
+<span class="material-symbols-outlined text-[12px] font-bold" data-icon="check">check</span>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-headline font-bold text-on-surface">test</h3>
+<span class="font-label text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-md border border-primary/20">YOU</span>
+</div>
+<p class="font-body text-xs text-on-surface-variant">Active now</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-mono text-xl font-bold text-primary tracking-tight">$2,300</p>
+<p class="font-label text-[10px] text-on-surface-variant uppercase tracking-tighter">Current Balance</p>
+</div>
+</div>
+</div>
+<!-- Opponent Card -->
+<div class="bg-surface-container-low rounded-3xl p-5 flex items-center justify-between hover:bg-surface-container-high transition-colors group cursor-pointer active:scale-[0.99]">
+<div class="flex items-center gap-4">
+<img alt="Alex Avatar" class="w-12 h-12 rounded-2xl object-cover bg-tertiary/10 p-1" data-alt="Profile avatar for player Alex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1ZpEKB7bCSSJz8CixvfLIbjJ4FQsarfalNPMO45G9k6szlRGxL7n_OfGQUqNKlU-r25dDeityDZxjNYHoZ6atvxsQMUZt1Rlv05TP0siHBHX351Fgy8xPlQckEkErHVGJTIPrggo47unMNHWKoDn7eLtvtlgGReDIijbzdr1R5QxWegWRsEwtFnPBlRd2oETj_Vx6cXADanevX5uAAImx2TjW-trG9hYo_2LuOxJoTATbTRzVLU_Ho3qALhddv-g9oTh5_YGBMEvm"/>
+<div>
+<h3 class="font-headline font-bold text-on-surface">Alex</h3>
+<p class="font-body text-xs text-on-surface-variant">Connected</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right">
+<p class="font-mono text-xl font-bold text-on-surface tracking-tight">$2,300</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#131313]/80 backdrop-blur-xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-[#3FFF8B]/10">
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Wallet</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="receipt_long">receipt_long</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Ledger</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold bg-primary/10 rounded-xl px-4 py-2 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Players</span>
+</a>
+</nav>
+</body></html>

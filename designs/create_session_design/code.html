@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Session | Neon Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ffb4ab",
+              "outline-variant": "#3b4a3d",
+              "background": "#0E0E0E",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "surface-container-highest": "#353534",
+              "surface-container": "#201f1f",
+              "inverse-surface": "#e5e2e1",
+              "on-secondary-fixed": "#221b00",
+              "surface-container-high": "#2a2a2a",
+              "secondary-fixed": "#ffe16d",
+              "outline": "#859585",
+              "primary": "#3FFF8B",
+              "secondary-container": "#ffdb3c",
+              "on-secondary": "#3a3000",
+              "surface-container-lowest": "#0e0e0e",
+              "primary-fixed-dim": "#00e475",
+              "error-container": "#93000a",
+              "on-primary-container": "#00612e",
+              "on-tertiary-container": "#004eb5",
+              "on-tertiary-fixed-variant": "#00429b",
+              "secondary-fixed-dim": "#e9c400",
+              "on-surface": "#e5e2e1",
+              "on-primary": "#003918",
+              "secondary": "#fff9ef",
+              "inverse-primary": "#006d35",
+              "surface-bright": "#393939",
+              "surface-container-low": "#131313",
+              "primary-container": "#3FFF8B",
+              "inverse-on-surface": "#313030",
+              "on-tertiary-fixed": "#001945",
+              "tertiary-fixed-dim": "#b0c6ff",
+              "on-secondary-container": "#725f00",
+              "on-primary-fixed": "#00210b",
+              "on-tertiary": "#002d6e",
+              "surface": "#0E0E0E",
+              "on-error": "#690005",
+              "primary-fixed": "#62ff96",
+              "tertiary-fixed": "#d9e2ff",
+              "on-primary-fixed-variant": "#005226",
+              "surface-tint": "#00e475",
+              "tertiary-container": "#b3c8ff",
+              "surface-dim": "#0E0E0E",
+              "tertiary": "#dce4ff",
+              "on-secondary-fixed-variant": "#544600",
+              "on-surface-variant": "#bacbb9",
+              "surface-variant": "#353534"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Inter"],
+              "mono": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "8px", "lg": "12px", "xl": "16px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0E0E0E;
+            color: #e5e2e1;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .flat-no-shadows {
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen pb-40">
+<!-- TopAppBar from COMPONENTS_29 -->
+<header class="fixed top-0 w-full z-50 bg-[#0E0E0E] flex items-center justify-between px-6 h-16 w-full border-b border-[#3FFF8B]/5">
+<div class="flex items-center gap-4">
+<button class="text-[#3FFF8B] hover:bg-[#20201F] transition-colors p-2 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-[#3FFF8B] font-['Plus_Jakarta_Sans'] uppercase tracking-widest font-bold text-base">ROOM: #84920</h1>
+</div>
+<div class="flex items-center">
+<button class="text-[#3FFF8B] hover:bg-[#20201F] transition-colors p-2 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-md mx-auto space-y-10">
+<!-- Header Editorial -->
+<section class="space-y-2">
+<p class="text-primary font-mono text-[10px] tracking-[0.3em] font-bold uppercase">INITIAL SETUP</p>
+<h2 class="text-on-surface font-headline text-3xl font-extrabold tracking-tight">Create Session</h2>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed opacity-70">Configure the fiscal rules for your upcoming digital ledger session.</p>
+</section>
+<!-- Form Sections -->
+<div class="space-y-10">
+<!-- Name Input -->
+<div class="space-y-3">
+<label class="font-mono text-[10px] font-bold text-on-surface-variant tracking-[0.2em] px-1 uppercase opacity-60">YOUR NAME</label>
+<div class="relative group">
+<input class="w-full bg-[#131313] border border-white/5 rounded-xl px-5 py-4 font-body text-on-surface focus:outline-none focus:border-primary/50 transition-colors placeholder:text-neutral-700" placeholder="Enter banker name" type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700">
+<span class="material-symbols-outlined">fingerprint</span>
+</div>
+</div>
+</div>
+<!-- Currency Selector -->
+<div class="space-y-3">
+<label class="font-mono text-[10px] font-bold text-on-surface-variant tracking-[0.2em] px-1 uppercase opacity-60">CURRENCY SYMBOL</label>
+<div class="grid grid-cols-4 gap-3">
+<button class="bg-primary text-[#0E0E0E] font-headline font-extrabold text-xl py-4 rounded-xl active:scale-95 transition-all">
+                        $
+                    </button>
+<button class="bg-[#1C1C1C] text-on-surface font-headline font-bold text-xl py-4 rounded-xl hover:bg-[#252525] active:scale-95 transition-all border border-white/5">
+                        €
+                    </button>
+<button class="bg-[#1C1C1C] text-on-surface font-headline font-bold text-xl py-4 rounded-xl hover:bg-[#252525] active:scale-95 transition-all border border-white/5">
+                        £
+                    </button>
+<button class="bg-[#1C1C1C] text-on-surface font-headline font-bold text-xl py-4 rounded-xl hover:bg-[#252525] active:scale-95 transition-all border border-white/5">
+                        ¥
+                    </button>
+</div>
+</div>
+<!-- Starting Capital -->
+<div class="space-y-4">
+<div class="flex justify-between items-end px-1">
+<label class="font-mono text-[10px] font-bold text-on-surface-variant tracking-[0.2em] uppercase opacity-60">STARTING CAPITAL</label>
+<span class="font-mono text-primary font-black text-xl">$1,500</span>
+</div>
+<!-- Bento Grid Presets -->
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-start p-5 bg-primary/5 border-2 border-primary/40 rounded-2xl active:scale-95 transition-all text-left group">
+<span class="text-primary font-mono text-2xl font-black">$1500</span>
+<span class="text-primary/60 font-mono text-[9px] tracking-widest uppercase mt-1 font-bold">Standard Start</span>
+</button>
+<button class="flex flex-col items-start p-5 bg-[#131313] border border-white/5 rounded-2xl active:scale-95 transition-all text-left hover:bg-[#1C1C1C]">
+<span class="text-on-surface font-mono text-2xl font-black">$2000</span>
+<span class="text-on-surface-variant font-mono text-[9px] tracking-widest uppercase mt-1 font-bold">Pro Tier</span>
+</button>
+<button class="flex flex-col items-start p-5 bg-[#131313] border border-white/5 rounded-2xl active:scale-95 transition-all text-left hover:bg-[#1C1C1C]">
+<span class="text-on-surface font-mono text-2xl font-black">$3000</span>
+<span class="text-on-surface-variant font-mono text-[9px] tracking-widest uppercase mt-1 font-bold">Capitalist</span>
+</button>
+<button class="flex flex-col items-start p-5 bg-[#131313] border border-white/5 rounded-2xl active:scale-95 transition-all text-left hover:bg-[#1C1C1C]">
+<span class="text-on-surface font-mono text-2xl font-black">$5000</span>
+<span class="text-on-surface-variant font-mono text-[9px] tracking-widest uppercase mt-1 font-bold">Whale Mode</span>
+</button>
+</div>
+</div>
+<!-- GO Amount -->
+<div class="bg-[#131313] border border-white/5 rounded-2xl p-6 flex items-center justify-between">
+<div class="space-y-1">
+<h4 class="text-on-surface font-headline font-bold text-lg tracking-tight">GO Amount</h4>
+<p class="text-on-surface-variant font-body text-xs opacity-60">Salary for passing start</p>
+</div>
+<div class="flex items-center gap-4 bg-[#1C1C1C] border border-white/5 rounded-xl px-4 py-2">
+<button class="text-primary active:scale-150 transition-transform">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+<span class="font-mono text-xl font-black text-on-surface w-14 text-center">$200</span>
+<button class="text-primary active:scale-150 transition-transform">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Action -->
+<div class="fixed bottom-0 left-0 w-full px-6 pb-12 pt-10 bg-gradient-to-t from-[#0E0E0E] via-[#0E0E0E]/95 to-transparent z-40">
+<button class="w-full bg-primary text-[#0E0E0E] py-5 rounded-2xl font-headline font-black text-lg flex items-center justify-center gap-3 shadow-[0_12px_40px_rgba(63,255,139,0.25)] active:scale-[0.97] transition-all uppercase tracking-widest">
+            CREATE &amp; START
+            <span class="material-symbols-outlined font-black">rocket_launch</span>
+</button>
+</div>
+<!-- BottomNavBar (Hidden for task focus) -->
+<div class="hidden">
+<div class="style_active_navigation">flex flex-col items-center justify-center text-[#3FFF8B] bg-[#3FFF8B]/10 rounded-xl px-4 py-1</div>
+<div class="style_inactive_navigation">flex flex-col items-center justify-center text-gray-500 opacity-60</div>
+</div>
+</body></html>

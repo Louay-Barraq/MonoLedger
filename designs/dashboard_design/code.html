@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ffb4ab",
+              "outline-variant": "#3b4a3d",
+              "background": "#0E0E0E",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "surface-container-highest": "#353534",
+              "surface-container": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "on-secondary-fixed": "#221b00",
+              "surface-container-high": "#20201F",
+              "secondary-fixed": "#ffe16d",
+              "outline": "#859585",
+              "primary": "#3FFF8B",
+              "secondary-container": "#3FFF8B",
+              "on-secondary": "#003918",
+              "surface-container-lowest": "#080808",
+              "primary-fixed-dim": "#00e475",
+              "error-container": "#93000a",
+              "on-primary-container": "#00612e",
+              "on-tertiary-container": "#004eb5",
+              "on-tertiary-fixed-variant": "#00429b",
+              "secondary-fixed-dim": "#e9c400",
+              "on-surface": "#e5e2e1",
+              "on-primary": "#003918",
+              "secondary": "#fff9ef",
+              "inverse-primary": "#006d35",
+              "surface-bright": "#393939",
+              "surface-container-low": "#131313",
+              "primary-container": "#3FFF8B",
+              "inverse-on-surface": "#313030",
+              "on-tertiary-fixed": "#001945",
+              "tertiary-fixed-dim": "#b0c6ff",
+              "on-secondary-container": "#003918",
+              "on-primary-fixed": "#00210b",
+              "on-tertiary": "#002d6e",
+              "surface": "#0E0E0E",
+              "on-error": "#690005",
+              "primary-fixed": "#62ff96",
+              "tertiary-fixed": "#d9e2ff",
+              "on-primary-fixed-variant": "#005226",
+              "surface-tint": "#3FFF8B",
+              "tertiary-container": "#b3c8ff",
+              "surface-dim": "#0E0E0E",
+              "tertiary": "#dce4ff",
+              "on-secondary-fixed-variant": "#544600",
+              "on-surface-variant": "#bacbb9",
+              "surface-variant": "#20201F"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Space Grotesk"],
+              "mono-data": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .flat-no-shadows { box-shadow: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary min-h-screen">
+<!-- TopAppBar shared component -->
+<header class="fixed top-0 w-full z-50 bg-[#0E0E0E] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-2 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-[#3FFF8B]">logout</span>
+</div>
+<div class="font-['Plus_Jakarta_Sans'] uppercase tracking-widest font-bold flex flex-col items-center">
+<span class="text-[10px] text-gray-500 leading-none mb-1">ROOM CODE</span>
+<h1 class="text-[#3FFF8B] font-black tracking-tighter text-xl">#84920</h1>
+</div>
+<div class="flex items-center gap-2 active:scale-95 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-gray-500">share</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-md mx-auto space-y-10">
+<!-- Hero Balance Section -->
+<section class="text-center space-y-2">
+<p class="font-label text-xs font-bold tracking-[0.2em] text-gray-500 uppercase">CURRENT BALANCE</p>
+<div class="flex flex-col items-center justify-center">
+<span class="font-headline font-extrabold text-7xl md:text-8xl text-on-surface tracking-tighter">
+                $2,300
+            </span>
+<div class="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-lg border border-primary/20">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-mono-data text-xs font-bold">+12% vs START</span>
+</div>
+</div>
+</section>
+<!-- Primary Action: GO -->
+<section class="relative group">
+<button class="w-full h-24 bg-primary text-on-primary rounded-xl flex items-center justify-between px-8 shadow-[0_10px_40px_rgba(63,255,139,0.2)] transition-all active:scale-95 overflow-hidden">
+<div class="flex flex-col items-start">
+<span class="font-headline font-black text-4xl tracking-tight italic">GO</span>
+<span class="font-label text-[10px] font-bold uppercase tracking-widest">Collect Salary</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-data font-extrabold text-2xl">+$200</span>
+<span class="material-symbols-outlined text-3xl">arrow_forward</span>
+</div>
+</button>
+</section>
+<!-- Secondary Bank Actions -->
+<section class="grid grid-cols-2 gap-4">
+<button class="flex flex-col items-center justify-center gap-3 bg-surface-container-high p-5 rounded-xl border border-white/5 transition-all active:scale-95 hover:bg-[#20201F]">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<span class="font-label text-[11px] font-bold uppercase tracking-wider text-gray-400">Pay Bank</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-3 bg-surface-container-high p-5 rounded-xl border border-white/5 transition-all active:scale-95 hover:bg-[#20201F]">
+<div class="w-12 h-12 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+<span class="font-label text-[11px] font-bold uppercase tracking-wider text-gray-400">From Bank</span>
+</button>
+</section>
+<!-- Players Section -->
+<section class="space-y-6">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<h3 class="font-headline font-extrabold text-xl text-on-surface italic">Players</h3>
+<span class="font-label text-[10px] text-gray-500 font-bold uppercase">4 ACTIVE</span>
+</div>
+<div class="space-y-3">
+<!-- Player Card 1: Alex -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-white/5">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-12 h-12 rounded-lg object-cover bg-surface-container-high border border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABZvsu7i-7Dicm7c5JSQcA7qVPMmZYwjWqET72sjM6-ajpzxTCZKvY7LTHf0rTp9Jufls-W9PCdywop1MN3d6lB4P4IVP-u--ULVIg_7NywuHLliglJQRF5yR-nr44Fpn6JYrAC8jvRro1AoafXvauf9TIQ6lMG1_d2FLToNAkg1kHWwOX_FuJ1UgfxItgLnTt_M09LK4SEDVybT-mhpofefNZD6H3FjIZwrrdcRPaz-dMF0ux-qgeAvkRCPz4982TF8y1dnzSekx0"/>
+<div class="absolute -bottom-1 -right-1 w-3 h-3 bg-primary border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface">Alex Rivera</p>
+<p class="font-label text-[10px] text-gray-500 uppercase font-semibold">Car Token</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-mono-data font-bold text-primary">$1,450</p>
+<p class="font-label text-[10px] text-gray-500">RANK #1</p>
+</div>
+</div>
+<!-- Player Card 2: Sarah -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-white/5">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-12 h-12 rounded-lg object-cover bg-surface-container-high border border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADVVWgT6KHIiOCzQz01KNNdo_06aECPvgC6AcDmUtuZUp04seM5xHpc-LFyIOcU6ky3DOnH39_EsCqEInU8fLq6TQdcISNEjBYz1CTyLbLqRwCUxg7aCP4ej_0OPKqgfaEeO1dwpjPpksuoMhv4knTwEAjsiRxuCluCfBN-WZBi5Qgjx1zPuCLNKnTwaeEDaY9tgBAdDsvR1yEYgFSh_37KeEvMCrSoa7Ag34UwQryM7KY50vpSfaOG1CyEpB_VY-5YgF8j0ot8bFA"/>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface">Sarah Chen</p>
+<p class="font-label text-[10px] text-gray-500 uppercase font-semibold">Hat Token</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-mono-data font-bold text-on-surface">$890</p>
+<p class="font-label text-[10px] text-gray-500">RANK #2</p>
+</div>
+</div>
+<!-- Player Card 3: Chris -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-white/5">
+<div class="flex items-center gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-12 h-12 rounded-lg object-cover bg-surface-container-high border border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtMAZla3DExAvwVRiGEUUoAel8PJBnaPoxzusCgwNJq_fBPNfJ0dr5QBg3Knk8akN9NiuhjiPzph4aqlRjJn7-nfRUS_orJSjjxdGU_YRcvYzN5TIIzW9D_52uGMdkiWLLHYudhvVvrTtrPBNZ3YSw8RpTD-wjAHOCwah8pIjVbjy29WgeLFLL7zIOUzupn6niwQwn7z9cwqmDPEzMuS9IB78HbPoKBH5hBxdVIGaa09n3fgAn-EQiYdrQIiMK1UXnj9tUogoqyziv"/>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface">Chris Miller</p>
+<p class="font-label text-[10px] text-gray-500 uppercase font-semibold">Thimble Token</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-mono-data font-bold text-on-surface">$420</p>
+<p class="font-label text-[10px] text-gray-500">RANK #3</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar shared component -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-4 bg-[#131313]/80 backdrop-blur-xl z-50 rounded-t-2xl border-t border-[#3FFF8B]/10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<!-- Active: Wallet -->
+<button class="flex flex-col items-center justify-center text-[#3FFF8B] bg-[#3FFF8B]/10 rounded-xl px-4 py-1 active:scale-98 duration-100 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Wallet</span>
+</button>
+<!-- Inactive: Ledger -->
+<button class="flex flex-col items-center justify-center text-gray-500 opacity-60 hover:text-[#3FFF8B] active:scale-98 duration-100 transition-all">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Ledger</span>
+</button>
+<!-- Inactive: Players -->
+<button class="flex flex-col items-center justify-center text-gray-500 opacity-60 hover:text-[#3FFF8B] active:scale-98 duration-100 transition-all">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Players</span>
+</button>
+</nav>
+<!-- FAB Contextual Action -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-on-primary rounded-xl flex items-center justify-center shadow-2xl transition-all active:scale-95 z-40 border border-white/10">
+<span class="material-symbols-outlined text-3xl">currency_exchange</span>
+</button>
+</body></html>

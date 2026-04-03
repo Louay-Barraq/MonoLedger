@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MonoLedger - Neon Ledger System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed-dim": "#efc900",
+                        "primary-fixed-dim": "#24f07e",
+                        "surface-container-low": "#131313",
+                        "error-container": "#9f0519",
+                        "error-dim": "#d7383b",
+                        "on-surface-variant": "#adaaaa",
+                        "secondary": "#ffd709",
+                        "on-error": "#490006",
+                        "primary": "#3fff8b",
+                        "primary-dim": "#24f07e",
+                        "surface-variant": "#262626",
+                        "error": "#ff716c",
+                        "on-background": "#ffffff",
+                        "on-primary": "#005d2c",
+                        "tertiary-fixed-dim": "#4ca8ff",
+                        "on-tertiary-fixed-variant": "#003b67",
+                        "surface-tint": "#3fff8b",
+                        "secondary-fixed": "#ffd709",
+                        "secondary-container": "#705d00",
+                        "primary-container": "#13ea79",
+                        "on-tertiary-container": "#001429",
+                        "on-secondary": "#5b4b00",
+                        "outline": "#767575",
+                        "on-primary-fixed-variant": "#006832",
+                        "primary-fixed": "#3fff8b",
+                        "on-primary-container": "#004f24",
+                        "surface-container": "#1a1a1a",
+                        "surface-container-high": "#20201f",
+                        "on-tertiary-fixed": "#001930",
+                        "inverse-on-surface": "#565555",
+                        "tertiary-container": "#2498f5",
+                        "secondary-dim": "#efc900",
+                        "tertiary-dim": "#3aa2ff",
+                        "on-secondary-container": "#fff7e6",
+                        "inverse-surface": "#fcf9f8",
+                        "on-surface": "#ffffff",
+                        "surface-bright": "#2c2c2c",
+                        "surface-container-lowest": "#000000",
+                        "surface": "#0e0e0e",
+                        "on-primary-fixed": "#004820",
+                        "tertiary-fixed": "#70b5ff",
+                        "outline-variant": "#484847",
+                        "on-error-container": "#ffa8a3",
+                        "on-secondary-fixed-variant": "#665500",
+                        "surface-container-highest": "#262626",
+                        "background": "#0e0e0e",
+                        "inverse-primary": "#006e35",
+                        "tertiary": "#44a5ff",
+                        "on-secondary-fixed": "#453900",
+                        "surface-dim": "#0e0e0e",
+                        "on-tertiary": "#002442"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "8px", "lg": "12px", "xl": "16px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .action-gradient {
+            background: linear-gradient(135deg, #3fff8b 0%, #13ea79 100%);
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar Shared Component -->
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 w-full bg-[#0E0E0E]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#3FFF8B]">settings</span>
+<h1 class="font-['Plus_Jakarta_Sans'] uppercase tracking-widest font-bold text-[#3FFF8B] text-xl">ROOM: #84920</h1>
+</div>
+<button class="hover:bg-[#20201F] transition-colors p-2 rounded-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-gray-500">logout</span>
+</button>
+</header>
+<main class="min-h-screen pt-24 pb-32 px-4 flex flex-col items-center justify-start max-w-lg mx-auto">
+<!-- Payment Modal Card -->
+<section class="w-full bg-surface-container-low rounded-xl overflow-hidden shadow-2xl flex flex-col border border-outline-variant/10">
+<!-- Header Section -->
+<div class="p-6 pb-2 text-center">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant">Transaction</span>
+<h2 class="font-headline text-2xl font-extrabold mt-1">Pay Sarah</h2>
+</div>
+<!-- Draft Total Display -->
+<div class="px-6 py-4 flex flex-col items-center">
+<div class="w-full bg-surface-container-lowest rounded-lg p-8 flex flex-col items-end relative overflow-hidden border border-outline-variant/20">
+<div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary absolute top-4 left-6 font-bold">Current Draft</span>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="font-mono text-4xl text-primary/50">$</span>
+<span class="font-mono text-7xl font-bold tracking-tighter text-primary">1,250</span>
+</div>
+<button class="absolute bottom-4 left-6 flex items-center gap-1 text-error hover:bg-error/10 px-3 py-1.5 rounded-lg transition-all active:scale-90">
+<span class="material-symbols-outlined text-sm">close</span>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold">Clear</span>
+</button>
+</div>
+</div>
+<!-- Bill Grid -->
+<div class="px-6 pb-8">
+<div class="grid grid-cols-4 gap-4">
+<!-- $1 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant flex items-center justify-center group-hover:bg-outline-variant/10">
+<span class="font-mono text-lg font-bold text-on-surface">1</span>
+</div>
+</button>
+<!-- $5 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-error-dim flex items-center justify-center group-hover:bg-error-dim/10">
+<span class="font-mono text-lg font-bold text-error-dim">5</span>
+</div>
+</button>
+<!-- $10 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-secondary flex items-center justify-center group-hover:bg-secondary/10">
+<span class="font-mono text-lg font-bold text-secondary">10</span>
+</div>
+</button>
+<!-- $20 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-primary-dim flex items-center justify-center group-hover:bg-primary-dim/10">
+<span class="font-mono text-lg font-bold text-primary-dim">20</span>
+</div>
+</button>
+<!-- $50 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-tertiary flex items-center justify-center group-hover:bg-tertiary/10">
+<span class="font-mono text-lg font-bold text-tertiary">50</span>
+</div>
+</button>
+<!-- $100 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-on-surface flex items-center justify-center group-hover:bg-on-surface/10">
+<span class="font-mono text-lg font-bold text-on-surface">100</span>
+</div>
+</button>
+<!-- $500 -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-secondary-container flex items-center justify-center group-hover:bg-secondary-container/10">
+<span class="font-mono text-lg font-bold text-secondary-container">500</span>
+</div>
+</button>
+<!-- Custom -->
+<button class="flex flex-col items-center gap-2 group active:scale-90 transition-all">
+<div class="w-14 h-14 rounded-full border-2 border-outline-variant border-dashed flex items-center justify-center group-hover:bg-outline-variant/10">
+<span class="material-symbols-outlined text-outline">edit</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Confirmation Slider -->
+<div class="p-6 pt-0">
+<div class="relative h-16 w-full bg-surface-container-lowest rounded-lg border border-outline-variant/20 p-1 flex items-center overflow-hidden">
+<!-- Progress fill -->
+<div class="absolute left-0 top-0 h-full w-1/5 bg-primary/20"></div>
+<!-- Handle -->
+<div class="z-10 h-14 w-14 rounded-lg action-gradient flex items-center justify-center shadow-lg shadow-primary/20 cursor-grab active:cursor-grabbing transition-transform active:scale-95">
+<span class="material-symbols-outlined text-on-primary font-bold">keyboard_double_arrow_right</span>
+</div>
+<!-- Label -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="font-label text-[12px] uppercase tracking-[0.3em] font-bold text-on-surface/40">Slide to Pay</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Player Quick Info -->
+<div class="mt-8 w-full grid grid-cols-2 gap-4">
+<div class="bg-surface-container-high p-4 rounded-xl flex flex-col gap-1 border border-outline-variant/10">
+<span class="font-label text-[10px] uppercase text-on-surface-variant tracking-wider font-bold">Your Balance</span>
+<span class="font-mono text-2xl font-bold text-primary">$14,200</span>
+</div>
+<div class="bg-surface-container-high p-4 rounded-xl flex flex-col gap-1 border border-outline-variant/10">
+<span class="font-label text-[10px] uppercase text-on-surface-variant tracking-wider font-bold">Target Debt</span>
+<span class="font-mono text-2xl font-bold text-on-surface">$2,000</span>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shared Component -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-4 bg-[#131313]/80 backdrop-blur-xl border-t border-[#3FFF8B]/10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-50 rounded-t-2xl">
+<div class="flex flex-col items-center justify-center text-gray-500 opacity-60 hover:text-[#3FFF8B] transition-all active:scale-98 duration-100">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Wallet</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#3FFF8B] bg-[#3FFF8B]/10 rounded-xl px-4 py-1 active:scale-98 duration-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Ledger</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 opacity-60 hover:text-[#3FFF8B] transition-all active:scale-98 duration-100">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['Space_Grotesk'] text-[10px] uppercase font-bold tracking-tighter mt-1">Players</span>
+</div>
+</nav>
+</body></html>
