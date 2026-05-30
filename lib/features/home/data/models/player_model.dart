@@ -19,7 +19,7 @@ class PlayerModel extends Player {
       name: json['name'] ?? 'Unknown',
       balance: (json['balance'] as num).toDouble(),
       isBanker: json['is_banker'] ?? false,
-      status: json['status'] ?? 'ACTIVE',
+      status: (json['status'] as String?)?.toUpperCase() ?? 'ACTIVE',
     );
   }
 

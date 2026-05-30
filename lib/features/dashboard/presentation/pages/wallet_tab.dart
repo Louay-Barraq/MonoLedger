@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Wallet Tab
-// ─────────────────────────────────────────────────────────────────────────────
+import 'package:monoledger/core/utils/currency_formatter.dart';
+import 'package:monoledger/core/widgets/overflow_safe_text.dart';
+import 'package:monoledger/core/utils/payment_pad_route.dart';
+import 'package:monoledger/features/home/domain/entities/player.dart';
+import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
+import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class WalletTab extends StatelessWidget {
   final String sessionCode;
@@ -14,85 +19,160 @@ class WalletTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Balance Card
-          _BalanceCard(),
-          const SizedBox(height: 24),
+    return BlocBuilder<SessionBloc, SessionState>(
+      builder: (context, state) {
+        if (state is! SessionSuccess) {
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
+        }
 
-          // GO Salary Banner
-          _GoSalaryBanner(),
-          const SizedBox(height: 24),
+        final session = state.session;
+        final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+        final activePlayers = session.activePlayers;
+        final sortedPlayers = List<Player>.from(activePlayers)
+          ..sort((a, b) => b.balance.compareTo(a.balance));
 
-          // Bank Actions
-          Row(
+        final currentPlayer = activePlayers.cast<Player?>().firstWhere(
+              (p) => p!.userId == currentUserId,
+              orElse: () => null,
+            );
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: _BankActionCard(
-                  label: 'PAY BANK',
-                  icon: Icons.account_balance_rounded,
-                  isDebit: true,
-                  onTap: () => context.push('/payment-pad', extra: {'targetName': 'The Bank', 'isPaying': true}),
-                ),
+              _BalanceCard(
+                balance: currentPlayer?.balance ?? 0.0,
+                startingBalance: session.startingBalance,
+                currency: session.currency,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _BankActionCard(
-                  label: 'FROM BANK',
-                  icon: Icons.payments_rounded,
-                  isDebit: false,
-                  onTap: () => context.push('/payment-pad', extra: {'targetName': 'The Bank', 'isPaying': false}),
-                ),
+              const SizedBox(height: 24),
+              _GoSalaryBanner(
+                goAmount: session.goAmount,
+                currency: session.currency,
+                sessionId: session.id,
+                enabled: currentPlayer != null && session.status == 'open',
               ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: _BankActionCard(
+                      label: 'PAY BANK',
+                      icon: Icons.account_balance_rounded,
+                      onTap: () => context.push(
+                        '/payment-pad',
+                        extra: PaymentPadRoute.bank(
+                          sessionId: session.id,
+                          currency: session.currency,
+                          isPaying: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _BankActionCard(
+                      label: 'FROM BANK',
+                      icon: Icons.payments_rounded,
+                      onTap: () => context.push(
+                        '/payment-pad',
+                        extra: PaymentPadRoute.bank(
+                          sessionId: session.id,
+                          currency: session.currency,
+                          isPaying: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Players',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  Text(
+                    '${activePlayers.length} ACTIVE',
+                    style: GoogleFonts.spaceMono(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (sortedPlayers.isEmpty)
+                Text(
+                  'No players in session yet',
+                  style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5)),
+                )
+              else
+                ...sortedPlayers.asMap().entries.map((entry) {
+                  final rank = entry.key + 1;
+                  final player = entry.value;
+                  final isCurrentUser = player.userId == currentUserId;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _PlayerCard(
+                      name: player.name,
+                      balance: player.balance,
+                      rank: rank,
+                      isCurrentUser: isCurrentUser,
+                      currency: session.currency,
+                      onTap: isCurrentUser
+                          ? null
+                          : () => context.push(
+                                '/payment-pad',
+                                extra: PaymentPadRoute.player(
+                                  sessionId: session.id,
+                                  currency: session.currency,
+                                  targetName: player.name,
+                                  recipientPlayerId: player.id,
+                                  isPaying: true,
+                                ),
+                              ),
+                    ),
+                  );
+                }),
+              const SizedBox(height: 80),
             ],
           ),
-          const SizedBox(height: 32),
-
-          // Players Section Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Players',
-                style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              Text(
-                '4 ACTIVE',
-                style: GoogleFonts.spaceMono(
-                  color: Colors.white.withValues(alpha: 0.4),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Players List
-          _PlayerCard(name: 'Alex Rivera', token: 'CAR TOKEN', balance: 1450, rank: 1, isCurrentUser: false),
-          const SizedBox(height: 8),
-          _PlayerCard(name: 'Sarah Chen', token: 'HAT TOKEN', balance: 890, rank: 2, isCurrentUser: false),
-          const SizedBox(height: 8),
-          _PlayerCard(name: 'Chris Miller', token: 'THIMBLE TOKEN', balance: 420, rank: 3, isCurrentUser: true),
-          const SizedBox(height: 80),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
 class _BalanceCard extends StatelessWidget {
+  final num balance;
+  final int startingBalance;
+  final String currency;
+
+  const _BalanceCard({
+    required this.balance,
+    required this.startingBalance,
+    required this.currency,
+  });
+
   @override
   Widget build(BuildContext context) {
+    final pctChange = startingBalance > 0
+        ? ((balance - startingBalance) / startingBalance * 100).round()
+        : 0;
+    final isPositive = pctChange >= 0;
+    final trendColor = isPositive ? AppTheme.primaryColor : AppTheme.errorColor;
+
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
@@ -113,32 +193,37 @@ class _BalanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            '\$2,300',
+          OverflowSafeText(
+            CurrencyFormatter.formatMoney(currency, balance),
             style: GoogleFonts.plusJakartaSans(
               color: Colors.white,
-              fontSize: 54,
+              fontSize: 48,
               fontWeight: FontWeight.w800,
               letterSpacing: -2,
             ),
+            maxLines: 2,
           ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withValues(alpha: 0.12),
+              color: trendColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3)),
+              border: Border.all(color: trendColor.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.trending_up_rounded, color: AppTheme.primaryColor, size: 16),
+                Icon(
+                  isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                  color: trendColor,
+                  size: 16,
+                ),
                 const SizedBox(width: 6),
                 Text(
-                  '+12% vs START',
+                  '${isPositive ? '+' : ''}$pctChange% vs START',
                   style: GoogleFonts.spaceMono(
-                    color: AppTheme.primaryColor,
+                    color: trendColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -154,73 +239,114 @@ class _BalanceCard extends StatelessWidget {
 }
 
 class _GoSalaryBanner extends StatelessWidget {
+  final int goAmount;
+  final String currency;
+  final String sessionId;
+  final bool enabled;
+
+  const _GoSalaryBanner({
+    required this.goAmount,
+    required this.currency,
+    required this.sessionId,
+    required this.enabled,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: Collect GO salary action
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('GO Salary collected: +\$200', style: GoogleFonts.spaceMono(color: Colors.black)),
-            backgroundColor: AppTheme.primaryColor,
-          ),
-        );
+    return BlocListener<TransactionBloc, TransactionState>(
+      listenWhen: (prev, curr) =>
+          curr is TransactionSuccess || curr is TransactionError,
+      listener: (context, state) {
+        if (state is TransactionSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                state.message,
+                style: GoogleFonts.spaceMono(color: Colors.black),
+              ),
+              backgroundColor: AppTheme.primaryColor,
+            ),
+          );
+        } else if (state is TransactionError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppTheme.errorColor,
+            ),
+          );
+        }
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        decoration: BoxDecoration(
-          color: AppTheme.primaryColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryColor.withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'GO',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: Colors.black,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    fontStyle: FontStyle.italic,
-                    letterSpacing: -1,
-                  ),
-                ),
-                Text(
-                  'COLLECT SALARY',
-                  style: GoogleFonts.spaceMono(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
+      child: GestureDetector(
+        onTap: enabled
+            ? () {
+                context.read<TransactionBloc>().add(
+                      CollectGoSalaryRequested(sessionId: sessionId),
+                    );
+              }
+            : null,
+        child: Opacity(
+          opacity: enabled ? 1 : 0.5,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
-            const Spacer(),
-            Row(
+            child: Row(
               children: [
-                Text(
-                  '+\$200',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'GO',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.black,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          fontStyle: FontStyle.italic,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      Text(
+                        'COLLECT SALARY',
+                        style: GoogleFonts.spaceMono(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 24),
+                const SizedBox(width: 12),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RowTrailingValue(
+                      maxWidth: 160,
+                      text: CurrencyFormatter.formatSignedMoney(currency, goAmount, positive: true),
+                      style: GoogleFonts.plusJakartaSans(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 24),
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -230,10 +356,13 @@ class _GoSalaryBanner extends StatelessWidget {
 class _BankActionCard extends StatelessWidget {
   final String label;
   final IconData icon;
-  final bool isDebit;
   final VoidCallback onTap;
 
-  const _BankActionCard({required this.label, required this.icon, required this.isDebit, required this.onTap});
+  const _BankActionCard({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -276,25 +405,25 @@ class _BankActionCard extends StatelessWidget {
 
 class _PlayerCard extends StatelessWidget {
   final String name;
-  final String token;
-  final int balance;
+  final num balance;
   final int rank;
   final bool isCurrentUser;
+  final String currency;
+  final VoidCallback? onTap;
 
   const _PlayerCard({
     required this.name,
-    required this.token,
     required this.balance,
     required this.rank,
     required this.isCurrentUser,
+    required this.currency,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: isCurrentUser 
-          ? null 
-          : () => context.push('/payment-pad', extra: {'targetName': name, 'isPaying': true}),
+      onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -302,12 +431,13 @@ class _PlayerCard extends StatelessWidget {
           color: AppTheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isCurrentUser ? AppTheme.primaryColor.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.06),
+            color: isCurrentUser
+                ? AppTheme.primaryColor.withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.06),
           ),
         ),
         child: Row(
           children: [
-            // Avatar
             Container(
               width: 48,
               height: 48,
@@ -325,12 +455,15 @@ class _PlayerCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        name,
-                        style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
+                      Flexible(
+                        child: Text(
+                          name,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       if (isCurrentUser) ...[
@@ -354,40 +487,33 @@ class _PlayerCard extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    token,
-                    style: GoogleFonts.spaceMono(
-                      color: Colors.white.withValues(alpha: 0.4),
-                      fontSize: 10,
-                      letterSpacing: 1,
+                  if (!isCurrentUser)
+                    Text(
+                      'TAP TO PAY',
+                      style: GoogleFonts.spaceMono(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        fontSize: 9,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '\$$balance',
-                  style: GoogleFonts.spaceMono(
-                    color: rank == 1 ? AppTheme.primaryColor : Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'RANK #$rank',
-                  style: GoogleFonts.spaceMono(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    fontSize: 9,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ],
+            RowTrailingAmount(
+              primary: CurrencyFormatter.formatMoney(currency, balance),
+              primaryStyle: GoogleFonts.spaceMono(
+                color: rank == 1 ? AppTheme.primaryColor : Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+              secondary: 'RANK #$rank',
+              secondaryStyle: GoogleFonts.spaceMono(
+                color: Colors.white.withValues(alpha: 0.4),
+                fontSize: 9,
+                letterSpacing: 1,
+              ),
+              maxWidth: 120,
             ),
           ],
         ),

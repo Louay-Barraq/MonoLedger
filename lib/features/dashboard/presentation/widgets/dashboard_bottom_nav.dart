@@ -40,12 +40,12 @@ class DashboardBottomNav extends StatelessWidget {
                 isSelected: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
-              // _NavItem(
-              //   icon: Icons.group_rounded,
-              //   label: 'PLAYERS',
-              //   isSelected: currentIndex == 2,
-              //   onTap: () => onTap(2),
-              // ),
+              _NavItem(
+                icon: Icons.group_rounded,
+                label: 'PLAYERS',
+                isSelected: currentIndex == 2,
+                onTap: () => onTap(2),
+              ),
             ],
           ),
         ),

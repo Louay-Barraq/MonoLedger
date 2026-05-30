@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
+import 'package:monoledger/core/utils/qr_utils.dart';
+import 'package:monoledger/core/widgets/session_removal_dialog.dart';
+import 'package:monoledger/features/dashboard/presentation/pages/ledger_tab.dart';
+import 'package:monoledger/features/dashboard/presentation/pages/players_tab.dart';
+import 'package:monoledger/features/dashboard/presentation/pages/wallet_tab.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_app_bar.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_bottom_nav.dart';
-import 'package:monoledger/core/utils/qr_utils.dart';
-import 'package:monoledger/features/dashboard/presentation/pages/wallet_tab.dart';
-import 'package:monoledger/features/dashboard/presentation/pages/ledger_tab.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Dashboard Page – top-level container
-// ─────────────────────────────────────────────────────────────────────────────
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
-import 'package:monoledger/features/dashboard/presentation/pages/end_of_game_summary_page.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
+import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
+import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 
 class DashboardPage extends StatefulWidget {
@@ -27,42 +26,80 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0;
+  bool _initialized = false;
+  bool _handlingRemoval = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+
+    final sessionState = context.read<SessionBloc>().state;
+    if (sessionState is! SessionSuccess) {
+      context.read<SessionBloc>().add(SessionResumeByCodeRequested(widget.sessionCode));
+    } else {
+      _startTransactionWatch(sessionState.session.id);
+    }
+  }
+
+  void _startTransactionWatch(String sessionId) {
+    context.read<TransactionBloc>().add(TransactionsWatchStarted(sessionId));
+  }
+
+  Future<void> _handleKicked() async {
+    if (_handlingRemoval || !mounted) return;
+    _handlingRemoval = true;
+    context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+    await showKickedFromSessionDialog(context);
+    if (!mounted) return;
+    context.read<SessionBloc>().add(const SessionAcknowledgeRemoval());
+    context.go('/home');
+    _handlingRemoval = false;
+  }
+
+  Future<void> _handleSessionEnded(domain.Session session) async {
+    if (!mounted) return;
+    context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+    context.pushReplacement('/end-summary', extra: session);
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionBloc, SessionState>(
       listener: (context, state) {
-        if (state is SessionInitial) {
-          // Player left the session
-          Navigator.of(context).popUntil((route) => route.isFirst);
+        if (state is SessionKicked) {
+          _handleKicked();
+        } else if (state is SessionInitial) {
+          if (_handlingRemoval) return;
+          context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+          context.go('/home');
         } else if (state is SessionError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
           );
         } else if (state is SessionSuccess) {
+          _startTransactionWatch(state.session.id);
+
           final session = state.session;
-          final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-          
-          // Check if session ended
           if (session.status == 'ended') {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => EndOfGameSummaryPage(session: session)),
-            );
-          }
-          
-          // Check if player was kicked
-          final isActive = session.players.any((p) => p.userId == currentUserId);
-          if (!isActive && session.status != 'ended') {
-            Navigator.of(context).popUntil((route) => route.isFirst);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('You have been removed from the session.')),
-            );
+            _handleSessionEnded(session);
           }
         }
       },
       child: BlocBuilder<SessionBloc, SessionState>(
         builder: (context, state) {
           final session = state is SessionSuccess ? state.session : null;
+          final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+
+          if (session != null && !session.isUserActive(currentUserId)) {
+            return const Scaffold(
+              backgroundColor: AppTheme.backgroundColor,
+              body: Center(
+                child: CircularProgressIndicator(color: AppTheme.primaryColor),
+              ),
+            );
+          }
 
           return Scaffold(
             backgroundColor: AppTheme.backgroundColor,
@@ -73,14 +110,16 @@ class _DashboardPageState extends State<DashboardPage> {
                 QrUtils.showQrBottomSheet(context, widget.sessionCode);
               },
             ),
-            body: IndexedStack(
-              index: _currentIndex,
-              children: [
-                WalletTab(sessionCode: widget.sessionCode),
-                const LedgerTab(),
-                // PlayersTab(sessionCode: widget.sessionCode),
-              ],
-            ),
+            body: state is SessionLoading
+                ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
+                : IndexedStack(
+                    index: _currentIndex,
+                    children: [
+                      WalletTab(sessionCode: widget.sessionCode),
+                      const LedgerTab(),
+                      PlayersTab(sessionCode: widget.sessionCode),
+                    ],
+                  ),
             bottomNavigationBar: DashboardBottomNav(
               currentIndex: _currentIndex,
               onTap: (i) => setState(() => _currentIndex = i),
@@ -93,21 +132,26 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _showLeaveSessionDialog(BuildContext context, domain.Session? session) {
     if (session == null) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      context.go('/home');
       return;
     }
 
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = session.players.any((p) => p.userId == currentUserId && p.isBanker);
+    final isBanker = session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
+    final activeCount = session.activePlayers.length;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
         title: const Text('Leave Session?'),
-        content: Text(isBanker 
-          ? 'You are the Banker. If you leave, the role will be randomly transferred to another player. Are you sure?'
-          : 'Are you sure you want to leave this session?'),
+        content: Text(
+          isBanker
+              ? (activeCount > 1
+                  ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
+                  : 'You are the only player. Leaving will end the session. Continue?')
+              : 'You will leave this session and return to the home screen. Continue?',
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
           TextButton(

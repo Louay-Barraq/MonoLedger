@@ -3,22 +3,50 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
+import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
 import 'package:monoledger/features/home/domain/entities/player.dart';
+import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 
-class GameSettingsPage extends StatelessWidget {
+class GameSettingsPage extends StatefulWidget {
   final domain.Session session;
 
   const GameSettingsPage({super.key, required this.session});
 
   @override
+  State<GameSettingsPage> createState() => _GameSettingsPageState();
+}
+
+class _GameSettingsPageState extends State<GameSettingsPage> {
+  late domain.Session _session;
+
+  @override
+  void initState() {
+    super.initState();
+    _session = widget.session;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = session.players.any((p) => p.userId == currentUserId && p.isBanker);
+    final isBanker = _session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
 
-    return Scaffold(
+    return BlocListener<SessionBloc, SessionState>(
+      listenWhen: (prev, curr) =>
+          curr is SessionError ||
+          (curr is SessionSuccess && curr.session.id == widget.session.id),
+      listener: (context, state) {
+        if (state is SessionError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
+          );
+        } else if (state is SessionSuccess) {
+          setState(() => _session = state.session);
+        }
+      },
+      child: Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -73,6 +101,7 @@ class GameSettingsPage extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -101,7 +130,7 @@ class GameSettingsPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '#${session.joinCode}',
+                '#${_session.joinCode}',
                 style: GoogleFonts.spaceMono(
                   color: AppTheme.primaryColor,
                   fontSize: 32,
@@ -113,7 +142,7 @@ class GameSettingsPage extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              final code = session.joinCode;
+              final code = _session.joinCode;
               if (code != null) {
                 Clipboard.setData(ClipboardData(text: code));
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -159,8 +188,8 @@ class GameSettingsPage extends StatelessWidget {
       mainAxisSpacing: 16,
       childAspectRatio: 1.5,
       children: [
-        _buildRuleCard('Starting Capital', '${session.currency}${session.startingBalance}', Icons.payments_rounded),
-        _buildRuleCard('GO Bonus', '${session.currency}${session.goAmount}', Icons.autorenew_rounded),
+        _buildRuleCard('Starting Capital', CurrencyFormatter.formatMoney(_session.currency, _session.startingBalance), Icons.payments_rounded),
+        _buildRuleCard('GO Bonus', CurrencyFormatter.formatMoney(_session.currency, _session.goAmount), Icons.autorenew_rounded),
       ],
     );
   }
@@ -187,9 +216,16 @@ class GameSettingsPage extends StatelessWidget {
               Icon(icon, color: AppTheme.primaryColor, size: 14),
             ],
           ),
-          Text(
-            value,
-            style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          SizedBox(
+            width: double.infinity,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
         ],
       ),
@@ -197,8 +233,9 @@ class GameSettingsPage extends StatelessWidget {
   }
 
   Widget _buildPlayersList(BuildContext context, bool isBanker, String? currentUserId) {
+    final activePlayers = _session.activePlayers;
     return Column(
-      children: session.players.map((player) {
+      children: activePlayers.map((player) {
         final isSelf = player.userId == currentUserId;
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
@@ -340,18 +377,25 @@ class GameSettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Transfer Banker Role?'),
-        content: Text('Are you sure you want to transfer the Banker role to ${player.name}? You will lose Banker privileges.'),
+        title: const Text('Transfer ownership?'),
+        content: Text(
+          'Transfer Banker role and session host to ${player.name}? You will lose host and Banker privileges.',
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
           TextButton(
             onPressed: () {
               context.read<SessionBloc>().add(SessionTransferBankerRequested(
-                sessionId: session.id,
-                newBankerPlayerId: player.userId,
+                sessionId: _session.id,
+                newBankerPlayerId: player.id,
               ));
               Navigator.pop(ctx);
-              Navigator.pop(context); // Close settings page
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${player.name} is now the Banker and session host.'),
+                  backgroundColor: AppTheme.primaryColor,
+                ),
+              );
             },
             child: const Text('TRANSFER', style: TextStyle(color: Colors.orangeAccent)),
           ),
@@ -372,10 +416,13 @@ class GameSettingsPage extends StatelessWidget {
           TextButton(
             onPressed: () {
               context.read<SessionBloc>().add(SessionKickRequested(
-                sessionId: session.id,
-                playerUserId: player.userId,
+                sessionId: _session.id,
+                targetPlayerId: player.id,
               ));
               Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${player.name} was removed from the session.')),
+              );
             },
             child: const Text('KICK', style: TextStyle(color: Colors.redAccent)),
           ),
@@ -395,7 +442,7 @@ class GameSettingsPage extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionEndRequested(session.id));
+              context.read<SessionBloc>().add(SessionEndRequested(_session.id));
               Navigator.pop(ctx);
               Navigator.pop(context); // Close settings
             },
@@ -408,8 +455,9 @@ class GameSettingsPage extends StatelessWidget {
 
   void _showLeaveSessionDialog(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = session.players.any((p) => p.userId == currentUserId && p.isBanker);
-    final hasOthers = session.players.length > 1;
+    final isBanker = _session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
+    final activeCount = _session.activePlayers.length;
+    final hasOthers = activeCount > 1;
 
     showDialog(
       context: context,
@@ -417,17 +465,17 @@ class GameSettingsPage extends StatelessWidget {
         backgroundColor: AppTheme.surfaceContainerHigh,
         title: const Text('Leave Session?'),
         content: Text(
-          isBanker 
-            ? (hasOthers 
-                ? 'As the Banker, leaving will randomly transfer your role to another player. Continue?' 
-                : 'Leaving will end the session as you are the only player. Continue?')
-            : 'Are you sure you want to leave this session?'
+          isBanker
+            ? (hasOthers
+                ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
+                : 'You are the only player. Leaving will end the session for everyone. Continue?')
+            : 'You will leave this session and return to the home screen. Continue?'
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionLeaveRequested(session.id));
+              context.read<SessionBloc>().add(SessionLeaveRequested(_session.id));
               Navigator.pop(ctx);
               Navigator.pop(context); // Close settings
               // Dashboard listener will handle navigation to home

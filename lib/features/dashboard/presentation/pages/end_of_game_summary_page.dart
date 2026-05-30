@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
+import 'package:monoledger/core/utils/currency_formatter.dart';
+import 'package:monoledger/core/widgets/overflow_safe_text.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart';
 import 'package:monoledger/features/home/domain/entities/player.dart';
+import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 
 class EndOfGameSummaryPage extends StatelessWidget {
   final Session session;
@@ -11,7 +14,10 @@ class EndOfGameSummaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sortedPlayers = List<Player>.from(session.players)
+    final standings = session.activePlayers.isNotEmpty
+        ? session.activePlayers
+        : session.players.where((p) => p.status != 'KICKED').toList();
+    final sortedPlayers = List<Player>.from(standings)
       ..sort((a, b) => b.balance.compareTo(a.balance));
     
     final winner = sortedPlayers.isNotEmpty ? sortedPlayers.first : null;
@@ -159,13 +165,16 @@ class EndOfGameSummaryPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
             ),
-            child: Text(
-              '${session.currency}${winner.balance.toStringAsFixed(0)}',
-              style: GoogleFonts.spaceMono(
-                color: AppTheme.primaryColor,
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                CurrencyFormatter.formatMoney(session.currency, winner.balance),
+                style: GoogleFonts.spaceMono(
+                  color: AppTheme.primaryColor,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -2,
+                ),
               ),
             ),
           ),
@@ -195,7 +204,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
         Expanded(
           child: _buildStatCard(
             'Total Volume',
-            '${session.currency}${totalMoney.toStringAsFixed(0)}',
+            CurrencyFormatter.formatMoney(session.currency, totalMoney),
             Icons.payments_rounded,
             const Color(0xFF44A5FF),
           ),
@@ -296,8 +305,9 @@ class EndOfGameSummaryPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                '${session.currency}${player.balance.toStringAsFixed(0)}',
+              RowTrailingValue(
+                maxWidth: 120,
+                text: CurrencyFormatter.formatMoney(session.currency, player.balance),
                 style: GoogleFonts.spaceMono(
                   color: isWinner ? Colors.amber : Colors.white.withValues(alpha: 0.6),
                   fontWeight: FontWeight.bold,

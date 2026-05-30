@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
-import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
-import 'package:monoledger/features/dashboard/presentation/pages/game_settings_page.dart';
+import 'package:monoledger/core/widgets/overflow_safe_text.dart';
+import 'package:monoledger/features/dashboard/presentation/utils/ledger_display.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Ledger Tab
-// ─────────────────────────────────────────────────────────────────────────────
+import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
+import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/transactions/domain/entities/transaction.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
 
 class LedgerTab extends StatelessWidget {
   const LedgerTab({super.key});
@@ -16,156 +17,158 @@ class LedgerTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
-      builder: (context, state) {
-        final domain.Session? session = state is SessionSuccess ? state.session : null;
+      builder: (context, sessionState) {
+        final domain.Session? session =
+            sessionState is SessionSuccess ? sessionState.session : null;
 
-        return CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+        return BlocBuilder<TransactionBloc, TransactionState>(
+          builder: (context, txState) {
+            final transactions = switch (txState) {
+              TransactionListLoaded(:final transactions) => transactions,
+              _ => <LedgerTransaction>[],
+            };
+
+            return CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              'Ledger',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -1,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.surfaceContainerHigh,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  session?.players.length.toString() ?? '...',
-                                  style: GoogleFonts.spaceMono(
-                                    color: Colors.white.withValues(alpha: 0.6),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Ledger',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -1,
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.surfaceContainerHigh,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      transactions.length.toString(),
+                                      style: GoogleFonts.spaceMono(
+                                        color: Colors.white.withValues(alpha: 0.6),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+                            if (session != null)
+                              IconButton(
+                                onPressed: () => context.push('/game-settings', extra: session),
+                                icon: const Icon(Icons.settings_outlined, color: AppTheme.primaryColor),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppTheme.surfaceContainerHigh,
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                              ),
                           ],
                         ),
-                        if (session != null)
-                          IconButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => GameSettingsPage(session: session),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.settings_outlined, color: AppTheme.primaryColor),
-                            style: IconButton.styleFrom(
-                              backgroundColor: AppTheme.surfaceContainerHigh,
-                              padding: const EdgeInsets.all(12),
-                            ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'All session transactions',
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 14,
+                            height: 1.5,
                           ),
+                        ),
+                        const SizedBox(height: 28),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'All session transactions — visible to everyone',
-                      style: GoogleFonts.inter(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 14,
-                        height: 1.5,
+                  ),
+                ),
+                if (session == null)
+                  const SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                    ),
+                  )
+                else if (transactions.isEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        'No transactions yet',
+                        style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5)),
                       ),
                     ),
-                    const SizedBox(height: 28),
-                  ],
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  _LedgerItem(
-                    type: _TxType.fromBank,
-                    title: 'From The Bank',
-                    subtitle: 'PASSED GO • ALEX',
-                    time: '3m ago',
-                    amount: '+\$200',
-                    isPositive: true,
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    sliver: SliverList.builder(
+                      itemCount: transactions.length,
+                      itemBuilder: (context, index) {
+                        final tx = transactions[index];
+                        final item = ledgerDisplayItem(
+                          tx: tx,
+                          currency: session.currency,
+                          players: session.activePlayers,
+                        );
+                        return Column(
+                          children: [
+                            if (index > 0) const _LedgerDivider(),
+                            _LedgerItem(
+                              type: _mapType(item.type),
+                              title: item.title,
+                              subtitle: item.subtitle,
+                              time: item.timeLabel,
+                              amount: item.amountLabel,
+                              isPositive: item.isPositive,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
-                  _LedgerDivider(),
-                  _LedgerItem(
-                    type: _TxType.playerToPlayer,
-                    title: 'Sarah → Chris',
-                    subtitle: 'RENT (BROADWALK) • SARAH',
-                    time: '8m ago',
-                    amount: '-\$50',
-                    isPositive: false,
-                  ),
-                  _LedgerDivider(),
-                  _LedgerItem(
-                    type: _TxType.fromBank,
-                    title: 'From The Bank',
-                    subtitle: 'UTILITY BONUS • CHRIS',
-                    time: '15m ago',
-                    amount: '+\$150',
-                    isPositive: true,
-                  ),
-                  _LedgerDivider(),
-                  _LedgerItem(
-                    type: _TxType.playerToPlayer,
-                    title: 'Alex → Sarah',
-                    subtitle: 'PROPERTY TRADE • ALEX',
-                    time: '34m ago',
-                    amount: '-\$2,500',
-                    isPositive: false,
-                  ),
-                  _LedgerDivider(),
-                  _LedgerItem(
-                    type: _TxType.toBank,
-                    title: 'To The Bank',
-                    subtitle: 'INCOME TAX • CHRIS',
-                    time: '1h ago',
-                    amount: '-\$200',
-                    isPositive: false,
-                  ),
-                  _LedgerDivider(),
-                  _LedgerItem(
-                    type: _TxType.fromBank,
-                    title: 'From The Bank',
-                    subtitle: 'PASSED GO • SARAH',
-                    time: '2h ago',
-                    amount: '+\$200',
-                    isPositive: true,
-                  ),
-                  const SizedBox(height: 80),
-                ]),
-              ),
-            ),
-          ],
+                const SliverToBoxAdapter(child: SizedBox(height: 80)),
+              ],
+            );
+          },
         );
       },
     );
+  }
+
+  _TxType _mapType(TransactionType type) {
+    switch (type) {
+      case TransactionType.fromBank:
+      case TransactionType.collectGo:
+        return _TxType.fromBank;
+      case TransactionType.payBank:
+        return _TxType.toBank;
+      case TransactionType.playerToPlayer:
+        return _TxType.playerToPlayer;
+    }
   }
 }
 
 enum _TxType { fromBank, toBank, playerToPlayer }
 
 class _LedgerDivider extends StatelessWidget {
+  const _LedgerDivider();
+
   @override
   Widget build(BuildContext context) {
     return Divider(
@@ -267,8 +270,9 @@ class _LedgerItem extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            amount,
+          RowTrailingValue(
+            maxWidth: 112,
+            text: amount,
             style: GoogleFonts.spaceMono(
               color: isPositive ? AppTheme.primaryColor : const Color(0xFFFF5252),
               fontSize: 18,

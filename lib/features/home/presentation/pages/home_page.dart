@@ -34,7 +34,8 @@ class HomePage extends StatelessWidget {
                     const SizedBox(height: 48),
                     
                     // Action Buttons
-                    BlocConsumer<SessionBloc, SessionState>(
+                    BlocListener<SessionBloc, SessionState>(
+                      listenWhen: (_, state) => state is SessionError,
                       listener: (context, state) {
                         if (state is SessionError) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -43,35 +44,26 @@ class HomePage extends StatelessWidget {
                               backgroundColor: AppTheme.errorColor,
                             ),
                           );
-                        } else if (state is SessionSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('SESSION CREATED: ${state.session.joinCode}'),
-                              backgroundColor: AppTheme.primaryColor,
-                            ),
-                          );
                         }
                       },
-                      builder: (context, state) {
-                        return Column(
-                          children: [
-                            _LandingButton(
-                              label: 'CREATE SESSION',
-                              icon: Icons.add_circle,
-                              isPrimary: true,
-                              isLoading: false,
-                              onPressed: () => context.push('/create-session'),
-                            ),
-                            const SizedBox(height: 16),
-                            _LandingButton(
-                              label: 'JOIN SESSION',
-                              icon: Icons.arrow_forward,
-                              isPrimary: false,
-                              onPressed: () => context.push('/join-session'),
-                            ),
-                          ],
-                        );
-                      },
+                      child: Column(
+                        children: [
+                          _LandingButton(
+                            label: 'CREATE SESSION',
+                            icon: Icons.add_circle,
+                            isPrimary: true,
+                            isLoading: false,
+                            onPressed: () => context.push('/create-session'),
+                          ),
+                          const SizedBox(height: 16),
+                          _LandingButton(
+                            label: 'JOIN SESSION',
+                            icon: Icons.arrow_forward,
+                            isPrimary: false,
+                            onPressed: () => context.push('/join-session'),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 40),
                     
@@ -99,7 +91,7 @@ class HomePage extends StatelessWidget {
                     
                     // Footer Text
                     Text(
-                      'Supports 2-10 players. Optimized for\nMonopoly, Life & more.',
+                      'Supports 2-10 players. \nOptimized for\nMonopoly, Life & more.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.plusJakartaSans(
                         color: Colors.white.withValues(alpha: 0.5),
