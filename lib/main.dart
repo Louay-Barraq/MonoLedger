@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
+import 'package:monoledger/core/utils/payment_pad_route.dart';
 import 'package:monoledger/init_dependencies.dart';
 
 import 'package:monoledger/features/splash/presentation/pages/splash_page.dart';
@@ -11,9 +12,13 @@ import 'package:monoledger/features/session/presentation/pages/create_session_pa
 import 'package:monoledger/features/session/presentation/pages/join_session_page.dart';
 import 'package:monoledger/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:monoledger/features/dashboard/presentation/pages/payment_pad_page.dart';
+import 'package:monoledger/features/dashboard/presentation/pages/game_settings_page.dart';
+import 'package:monoledger/features/dashboard/presentation/pages/end_of_game_summary_page.dart';
 
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/home/domain/entities/session.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,16 +60,30 @@ final _router = GoRouter(
       path: '/payment-pad',
       builder: (context, state) {
         final Map<String, dynamic> args = state.extra as Map<String, dynamic>? ?? {};
-        final targetName = args['targetName'] as String? ?? 'Unknown';
-        final isPaying = args['isPaying'] as bool? ?? true;
-        
         return PaymentPadPage(
-          targetName: targetName,
-          isPaying: isPaying,
+          targetName: args[PaymentPadRoute.targetName] as String? ?? 'Unknown',
+          isPaying: args[PaymentPadRoute.isPaying] as bool? ?? true,
+          sessionId: args[PaymentPadRoute.sessionId] as String? ?? '',
+          currency: args[PaymentPadRoute.currency] as String? ?? '\$',
+          recipientPlayerId: args[PaymentPadRoute.recipientPlayerId] as String?,
+          isBankTarget: args[PaymentPadRoute.isBankTarget] as bool? ?? false,
         );
       },
     ),
-    // TODO: Add other routes
+    GoRoute(
+      path: '/game-settings',
+      builder: (context, state) {
+        final session = state.extra as Session;
+        return GameSettingsPage(session: session);
+      },
+    ),
+    GoRoute(
+      path: '/end-summary',
+      builder: (context, state) {
+        final session = state.extra as Session;
+        return EndOfGameSummaryPage(session: session);
+      },
+    ),
   ],
 );
 
@@ -80,6 +99,9 @@ class MonoLedgerApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => serviceLocator<SessionBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => serviceLocator<TransactionBloc>(),
         ),
       ],
       child: MaterialApp.router(
