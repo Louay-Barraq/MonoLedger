@@ -25,10 +25,22 @@ tasks.register<Delete>("clean") {
 
 subprojects {
     val projectObj = this
-    pluginManager.withPlugin("com.android.library") {
+    val configureProject = {
         val android = projectObj.extensions.findByName("android")
         if (android != null) {
             try {
+                // Force compileSdk to 36 to resolve android:attr/lStar AAPT linking errors in older library dependencies
+                val targetMethods = listOf("compileSdkVersion", "setCompileSdkVersion", "setCompileSdk", "compileSdk")
+                for (methodName in targetMethods) {
+                    val method = android::class.java.methods.find {
+                        it.name == methodName && it.parameterTypes.size == 1 && (it.parameterTypes[0] == Int::class.java || it.parameterTypes[0] == java.lang.Integer::class.java)
+                    }
+                    if (method != null) {
+                        method.invoke(android, 36)
+                        break
+                    }
+                }
+
                 val getNamespace = android::class.java.methods.find { it.name == "getNamespace" }
                 val setNamespace = android::class.java.methods.find { it.name == "setNamespace" }
                 if (getNamespace != null && setNamespace != null) {
@@ -47,6 +59,14 @@ subprojects {
             } catch (e: Exception) {
                 // Ignore reflection errors
             }
+        }
+    }
+
+    if (projectObj.state.executed) {
+        configureProject()
+    } else {
+        projectObj.afterEvaluate {
+            configureProject()
         }
     }
 }
