@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 import '../../domain/entities/session.dart';
+import '../../domain/entities/session_extensions.dart';
 import '../../domain/repositories/session_repository.dart';
 
 // Events
@@ -51,10 +53,10 @@ class SessionEndRequested extends SessionEvent {
 
 class SessionKickRequested extends SessionEvent {
   final String sessionId;
-  final String playerUserId;
-  const SessionKickRequested({required this.sessionId, required this.playerUserId});
+  final String targetPlayerId;
+  const SessionKickRequested({required this.sessionId, required this.targetPlayerId});
   @override
-  List<Object> get props => [sessionId, playerUserId];
+  List<Object> get props => [sessionId, targetPlayerId];
 }
 
 class SessionTransferBankerRequested extends SessionEvent {
@@ -70,6 +72,13 @@ class SessionLeaveRequested extends SessionEvent {
   const SessionLeaveRequested(this.sessionId);
   @override
   List<Object> get props => [sessionId];
+}
+
+class SessionResumeByCodeRequested extends SessionEvent {
+  final String joinCode;
+  const SessionResumeByCodeRequested(this.joinCode);
+  @override
+  List<Object> get props => [joinCode];
 }
 
 // States
@@ -94,10 +103,20 @@ class SessionError extends SessionState {
   List<Object> get props => [message];
 }
 
+/// Current user was removed by the Banker (kick).
+class SessionKicked extends SessionState {
+  const SessionKicked();
+}
+
+class SessionAcknowledgeRemoval extends SessionEvent {
+  const SessionAcknowledgeRemoval();
+}
+
 // BLoC
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final SessionRepository _repository;
   StreamSubscription? _sessionSubscription;
+  bool _voluntaryLeaveInProgress = false;
 
   SessionBloc(this._repository) : super(SessionInitial()) {
     on<SessionCreateRequested>(_onCreateRequested);
@@ -107,6 +126,8 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     on<SessionTransferBankerRequested>(_onTransferBankerRequested);
     on<SessionLeaveRequested>(_onLeaveRequested);
     on<SessionUpdateReceived>(_onUpdateReceived);
+    on<SessionResumeByCodeRequested>(_onResumeByCodeRequested);
+    on<SessionAcknowledgeRemoval>((_, emit) => emit(SessionInitial()));
   }
 
   @override
@@ -152,6 +173,8 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
         errorMessage = 'Invalid session code. Please check and try again.';
       } else if (errorStr.contains('session_closed')) {
         errorMessage = 'This session is no longer active.';
+      } else if (errorStr.contains('player_kicked') || errorStr.contains('removed from this session')) {
+        errorMessage = 'You were removed from this session and cannot rejoin.';
       } else if (errorStr.contains('socket') || errorStr.contains('network') || errorStr.contains('connection')) {
         errorMessage = 'Network error. Please check your connection.';
       }
@@ -161,7 +184,25 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   }
 
   void _onUpdateReceived(SessionUpdateReceived event, Emitter<SessionState> emit) {
-    emit(SessionSuccess(event.session));
+    if (_voluntaryLeaveInProgress) return;
+
+    final session = event.session;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final myPlayer = session.playerByUserId(userId);
+
+    if (myPlayer?.status == 'KICKED') {
+      _sessionSubscription?.cancel();
+      emit(const SessionKicked());
+      return;
+    }
+
+    if (!session.isUserActive(userId)) {
+      _sessionSubscription?.cancel();
+      emit(SessionInitial());
+      return;
+    }
+
+    emit(SessionSuccess(session));
   }
 
   Future<void> _onEndRequested(SessionEndRequested event, Emitter<SessionState> emit) async {
@@ -174,9 +215,9 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   Future<void> _onKickRequested(SessionKickRequested event, Emitter<SessionState> emit) async {
     try {
-      await _repository.kickPlayer(event.sessionId, event.playerUserId);
+      await _repository.kickPlayer(event.sessionId, event.targetPlayerId);
     } catch (e) {
-      emit(SessionError(e.toString()));
+      emit(SessionError(_mapSessionError(e)));
     }
   }
 
@@ -184,14 +225,49 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     try {
       await _repository.transferBankerRole(event.sessionId, event.newBankerPlayerId);
     } catch (e) {
-      emit(SessionError(e.toString()));
+      emit(SessionError(_mapSessionError(e)));
     }
   }
 
   Future<void> _onLeaveRequested(SessionLeaveRequested event, Emitter<SessionState> emit) async {
+    _voluntaryLeaveInProgress = true;
     try {
       await _repository.leaveSession(event.sessionId);
-      emit(SessionInitial()); // Go back to initial state after leaving
+      await _sessionSubscription?.cancel();
+      _sessionSubscription = null;
+      emit(SessionInitial());
+    } catch (e) {
+      emit(SessionError(_mapSessionError(e)));
+    } finally {
+      _voluntaryLeaveInProgress = false;
+    }
+  }
+
+  String _mapSessionError(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('only_banker') || msg.contains('only the banker')) {
+      return 'Only the Banker can perform this action.';
+    }
+    if (msg.contains('player_not_found')) {
+      return 'That player is no longer in the session.';
+    }
+    return 'Session action failed. Please try again.';
+  }
+
+  Future<void> _onResumeByCodeRequested(
+    SessionResumeByCodeRequested event,
+    Emitter<SessionState> emit,
+  ) async {
+    if (state is SessionSuccess) return;
+    emit(SessionLoading());
+    try {
+      final session = await _repository.fetchSessionByJoinCode(event.joinCode);
+      if (session == null) {
+        emit(const SessionError('Session not found. Join again from the home screen.'));
+        return;
+      }
+      _startWatching(session.id);
+      emit(SessionSuccess(session));
     } catch (e) {
       emit(SessionError(e.toString()));
     }

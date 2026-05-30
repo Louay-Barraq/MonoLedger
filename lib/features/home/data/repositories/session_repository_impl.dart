@@ -38,8 +38,8 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
-  Future<void> kickPlayer(String sessionId, String playerUserId) async {
-    await _remoteDataSource.kickPlayer(sessionId, playerUserId);
+  Future<void> kickPlayer(String sessionId, String targetPlayerId) async {
+    await _remoteDataSource.kickPlayer(sessionId, targetPlayerId);
   }
 
   @override
@@ -50,5 +50,10 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   Stream<Session> watchSession(String sessionId) {
     return _remoteDataSource.watchSession(sessionId);
+  }
+
+  @override
+  Future<Session?> fetchSessionByJoinCode(String joinCode) {
+    return _remoteDataSource.fetchSessionByJoinCode(joinCode);
   }
 }

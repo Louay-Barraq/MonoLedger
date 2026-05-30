@@ -10,7 +10,8 @@ abstract interface class SessionRepository {
   Future<Session> joinSession(String joinCode, String playerName);
   Future<void> leaveSession(String sessionId);
   Future<void> endSession(String sessionId);
-  Future<void> kickPlayer(String sessionId, String playerUserId);
+  Future<void> kickPlayer(String sessionId, String targetPlayerId);
   Future<void> transferBankerRole(String sessionId, String newBankerPlayerId);
   Stream<Session> watchSession(String sessionId);
+  Future<Session?> fetchSessionByJoinCode(String joinCode);
 }

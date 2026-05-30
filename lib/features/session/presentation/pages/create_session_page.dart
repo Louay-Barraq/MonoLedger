@@ -222,7 +222,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     children: [
                       _sectionTitle('STARTING CAPITAL'),
                       Text(
-                        '$_currencySymbol ${CurrencyFormatter.formatAmount(_startingCapital)}',
+                        CurrencyFormatter.formatMoney(_currencySymbol, _startingCapital),
                         style: GoogleFonts.spaceMono(
                           color: AppTheme.primaryColor,
                           fontSize: 18,
@@ -328,7 +328,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     children: [
                       _sectionTitle('GO AMOUNT'),
                       Text(
-                        '$_currencySymbol ${CurrencyFormatter.formatAmount(_goAmount)}',
+                        CurrencyFormatter.formatMoney(_currencySymbol, _goAmount),
                         style: GoogleFonts.spaceMono(
                           color: AppTheme.primaryColor,
                           fontSize: 18,
@@ -568,7 +568,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$_currencySymbol ${CurrencyFormatter.formatAmount(amount)}',
+              CurrencyFormatter.formatMoney(_currencySymbol, amount),
               style: GoogleFonts.spaceMono(
                 color: isSelected ? AppTheme.primaryColor : Colors.white,
                 fontSize: 18,
