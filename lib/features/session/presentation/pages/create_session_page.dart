@@ -6,6 +6,8 @@ import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/core/utils/thousands_separator_formatter.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/go_request_bloc.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
 
 class CreateSessionPage extends StatefulWidget {
   const CreateSessionPage({super.key});
@@ -441,6 +443,8 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                                 return;
                               }
                               
+                              context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+                              context.read<GoRequestBloc>().add(const GoRequestsWatchStopped());
                               context.read<SessionBloc>().add(
                                 SessionCreateRequested(
                                   currency: _currencySymbol,

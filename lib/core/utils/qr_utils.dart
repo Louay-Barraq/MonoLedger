@@ -4,8 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:monoledger/core/utils/join_code_parser.dart';
 
 class QrUtils {
+  static String joinPayload(String sessionCode) => JoinCodeParser.encodeForQr(sessionCode);
+
   static void showQrBottomSheet(BuildContext context, String code) {
     showModalBottomSheet(
       context: context,
@@ -65,7 +68,7 @@ class QrUtils {
                       ],
                     ),
                     child: QrImageView(
-                      data: code,
+                      data: joinPayload(code),
                       version: QrVersions.auto,
                       size: 200.0,
                       backgroundColor: Colors.white,
