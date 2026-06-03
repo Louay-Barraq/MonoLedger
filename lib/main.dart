@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:monoledger/core/localization/app_locale.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/payment_pad_route.dart';
 import 'package:monoledger/init_dependencies.dart';
@@ -9,7 +12,9 @@ import 'package:monoledger/features/splash/presentation/pages/splash_page.dart';
 import 'package:monoledger/features/splash/presentation/pages/onboarding_page.dart';
 import 'package:monoledger/features/home/presentation/pages/home_page.dart';
 import 'package:monoledger/features/session/presentation/pages/create_session_page.dart';
-import 'package:monoledger/features/session/presentation/pages/join_session_page.dart';
+import 'package:monoledger/features/session/presentation/pages/join_method_page.dart';
+import 'package:monoledger/features/session/presentation/pages/join_session_code_page.dart';
+import 'package:monoledger/features/session/presentation/pages/join_session_scan_page.dart';
 import 'package:monoledger/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:monoledger/features/dashboard/presentation/pages/payment_pad_page.dart';
 import 'package:monoledger/features/dashboard/presentation/pages/game_settings_page.dart';
@@ -18,7 +23,12 @@ import 'package:monoledger/features/dashboard/presentation/pages/end_of_game_sum
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/go_request_bloc.dart';
 import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
+import 'package:monoledger/features/settings/presentation/cubit/locale_cubit.dart';
+import 'package:monoledger/features/settings/presentation/pages/settings_page.dart';
+import 'package:monoledger/features/settings/presentation/pages/help_page.dart';
+import 'package:monoledger/features/settings/presentation/pages/about_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +57,18 @@ final _router = GoRouter(
     ),
     GoRoute(
       path: '/join-session',
-      builder: (context, state) => const JoinSessionPage(),
+      builder: (context, state) => const JoinMethodPage(),
+    ),
+    GoRoute(
+      path: '/join-session/code',
+      builder: (context, state) {
+        final code = state.uri.queryParameters['code'];
+        return JoinSessionCodePage(initialCode: code);
+      },
+    ),
+    GoRoute(
+      path: '/join-session/scan',
+      builder: (context, state) => const JoinSessionScanPage(),
     ),
     GoRoute(
       path: '/dashboard',
@@ -84,6 +105,20 @@ final _router = GoRouter(
         return EndOfGameSummaryPage(session: session);
       },
     ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsPage(),
+      routes: [
+        GoRoute(
+          path: 'help',
+          builder: (context, state) => const HelpPage(),
+        ),
+        GoRoute(
+          path: 'about',
+          builder: (context, state) => const AboutPage(),
+        ),
+      ],
+    ),
   ],
 );
 
@@ -103,12 +138,30 @@ class MonoLedgerApp extends StatelessWidget {
         BlocProvider(
           create: (context) => serviceLocator<TransactionBloc>(),
         ),
+        BlocProvider(
+          create: (context) => serviceLocator<GoRequestBloc>(),
+        ),
+        BlocProvider.value(
+          value: serviceLocator<LocaleCubit>(),
+        ),
       ],
-      child: MaterialApp.router(
-        title: 'MonoLedger',
-        theme: AppTheme.darkTheme,
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
+      child: BlocBuilder<LocaleCubit, LocaleState>(
+        builder: (context, localeState) {
+          return MaterialApp.router(
+            title: 'MonoLedger',
+            theme: AppTheme.darkTheme,
+            locale: localeState.locale,
+            supportedLocales: AppLocale.supported,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            routerConfig: _router,
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }

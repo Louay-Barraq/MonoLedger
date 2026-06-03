@@ -6,7 +6,7 @@ MonoLedger is a tactical board game currency manager designed to replace physica
 
 ### 1. Session Management
 -   **Host Role**: Creates a session, defines starting capital, and sets currency denominations.
--   **Join via Code/QR**: Players join instantly by scanning or entering a short code.
+-   **Join via Code/QR**: Players choose to enter a 6-character code or scan the host's QR code.
 -   **Live Sync**: All transactions are broadcasted to all participants in real-time.
 
 ### 2. Transaction Engine
@@ -23,6 +23,7 @@ MonoLedger is a tactical board game currency manager designed to replace physica
 
 ### The "Bank"
 -   The session host usually acts as the Bank, though the app supports a shared/automated Bank entity.
+-   **GO salary** requires Banker approval (incoming-call style prompt on the Banker's screen). The Banker collects GO instantly without approval.
 -   All transfers from the Bank must be double-confirmed if they exceed 50% of the total game liquidity.
 
 ### Denominations

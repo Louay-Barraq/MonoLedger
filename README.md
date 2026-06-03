@@ -26,7 +26,7 @@ flutter pub get
 2. Apply database migrations in the Supabase SQL editor (in order):
 
    - Existing project RPCs (`join_session_by_code`, etc.) must already be present
-   - Run migrations in order under `supabase/migrations/` (including `20250529160000_fix_join_session_rejoin.sql` for leave/rejoin and kicked-player rules)
+   - Run migrations in order under `supabase/migrations/` (including `20250529160000_fix_join_session_rejoin.sql` and `20250529170000_go_salary_requests.sql` for banker-approved GO collect)
 
 3. Run the app (optional custom credentials):
 
