@@ -9,6 +9,8 @@ import 'package:monoledger/features/dashboard/presentation/pages/players_tab.dar
 import 'package:monoledger/features/dashboard/presentation/pages/wallet_tab.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_app_bar.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_bottom_nav.dart';
+import 'package:monoledger/features/dashboard/presentation/widgets/go_approval_banner_host.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/go_request_bloc.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
@@ -28,6 +30,8 @@ class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0;
   bool _initialized = false;
   bool _handlingRemoval = false;
+  String? _watchedSessionId;
+  String? _watchedGoSessionId;
 
   @override
   void didChangeDependencies() {
@@ -39,18 +43,46 @@ class _DashboardPageState extends State<DashboardPage> {
     if (sessionState is! SessionSuccess) {
       context.read<SessionBloc>().add(SessionResumeByCodeRequested(widget.sessionCode));
     } else {
-      _startTransactionWatch(sessionState.session.id);
+      _startSessionWatches(sessionState.session.id);
     }
   }
 
+  void _startSessionWatches(String sessionId) {
+    _startTransactionWatch(sessionId);
+    _startGoRequestWatch(sessionId);
+  }
+
   void _startTransactionWatch(String sessionId) {
+    if (_watchedSessionId == sessionId) return;
+    _watchedSessionId = sessionId;
     context.read<TransactionBloc>().add(TransactionsWatchStarted(sessionId));
+  }
+
+  void _stopTransactionWatch() {
+    _watchedSessionId = null;
+    context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+  }
+
+  void _startGoRequestWatch(String sessionId) {
+    if (_watchedGoSessionId == sessionId) return;
+    _watchedGoSessionId = sessionId;
+    context.read<GoRequestBloc>().add(GoRequestsWatchStarted(sessionId));
+  }
+
+  void _stopGoRequestWatch() {
+    _watchedGoSessionId = null;
+    context.read<GoRequestBloc>().add(const GoRequestsWatchStopped());
+  }
+
+  void _stopAllWatches() {
+    _stopTransactionWatch();
+    _stopGoRequestWatch();
   }
 
   Future<void> _handleKicked() async {
     if (_handlingRemoval || !mounted) return;
     _handlingRemoval = true;
-    context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+    _stopAllWatches();
     await showKickedFromSessionDialog(context);
     if (!mounted) return;
     context.read<SessionBloc>().add(const SessionAcknowledgeRemoval());
@@ -60,7 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _handleSessionEnded(domain.Session session) async {
     if (!mounted) return;
-    context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+    _stopAllWatches();
     context.pushReplacement('/end-summary', extra: session);
   }
 
@@ -72,14 +104,14 @@ class _DashboardPageState extends State<DashboardPage> {
           _handleKicked();
         } else if (state is SessionInitial) {
           if (_handlingRemoval) return;
-          context.read<TransactionBloc>().add(const TransactionsWatchStopped());
+          _stopAllWatches();
           context.go('/home');
         } else if (state is SessionError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
           );
         } else if (state is SessionSuccess) {
-          _startTransactionWatch(state.session.id);
+          _startSessionWatches(state.session.id);
 
           final session = state.session;
           if (session.status == 'ended') {
@@ -110,16 +142,26 @@ class _DashboardPageState extends State<DashboardPage> {
                 QrUtils.showQrBottomSheet(context, widget.sessionCode);
               },
             ),
-            body: state is SessionLoading
-                ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
-                : IndexedStack(
-                    index: _currentIndex,
-                    children: [
-                      WalletTab(sessionCode: widget.sessionCode),
-                      const LedgerTab(),
-                      PlayersTab(sessionCode: widget.sessionCode),
-                    ],
-                  ),
+            body: Stack(
+              children: [
+                state is SessionLoading
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
+                    : IndexedStack(
+                        index: _currentIndex,
+                        children: [
+                          WalletTab(sessionCode: widget.sessionCode),
+                          LedgerTab(key: ValueKey(session?.id ?? 'ledger')),
+                          PlayersTab(sessionCode: widget.sessionCode),
+                        ],
+                      ),
+                Positioned(
+                  top: 8,
+                  left: 16,
+                  right: 16,
+                  child: const GoApprovalBannerHost(),
+                ),
+              ],
+            ),
             bottomNavigationBar: DashboardBottomNav(
               currentIndex: _currentIndex,
               onTap: (i) => setState(() => _currentIndex = i),

@@ -9,7 +9,7 @@ import 'package:monoledger/core/utils/payment_pad_route.dart';
 import 'package:monoledger/features/home/domain/entities/player.dart';
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
-import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
+import 'package:monoledger/features/transactions/presentation/bloc/go_request_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class WalletTab extends StatelessWidget {
@@ -51,6 +51,7 @@ class WalletTab extends StatelessWidget {
                 goAmount: session.goAmount,
                 currency: session.currency,
                 sessionId: session.id,
+                myPlayerId: currentPlayer?.id,
                 enabled: currentPlayer != null && session.status == 'open',
               ),
               const SizedBox(height: 24),
@@ -171,7 +172,6 @@ class _BalanceCard extends StatelessWidget {
         ? ((balance - startingBalance) / startingBalance * 100).round()
         : 0;
     final isPositive = pctChange >= 0;
-    final trendColor = isPositive ? AppTheme.primaryColor : AppTheme.errorColor;
 
     return Container(
       padding: const EdgeInsets.all(28),
@@ -207,23 +207,23 @@ class _BalanceCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: trendColor.withValues(alpha: 0.12),
+              color: AppTheme.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: trendColor.withValues(alpha: 0.3)),
+              border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                  color: trendColor,
+                  color: AppTheme.primaryColor,
                   size: 16,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '${isPositive ? '+' : ''}$pctChange% vs START',
                   style: GoogleFonts.spaceMono(
-                    color: trendColor,
+                    color: AppTheme.primaryColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -242,50 +242,56 @@ class _GoSalaryBanner extends StatelessWidget {
   final int goAmount;
   final String currency;
   final String sessionId;
+  final String? myPlayerId;
   final bool enabled;
 
   const _GoSalaryBanner({
     required this.goAmount,
     required this.currency,
     required this.sessionId,
+    required this.myPlayerId,
     required this.enabled,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TransactionBloc, TransactionState>(
+    return BlocConsumer<GoRequestBloc, GoRequestState>(
       listenWhen: (prev, curr) =>
-          curr is TransactionSuccess || curr is TransactionError,
+          curr is GoRequestLoaded && curr.statusMessage != null,
       listener: (context, state) {
-        if (state is TransactionSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.message,
-                style: GoogleFonts.spaceMono(color: Colors.black),
+        if (state is! GoRequestLoaded || state.statusMessage == null) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              state.statusMessage!,
+              style: GoogleFonts.spaceMono(
+                color: state.statusIsError ? Colors.white : Colors.black,
               ),
-              backgroundColor: AppTheme.primaryColor,
             ),
-          );
-        } else if (state is TransactionError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppTheme.errorColor,
-            ),
-          );
-        }
+            backgroundColor:
+                state.statusIsError ? AppTheme.errorColor : AppTheme.primaryColor,
+          ),
+        );
+        context.read<GoRequestBloc>().add(const GoRequestStatusCleared());
       },
-      child: GestureDetector(
-        onTap: enabled
+      builder: (context, goState) {
+        final loaded = goState is GoRequestLoaded ? goState : null;
+        final hasPending = myPlayerId != null &&
+            (loaded?.requests.any(
+                  (r) => r.requesterPlayerId == myPlayerId && r.isPending,
+                ) ??
+                false);
+        final isBusy = loaded?.actionInProgress ?? false;
+        final canTap = enabled && !hasPending && !isBusy;
+
+        return GestureDetector(
+        onTap: canTap
             ? () {
-                context.read<TransactionBloc>().add(
-                      CollectGoSalaryRequested(sessionId: sessionId),
-                    );
+                context.read<GoRequestBloc>().add(GoCollectRequested(sessionId));
               }
             : null,
         child: Opacity(
-          opacity: enabled ? 1 : 0.5,
+          opacity: canTap ? 1 : 0.55,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             decoration: BoxDecoration(
@@ -316,7 +322,7 @@ class _GoSalaryBanner extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'COLLECT SALARY',
+                        hasPending ? 'AWAITING BANKER' : 'COLLECT SALARY',
                         style: GoogleFonts.spaceMono(
                           color: Colors.black.withValues(alpha: 0.6),
                           fontSize: 10,
@@ -348,7 +354,8 @@ class _GoSalaryBanner extends StatelessWidget {
             ),
           ),
         ),
-      ),
+        );
+      },
     );
   }
 }

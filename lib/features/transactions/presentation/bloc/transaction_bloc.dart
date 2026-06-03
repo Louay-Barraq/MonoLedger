@@ -63,10 +63,11 @@ class TransactionsWatchStopped extends TransactionEvent {
 }
 
 class TransactionsUpdated extends TransactionEvent {
+  final String sessionId;
   final List<LedgerTransaction> transactions;
-  const TransactionsUpdated(this.transactions);
+  const TransactionsUpdated(this.sessionId, this.transactions);
   @override
-  List<Object?> get props => [transactions];
+  List<Object?> get props => [sessionId, transactions];
 }
 
 // States
@@ -104,6 +105,7 @@ class TransactionError extends TransactionState {
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final TransactionRepository _repository;
   StreamSubscription<List<LedgerTransaction>>? _watchSub;
+  String? _activeSessionId;
   List<LedgerTransaction> _cachedTransactions = [];
 
   TransactionBloc(this._repository) : super(TransactionInitial()) {
@@ -125,10 +127,17 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     TransactionsWatchStarted event,
     Emitter<TransactionState> emit,
   ) async {
+    if (_activeSessionId == event.sessionId && _watchSub != null) return;
+
     await _watchSub?.cancel();
+    _watchSub = null;
+    _activeSessionId = event.sessionId;
+    _cachedTransactions = [];
+    emit(const TransactionListLoaded([]));
+
     _watchSub = _repository.watchTransactions(event.sessionId).listen(
-      (txs) => add(TransactionsUpdated(txs)),
-      onError: (e) => add(const TransactionsUpdated([])),
+      (txs) => add(TransactionsUpdated(event.sessionId, txs)),
+      onError: (_) => add(TransactionsUpdated(event.sessionId, const [])),
     );
   }
 
@@ -138,6 +147,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   ) async {
     await _watchSub?.cancel();
     _watchSub = null;
+    _activeSessionId = null;
     _cachedTransactions = [];
     emit(TransactionInitial());
   }
@@ -146,6 +156,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     TransactionsUpdated event,
     Emitter<TransactionState> emit,
   ) {
+    if (event.sessionId != _activeSessionId) return;
     _cachedTransactions = event.transactions;
     emit(TransactionListLoaded(_cachedTransactions));
   }

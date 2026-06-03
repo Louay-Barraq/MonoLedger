@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -35,6 +37,44 @@ void main() {
     expect: () => [
       isA<TransactionLoading>(),
       isA<TransactionSuccess>(),
+    ],
+  );
+
+  blocTest<TransactionBloc, TransactionState>(
+    'clears ledger when switching watch to a new session id',
+    build: () {
+      when(() => repository.watchTransactions('session-a'))
+          .thenAnswer((_) => Stream.value(const []));
+      when(() => repository.watchTransactions('session-b'))
+          .thenAnswer((_) => Stream.value(const []));
+
+      return bloc;
+    },
+    act: (b) async {
+      b.add(const TransactionsWatchStarted('session-a'));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      b.add(const TransactionsWatchStarted('session-b'));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    },
+    expect: () => [const TransactionListLoaded([])],
+    verify: (b) {
+      expect(b.state, isA<TransactionListLoaded>());
+    },
+  );
+
+  blocTest<TransactionBloc, TransactionState>(
+    'TransactionsWatchStopped resets to initial',
+    build: () => bloc,
+    act: (b) async {
+      when(() => repository.watchTransactions(any()))
+          .thenAnswer((_) => const Stream.empty());
+      b.add(const TransactionsWatchStarted('session-a'));
+      await Future<void>.delayed(Duration.zero);
+      b.add(const TransactionsWatchStopped());
+    },
+    expect: () => [
+      const TransactionListLoaded([]),
+      isA<TransactionInitial>(),
     ],
   );
 }
