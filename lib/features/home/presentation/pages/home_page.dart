@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
 
@@ -11,113 +12,132 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: Stack(
         children: [
           // Background Dot Grid
           const Positioned.fill(child: _DotGridBackground()),
-          
+
           SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo Section
-                    const _LogoSection(),
-                    const SizedBox(height: 32),
-                    
-                    // Title Section
-                    const _TitleSection(),
-                    const SizedBox(height: 48),
-                    
-                    // Action Buttons
-                    BlocListener<SessionBloc, SessionState>(
-                      listenWhen: (_, state) => state is SessionError,
-                      listener: (context, state) {
-                        if (state is SessionError) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(state.message),
-                              backgroundColor: AppTheme.errorColor,
-                            ),
-                          );
-                        }
-                      },
-                      child: Column(
-                        children: [
-                          _LandingButton(
-                            label: 'CREATE SESSION',
-                            icon: Icons.add_circle,
-                            isPrimary: true,
-                            isLoading: false,
-                            onPressed: () => context.push('/create-session'),
-                          ),
-                          const SizedBox(height: 16),
-                          _LandingButton(
-                            label: 'JOIN SESSION',
-                            icon: Icons.arrow_forward,
-                            isPrimary: false,
-                            onPressed: () => context.push('/join-session'),
-                          ),
-                        ],
-                      ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 8,
+                  left: 16,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.settings_rounded,
+                      color: AppTheme.primaryColor,
+                      size: 26,
                     ),
-                    const SizedBox(height: 40),
-                    
-                    // Info Cards Row
-                    const Row(
+                    tooltip: l10n.settingsTitle,
+                    onPressed: () => context.push('/settings'),
+                  ),
+                ),
+                Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: _InfoCard(
-                            icon: Icons.group_outlined,
-                            label: 'CAPACITY',
-                            value: '2-10 PLAYERS',
+                        // Logo Section
+                        const _LogoSection(),
+                        const SizedBox(height: 32),
+
+                        // Title Section
+                        _TitleSection(tagline: l10n.homeTagline),
+                        const SizedBox(height: 48),
+
+                        // Action Buttons
+                        BlocListener<SessionBloc, SessionState>(
+                          listenWhen: (_, state) => state is SessionError,
+                          listener: (context, state) {
+                            if (state is SessionError) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(state.message),
+                                  backgroundColor: AppTheme.errorColor,
+                                ),
+                              );
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              _LandingButton(
+                                label: l10n.homeCreateSession,
+                                icon: Icons.add_circle,
+                                isPrimary: true,
+                                isLoading: false,
+                                onPressed: () => context.push('/create-session'),
+                              ),
+                              const SizedBox(height: 16),
+                              _LandingButton(
+                                label: l10n.homeJoinSession,
+                                icon: Icons.arrow_forward,
+                                isPrimary: false,
+                                onPressed: () => context.push('/join-session'),
+                              ),
+                            ],
                           ),
                         ),
-                        SizedBox(width: 16),
-                        Expanded(
-                          child: _InfoCard(
-                            icon: Icons.flash_on_rounded,
-                            label: 'SYNCING',
-                            value: 'REAL-TIME',
+                        const SizedBox(height: 40),
+
+                        // Info Cards Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _InfoCard(
+                                icon: Icons.group_outlined,
+                                label: l10n.homeCapacity,
+                                value: l10n.homeCapacityValue,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _InfoCard(
+                                icon: Icons.flash_on_rounded,
+                                label: l10n.homeSyncing,
+                                value: l10n.homeSyncingValue,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 48),
+
+                        // Footer Text
+                        Text(
+                          l10n.homeFooter,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white.withValues(alpha: 0.5),
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            3,
+                            (index) => Container(
+                              width: 4,
+                              height: 4,
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppTheme.primaryColor.withValues(alpha: index == 1 ? 1 : 0.2),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 48),
-                    
-                    // Footer Text
-                    Text(
-                      'Supports 2-10 players. \nOptimized for\nMonopoly, Life & more.',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        3,
-                        (index) => Container(
-                          width: 4,
-                          height: 4,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppTheme.primaryColor.withValues(alpha: index == 1 ? 1 : 0.2),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -159,7 +179,9 @@ class _LogoSection extends StatelessWidget {
 }
 
 class _TitleSection extends StatelessWidget {
-  const _TitleSection();
+  final String tagline;
+
+  const _TitleSection({required this.tagline});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +202,7 @@ class _TitleSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'DIGITAL CURRENCY FOR BOARD GAMES',
+          tagline,
           style: GoogleFonts.plusJakartaSans(
             color: Colors.white.withValues(alpha: 0.7),
             fontSize: 10,

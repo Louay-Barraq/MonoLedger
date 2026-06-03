@@ -258,7 +258,14 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     SessionResumeByCodeRequested event,
     Emitter<SessionState> emit,
   ) async {
-    if (state is SessionSuccess) return;
+    if (state is SessionSuccess) {
+      final current = (state as SessionSuccess).session;
+      if (current.joinCode?.toUpperCase() == event.joinCode.trim().toUpperCase()) {
+        return;
+      }
+      await _sessionSubscription?.cancel();
+      _sessionSubscription = null;
+    }
     emit(SessionLoading());
     try {
       final session = await _repository.fetchSessionByJoinCode(event.joinCode);
