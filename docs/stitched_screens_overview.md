@@ -1,102 +1,292 @@
-# MonoLedger PRD - Stitch Screens Overview
+# Screens Overview
 
-This document provides a detailed overview of the screens and design system found in the "MonoLedger PRD" Stitch project.
+This document describes the major MonoLedger screens and how they fit together in the user journey.
 
-## 🎨 Design Strategy: Tactical Kineticism
+## Design Direction
 
-The design system is built for speed, precision, and high-stakes interaction, moving away from a "static app" feel toward a "high-end utility instrument."
+MonoLedger is designed like a fast board-game finance console:
 
-- **Foundation**: Deep charcoal foundations with piercing neon accents.
-- **Primary Color**: `#3FFF8B` (Neon Green) - The "Action" color.
-- **Secondary Color**: `#FFD709` (Gold) - The "Value" color.
-- **Tertiary Color**: `#44A5FF` (Sky Blue) - The "Logic" color.
-- **Typography**: 
-  - **Headlines**: Plus Jakarta Sans (Authoritative/Wide)
-  - **Body**: Inter (Neutral/Legible)
-  - **Data/Currency**: Space Grotesk / JetBrains Mono (Monospaced for stability)
-- **Layering**: Depth is achieved through background color shifts (`surface-container` tiers) instead of 1px borders.
+- Dark background for focus during game night.
+- Neon green for primary action and important status.
+- Large readable balances.
+- Monospace labels for codes, currency, and compact data.
+- Touch-first controls for quick play.
+- Confirmation patterns for irreversible or high-impact actions.
 
----
+The goal is to make the app feel quick and tactile without making the rules hard to understand.
 
-## 📱 Screens Overview
+## Navigation Map
 
-### 1. Landing Screen (Final)
-The entry point of the application.
-- **Purpose**: Welcoming the user and providing clear paths to start or join a game.
-- **Key Elements**: Primary CTAs for "Create Session" and "Join Session", branding logo.
+```text
+Splash
+  -> Onboarding
+  -> Home
 
-### 2. Create Session (Final)
-The setup interface for game hosts.
-- **Purpose**: Configuring a new game session.
-- **Key Elements**: Input fields for game rules, starting balances, and session naming.
+Home
+  -> Create Session
+  -> Join Session
+  -> Settings
 
-### 3. Join Session (Final)
-The entry point for players joining a host.
-- **Purpose**: Connecting to an existing game via a session code.
-- **Key Elements**: Session code input field, "Join" button.
+Join Session
+  -> Enter Code
+  -> Scan QR Code
 
-### 4. Dashboard (Final)
-The primary in-game interface.
-- **Purpose**: Providing a real-time overview of the player's status.
-- **Key Elements**: Current balance (large monospaced), quick action buttons (Pay, Request, Transfer), and game status indicators.
+Dashboard
+  -> Wallet Tab
+  -> Ledger Tab
+  -> Players Tab
+  -> Payment Pad
+  -> Game Settings
+  -> End Summary
 
-### 5. Payment Pad (Final)
-The transaction interface.
-- **Purpose**: Inputting and confirming currency transfers.
-- **Key Elements**: Number pad, denomination bill buttons (circular icons), and the "Slide to Pay" confirmation widget.
+Settings
+  -> Help
+  -> About
+```
 
-### 6. Players List
-Social overview of the game.
-- **Purpose**: Seeing who is currently in the session and their approximate status.
-- **Key Elements**: List of player cards showing names and status indicators (without dividers, separated by color shifts).
+## Splash Screen
 
-### 7. Detailed Ledger (Final)
-The financial audit log.
-- **Purpose**: Reviewing transaction history for transparency.
-- **Key Elements**: Chronological list of incoming/outgoing transfers with timestamps and descriptions.
+Purpose: introduce the brand and decide where the user should go next.
 
-### 8. Game Settings
-In-game configuration.
-- **Purpose**: Adjusting rules or app behavior during a session.
-- **Key Elements**: Toggles for notifications, haptics, and rule-specific adjustments.
+Behavior:
 
-### 9. End of Game Summary
-The final results screen.
-- **Purpose**: Determining the winner and showing final standings.
-- **Key Elements**: Ranked list of players with final balances and game stats.
+- Checks authentication status.
+- Routes authenticated users to Home.
+- Routes unauthenticated users to Onboarding.
 
-### 10. MonoLedger Board Game Currency Manager
-General overview/branding screen.
-- **Purpose**: High-level identification of the tool's utility.
-- **Key Elements**: Branding and mission statement for the currency manager.
+## Onboarding
 
----
+Purpose: quickly explain the app before anonymous sign-in.
 
-## ✨ New Designs: Splash & Onboarding
+Current flow:
 
-### 🚀 Splash Screen (Animation: "Power On")
-The initial loading sequence designed to set the "Tactical Kineticism" tone.
+1. Welcome to MonoLedger.
+2. Realtime syncing.
+3. Secure/private session experience.
 
-- **Visual State**: Deep charcoal (`#0E0E0E`) background.
-- **Animation Sequence**:
-    1. **Outline Trace**: A faint, dim outline of the MonoLedger logo appears.
-    2. **Pulse**: A high-speed neon green (`#3FFF8B`) pulse traces the logo's path.
-    3. **Illumination**: A subtle CRT-style flicker effect as the logo fills with color and the "MonoLedger" text fades in.
-    4. **Settling**: A soft, static glow remains behind the logo until the app transitions to Onboarding or Landing.
+The final onboarding action signs the user in anonymously and sends them to Home.
 
-### 📚 Onboarding Sequence (3 Steps)
+## Home
 
-#### Step 1: Welcome to the Neon Ledger
-- **Visuals**: Large geometric graphic representing "Wealth Control."
-- **Copy**: "Tactical Wealth Management. Welcome to the Neon Ledger."
-- **CTA**: "Next"
+Purpose: starting point for each visit.
 
-#### Step 2: Session Deployment
-- **Visuals**: Iconography showing session codes and "connection rays."
-- **Copy**: "Deploy your game. Create a new session or join an existing one in seconds."
-- **CTA**: "Next"
+Primary actions:
 
-#### Step 3: High-Speed Transactions
-- **Visuals**: Animated preview of the "Slide to Pay" handle moving across a track.
-- **Copy**: "Precision at speed. Authorize payments with a single tactile gesture."
-- **CTA**: "Get Started"
+- Create Session
+- Join Session
+
+Secondary actions:
+
+- Open Settings
+
+The page also communicates that the app supports multiplayer realtime board-game money tracking.
+
+## Create Session
+
+Purpose: configure a new game.
+
+Inputs and controls:
+
+- Banker name
+- Currency symbol
+- Starting capital presets
+- Custom starting capital
+- GO amount presets
+- Custom GO amount
+
+Successful creation sends the host into the Dashboard with a generated join code.
+
+## Join Method
+
+Purpose: let players choose how they want to connect.
+
+Options:
+
+- Enter Code
+- Scan QR Code
+
+## Join Code
+
+Purpose: manually join a session.
+
+Inputs:
+
+- 6-character session code
+- Player display name
+
+The screen validates that the code and name are present before dispatching the join request.
+
+## Join QR Scan
+
+Purpose: join by scanning the host's QR code.
+
+Behavior:
+
+- Opens the camera scanner.
+- Reads MonoLedger QR payloads.
+- Extracts the session code.
+- Routes to the Join Code screen with the code prefilled.
+
+## Dashboard
+
+Purpose: main in-game shell.
+
+The dashboard owns the current session context and starts watchers for:
+
+- Session/player updates
+- Transactions
+- GO salary requests
+
+It also handles:
+
+- Kicked-player removal flow
+- Session-ended flow
+- QR sharing
+- Leave-session confirmation
+- Bottom tab navigation
+
+## Wallet Tab
+
+Purpose: give each player their working game wallet.
+
+Main elements:
+
+- Current balance card
+- Change versus starting balance
+- GO salary button
+- Pay Bank action
+- From Bank action
+- Ranked active players list
+
+Tapping another player opens the Payment Pad for a player-to-player transfer.
+
+## Ledger Tab
+
+Purpose: provide financial transparency.
+
+Shows:
+
+- Number of transactions
+- Transaction list
+- Transaction type
+- Parties involved
+- Amount direction
+- Time label
+
+Also links to Game Settings when session data is available.
+
+## Players Tab
+
+Purpose: show who is currently in the game.
+
+Shows:
+
+- Bank/Banker card
+- Active players
+- Player balances
+- Banker badge
+
+## Payment Pad
+
+Purpose: enter and confirm transfers.
+
+Supports:
+
+- Player-to-player payments
+- Paying the bank
+- Receiving from the bank
+
+Controls:
+
+- Numeric keypad
+- Comma decimal separator
+- Quick denomination chips
+- Clear and backspace
+- Slide-to-confirm button
+
+Special behavior:
+
+- Large bank payouts above 50 percent of total player liquidity require a second confirmation.
+- Transfers are blocked if the user is no longer active in the session.
+
+## GO Approval Banner
+
+Purpose: notify the Banker when another player requests GO salary.
+
+Behavior:
+
+- Shows pending GO salary requests to the Banker.
+- Allows approve or decline.
+- Approved requests update the request and create a salary transaction through Supabase.
+
+## Game Settings
+
+Purpose: manage the active session.
+
+Always shows:
+
+- Session code
+- Copy code action
+- Starting capital
+- GO bonus
+- Active player list
+
+Banker controls:
+
+- Transfer Banker role
+- Kick player
+- Leave session
+- End session
+
+Player controls:
+
+- Leave session
+
+## End of Game Summary
+
+Purpose: close the session with a clear result.
+
+Shows:
+
+- Winner card
+- Final standings
+- Total money across listed players
+- Participant count
+- Save and exit action
+
+## Settings
+
+Purpose: app-level preferences and support information.
+
+Includes:
+
+- Language selection
+- Haptics toggle
+- Help and FAQ
+- About page
+- Version label
+
+## Help
+
+Purpose: answer common user questions.
+
+Topics include:
+
+- What MonoLedger is
+- Creating a session
+- Joining a session
+- Banker role
+- GO salary
+- Leaving and rejoining
+- Kicked players
+- Data storage
+- Supported games
+
+## About
+
+Purpose: explain the app and credit the developer.
+
+Includes:
+
+- MonoLedger summary
+- Developer information
