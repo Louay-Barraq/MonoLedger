@@ -41,20 +41,17 @@ LedgerDisplayItem ledgerDisplayItem({
   final names = {for (final p in players) p.id: p.name};
   final signedAmount = switch (tx.type) {
     TransactionType.payBank => CurrencyFormatter.formatSignedMoney(
-        currency,
-        tx.amount,
-        positive: false,
-      ),
-    TransactionType.fromBank || TransactionType.collectGo => CurrencyFormatter.formatSignedMoney(
-        currency,
-        tx.amount,
-        positive: true,
-      ),
+      currency,
+      tx.amount,
+      positive: false,
+    ),
+    TransactionType.fromBank || TransactionType.collectGo =>
+      CurrencyFormatter.formatSignedMoney(currency, tx.amount, positive: true),
     TransactionType.playerToPlayer => CurrencyFormatter.formatSignedMoney(
-        currency,
-        tx.amount,
-        positive: false,
-      ),
+      currency,
+      tx.amount,
+      positive: false,
+    ),
   };
   switch (tx.type) {
     case TransactionType.collectGo:
@@ -70,7 +67,8 @@ LedgerDisplayItem ledgerDisplayItem({
       return LedgerDisplayItem(
         type: tx.type,
         title: 'From The Bank',
-        subtitle: (tx.memo ?? 'FROM BANK').toUpperCase(),
+        subtitle:
+            '${(tx.memo ?? 'FROM BANK').toUpperCase()} • ${_playerName(names, tx.toPlayerId, 'PLAYER')}',
         timeLabel: _formatRelativeTime(tx.createdAt),
         amountLabel: signedAmount,
         isPositive: true,
@@ -79,7 +77,8 @@ LedgerDisplayItem ledgerDisplayItem({
       return LedgerDisplayItem(
         type: tx.type,
         title: 'To The Bank',
-        subtitle: (tx.memo ?? 'PAY BANK').toUpperCase(),
+        subtitle:
+            '${(tx.memo ?? 'PAY BANK').toUpperCase()} • ${_playerName(names, tx.fromPlayerId, 'PLAYER')}',
         timeLabel: _formatRelativeTime(tx.createdAt),
         amountLabel: signedAmount,
         isPositive: false,

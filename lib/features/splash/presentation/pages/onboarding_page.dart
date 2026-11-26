@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 
@@ -20,17 +21,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final List<OnboardingStep> _steps = [
     const OnboardingStep(
       title: 'WELCOME TO\nMONOLEDGER',
-      description: 'The ultimate digital currency companion for your favorite board games.',
-      icon: Icons.account_balance_wallet_rounded,
+      description:
+          'The ultimate digital currency companion for your favorite board games.',
+      icon: null, // brand mark
     ),
     const OnboardingStep(
       title: 'REAL-TIME\nSYNCING',
-      description: 'Every player stays in sync with live updates. No more manual calculations or paper money chaos.',
+      description:
+          'Every player stays in sync with live updates. No more manual calculations or paper money chaos.',
       icon: Icons.flash_on_rounded,
     ),
     const OnboardingStep(
       title: 'SECURE &\nPRIVATE',
-      description: 'Your session data is encrypted and secure. Focus on the game, we\'ll handle the numbers.',
+      description:
+          'Your session data is encrypted and secure. Focus on the game, we\'ll handle the numbers.',
       icon: Icons.security_rounded,
     ),
   ];
@@ -48,7 +52,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    onPageChanged: (index) => setState(() => _currentPage = index),
+                    onPageChanged: (index) =>
+                        setState(() => _currentPage = index),
                     itemCount: _steps.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -57,47 +62,67 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                _steps[index].icon,
-                                size: 80,
-                                color: AppTheme.primaryColor,
-                              ),
-                            )
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: _steps[index].icon == null
+                                      ? const MonoLedgerLogo(size: 96)
+                                      : Icon(
+                                          _steps[index].icon,
+                                          size: 80,
+                                          color: AppTheme.primaryColor,
+                                        ),
+                                )
                                 .animate(key: ValueKey('icon_$index'))
-                                .scale(duration: 400.ms, curve: Curves.easeOutBack),
+                                .scale(
+                                  duration: 400.ms,
+                                  curve: Curves.easeOutBack,
+                                ),
                             const SizedBox(height: 60),
                             RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -1,
-                                ),
-                                children: [
-                                  TextSpan(text: _steps[index].title.split('\n')[0] + '\n', style: const TextStyle(color: Colors.white)),
-                                  TextSpan(text: _steps[index].title.split('\n')[1], style: const TextStyle(color: AppTheme.primaryColor)),
-                                ],
-                              ),
-                            )
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -1,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                            '${_steps[index].title.split('\n')[0]}\n',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: _steps[index].title.split(
+                                          '\n',
+                                        )[1],
+                                        style: const TextStyle(
+                                          color: AppTheme.primaryColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                                 .animate(key: ValueKey('title_$index'))
                                 .fadeIn(duration: 400.ms)
                                 .slideX(begin: 0.2, end: 0),
                             const SizedBox(height: 24),
                             Text(
-                              _steps[index].description,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.plusJakartaSans(
-                                color: Colors.white.withValues(alpha: 0.6),
-                                fontSize: 16,
-                                height: 1.5,
-                              ),
-                            )
+                                  _steps[index].description,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    fontSize: 16,
+                                    height: 1.5,
+                                  ),
+                                )
                                 .animate(key: ValueKey('desc_$index'))
                                 .fadeIn(delay: 200.ms, duration: 400.ms),
                           ],
@@ -121,9 +146,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             width: _currentPage == index ? 24 : 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: _currentPage == index 
-                                  ? AppTheme.primaryColor 
-                                  : AppTheme.primaryColor.withValues(alpha: 0.2),
+                              color: _currentPage == index
+                                  ? AppTheme.primaryColor
+                                  : AppTheme.primaryColor.withValues(
+                                      alpha: 0.2,
+                                    ),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -152,7 +179,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 if (_currentPage > 0)
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.only(right: 12.0),
+                                      padding: const EdgeInsets.only(
+                                        right: 12.0,
+                                      ),
                                       child: ElevatedButton(
                                         onPressed: () {
                                           _pageController.previousPage(
@@ -161,41 +190,56 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                           );
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF1C2026),
+                                          backgroundColor: const Color(
+                                            0xFF1C2026,
+                                          ),
                                           foregroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                           ),
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
                                         ),
-                                        child: const Icon(Icons.arrow_back, color: AppTheme.primaryColor),
+                                        child: const Icon(
+                                          Icons.arrow_back,
+                                          color: AppTheme.primaryColor,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 Expanded(
                                   flex: 2,
                                   child: ElevatedButton(
-                                    onPressed: state is AuthLoading 
-                                        ? null 
+                                    onPressed: state is AuthLoading
+                                        ? null
                                         : () {
-                                            if (_currentPage < _steps.length - 1) {
+                                            if (_currentPage <
+                                                _steps.length - 1) {
                                               _pageController.nextPage(
                                                 duration: 300.ms,
                                                 curve: Curves.easeInOut,
                                               );
                                             } else {
-                                              context.read<AuthBloc>().add(AuthLoginAnonymouslyRequested());
+                                              context.read<AuthBloc>().add(
+                                                AuthLoginAnonymouslyRequested(),
+                                              );
                                             }
                                           },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppTheme.primaryColor,
                                       foregroundColor: Colors.black,
                                       elevation: 8,
-                                      shadowColor: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                      shadowColor: AppTheme.primaryColor
+                                          .withValues(alpha: 0.3),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                     ),
                                     child: state is AuthLoading
                                         ? const SizedBox(
@@ -207,8 +251,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                             ),
                                           )
                                         : Text(
-                                            _currentPage == _steps.length - 1 
-                                                ? 'START EXPERIENCE' 
+                                            _currentPage == _steps.length - 1
+                                                ? 'START EXPERIENCE'
                                                 : 'CONTINUE',
                                             style: GoogleFonts.plusJakartaSans(
                                               fontWeight: FontWeight.w800,
@@ -238,7 +282,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 class OnboardingStep {
   final String title;
   final String description;
-  final IconData icon;
+
+  /// null shows the MonoLedger logo.
+  final IconData? icon;
 
   const OnboardingStep({
     required this.title,
@@ -252,9 +298,7 @@ class _DotGridBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DotPainter(),
-    );
+    return CustomPaint(painter: _DotPainter());
   }
 }
 

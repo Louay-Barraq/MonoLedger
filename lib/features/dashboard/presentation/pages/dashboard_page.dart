@@ -11,7 +11,8 @@ import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_app
 import 'package:monoledger/features/dashboard/presentation/widgets/dashboard_bottom_nav.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/go_approval_banner_host.dart';
 import 'package:monoledger/features/transactions/presentation/bloc/go_request_bloc.dart';
-import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
+import 'package:monoledger/features/home/domain/entities/session.dart'
+    as domain;
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
 import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
@@ -41,7 +42,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
     final sessionState = context.read<SessionBloc>().state;
     if (sessionState is! SessionSuccess) {
-      context.read<SessionBloc>().add(SessionResumeByCodeRequested(widget.sessionCode));
+      context.read<SessionBloc>().add(
+        SessionResumeByCodeRequested(widget.sessionCode),
+      );
     } else {
       _startSessionWatches(sessionState.session.id);
     }
@@ -108,7 +111,10 @@ class _DashboardPageState extends State<DashboardPage> {
           context.go('/home');
         } else if (state is SessionError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppTheme.errorColor,
+            ),
           );
         } else if (state is SessionSuccess) {
           _startSessionWatches(state.session.id);
@@ -145,7 +151,11 @@ class _DashboardPageState extends State<DashboardPage> {
             body: Stack(
               children: [
                 state is SessionLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryColor,
+                        ),
+                      )
                     : IndexedStack(
                         index: _currentIndex,
                         children: [
@@ -179,7 +189,9 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
+    final isBanker = session.activePlayers.any(
+      (p) => p.userId == currentUserId && p.isBanker,
+    );
     final activeCount = session.activePlayers.length;
 
     showDialog(
@@ -190,18 +202,26 @@ class _DashboardPageState extends State<DashboardPage> {
         content: Text(
           isBanker
               ? (activeCount > 1
-                  ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
-                  : 'You are the only player. Leaving will end the session. Continue?')
+                    ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
+                    : 'You are the only player. Leaving will end the session. Continue?')
               : 'You will leave this session and return to the home screen. Continue?',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionLeaveRequested(session.id));
+              context.read<SessionBloc>().add(
+                SessionLeaveRequested(session.id),
+              );
               Navigator.pop(ctx);
             },
-            child: const Text('LEAVE', style: TextStyle(color: Colors.redAccent)),
+            child: const Text(
+              'LEAVE',
+              style: TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),

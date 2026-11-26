@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/config/app_config.dart';
 import 'package:monoledger/core/localization/app_locale.dart';
 import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
+import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:monoledger/features/settings/presentation/cubit/locale_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -20,7 +23,11 @@ class SettingsPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.primaryColor, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.primaryColor,
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -58,6 +65,20 @@ class SettingsPage extends StatelessWidget {
             subtitle: l10n.settingsAboutSubtitle,
             onTap: () => context.push('/settings/about'),
           ),
+          const SizedBox(height: 32),
+          const _SectionHeader(title: 'PRIVACY'),
+          const SizedBox(height: 12),
+          _SettingsNavTile(
+            icon: Icons.privacy_tip_outlined,
+            title: 'Privacy policy',
+            subtitle: 'What MonoLedger stores and why',
+            onTap: () => launchUrl(
+              Uri.parse(AppConfig.privacyPolicyUrl),
+              mode: LaunchMode.externalApplication,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const _DeleteDataTile(),
           const SizedBox(height: 32),
           Center(
             child: Text(
@@ -158,15 +179,18 @@ class _HapticsTile extends StatelessWidget {
 
     return BlocBuilder<LocaleCubit, LocaleState>(
       builder: (context, state) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceContainerLow,
+        return Material(
+          color: AppTheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           ),
+          clipBehavior: Clip.antiAlias,
           child: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
             activeThumbColor: AppTheme.primaryColor,
             title: Text(
               l10n.settingsHaptics,
@@ -245,10 +269,79 @@ class _SettingsNavTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.35)),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white.withValues(alpha: 0.35),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// In-app account deletion (required by Google Play for apps with accounts).
+class _DeleteDataTile extends StatelessWidget {
+  const _DeleteDataTile();
+
+  Future<void> _confirm(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceContainerHigh,
+        title: const Text('Delete my data?'),
+        content: const Text(
+          'This deletes your MonoLedger account, your profile and your game history. '
+          'You leave any game you are in. In games other people played with you, '
+          'your entries stay as "Deleted player" so their ledgers still add up. '
+          'This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(
+              'DELETE',
+              style: TextStyle(color: AppTheme.errorColor),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<AuthBloc>().add(AuthDeleteAccountRequested());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<AuthBloc, AuthState>(
+      listenWhen: (prev, curr) =>
+          prev is AuthLoading &&
+          (curr is AuthUnauthenticated || curr is AuthError),
+      listener: (context, state) {
+        if (state is AuthUnauthenticated) {
+          context.go('/onboarding');
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppTheme.errorColor,
+            ),
+          );
+        }
+      },
+      builder: (context, state) => _SettingsNavTile(
+        icon: Icons.delete_forever_outlined,
+        title: 'Delete my data',
+        subtitle: state is AuthLoading
+            ? 'Deleting…'
+            : 'Delete your account and game history',
+        onTap: state is AuthLoading ? () {} : () => _confirm(context),
       ),
     );
   }

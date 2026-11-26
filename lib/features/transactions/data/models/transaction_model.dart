@@ -12,6 +12,7 @@ class TransactionModel extends LedgerTransaction {
     required super.amount,
     super.memo,
     required super.createdAt,
+    super.reversesTxId,
   });
 
   static TransactionType _parseType(String type) {
@@ -41,6 +42,7 @@ class TransactionModel extends LedgerTransaction {
       amount: (json['amount'] as num).toDouble(),
       memo: json['memo'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      reversesTxId: json['reverses_tx_id'] as String?,
     );
   }
 }

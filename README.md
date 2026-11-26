@@ -1,6 +1,6 @@
 # MonoLedger
 
-MonoLedger is a Flutter app that replaces board-game paper money with a live digital ledger. It is built for games such as Monopoly, The Game of Life, and any table game where players need fast balance tracking, bank payments, and transparent transaction history.
+MonoLedger is a Flutter app that replaces board-game paper money with a live digital ledger. It is built for any table game where players need fast balance tracking, bank payments, and transparent transaction history.
 
 Players can host or join a session, share a short code or QR code, pay each other, pay the bank, collect GO salary, and review every transaction in real time.
 
@@ -107,6 +107,9 @@ supabase/
   migrations/           Database migrations and RPC definitions
 
 docs/
+  privacy-policy.html   Public privacy policy (GitHub Pages)
+  delete-data.html      Public data-deletion instructions
+  play-store-release.md Google Play release checklist and listing text
   functionalities_rules.md
   technical_details.md
   coding_standards.md

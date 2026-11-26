@@ -24,7 +24,10 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       leading: IconButton(
         onPressed: onLeave ?? () => Navigator.of(context).pop(),
-        icon: const Icon(Icons.exit_to_app_rounded, color: AppTheme.primaryColor),
+        icon: const Icon(
+          Icons.exit_to_app_rounded,
+          color: AppTheme.primaryColor,
+        ),
       ),
       title: Column(
         mainAxisSize: MainAxisSize.min,
@@ -52,7 +55,10 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: onShare,
-          icon: Icon(Icons.adaptive.share, color: Colors.white.withValues(alpha: 0.6)),
+          icon: Icon(
+            Icons.adaptive.share,
+            color: Colors.white.withValues(alpha: 0.6),
+          ),
         ),
       ],
     );

@@ -6,14 +6,16 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue.copyWith(text: '');
     }
 
     // Remove any non-digit characters
     String cleanText = newValue.text.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     // Parse to int
     int? value = int.tryParse(cleanText);
     if (value == null) return oldValue;

@@ -36,10 +36,14 @@ class SessionCreateRequested extends SessionEvent {
   @override
   List<Object?> get props => [currency, startingBalance, goAmount, bankerName];
 }
+
 class SessionJoinRequested extends SessionEvent {
   final String joinCode;
   final String playerName;
-  const SessionJoinRequested({required this.joinCode, required this.playerName});
+  const SessionJoinRequested({
+    required this.joinCode,
+    required this.playerName,
+  });
   @override
   List<Object> get props => [joinCode, playerName];
 }
@@ -54,7 +58,10 @@ class SessionEndRequested extends SessionEvent {
 class SessionKickRequested extends SessionEvent {
   final String sessionId;
   final String targetPlayerId;
-  const SessionKickRequested({required this.sessionId, required this.targetPlayerId});
+  const SessionKickRequested({
+    required this.sessionId,
+    required this.targetPlayerId,
+  });
   @override
   List<Object> get props => [sessionId, targetPlayerId];
 }
@@ -62,7 +69,10 @@ class SessionKickRequested extends SessionEvent {
 class SessionTransferBankerRequested extends SessionEvent {
   final String sessionId;
   final String newBankerPlayerId;
-  const SessionTransferBankerRequested({required this.sessionId, required this.newBankerPlayerId});
+  const SessionTransferBankerRequested({
+    required this.sessionId,
+    required this.newBankerPlayerId,
+  });
   @override
   List<Object> get props => [sessionId, newBankerPlayerId];
 }
@@ -89,13 +99,16 @@ abstract class SessionState extends Equatable {
 }
 
 class SessionInitial extends SessionState {}
+
 class SessionLoading extends SessionState {}
+
 class SessionSuccess extends SessionState {
   final Session session;
   const SessionSuccess(this.session);
   @override
   List<Object> get props => [session];
 }
+
 class SessionError extends SessionState {
   final String message;
   const SessionError(this.message);
@@ -116,9 +129,12 @@ class SessionAcknowledgeRemoval extends SessionEvent {
 class SessionBloc extends Bloc<SessionEvent, SessionState> {
   final SessionRepository _repository;
   StreamSubscription? _sessionSubscription;
+  String? _watchedSessionId;
   bool _voluntaryLeaveInProgress = false;
+  final Duration retryDelay;
 
-  SessionBloc(this._repository) : super(SessionInitial()) {
+  SessionBloc(this._repository, {this.retryDelay = const Duration(seconds: 2)})
+    : super(SessionInitial()) {
     on<SessionCreateRequested>(_onCreateRequested);
     on<SessionJoinRequested>(_onJoinRequested);
     on<SessionEndRequested>(_onEndRequested);
@@ -138,12 +154,42 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
 
   void _startWatching(String sessionId) {
     _sessionSubscription?.cancel();
-    _sessionSubscription = _repository.watchSession(sessionId).listen(
-      (session) => add(SessionUpdateReceived(session)),
-    );
+    _watchedSessionId = sessionId;
+    _sessionSubscription = _repository
+        .watchSession(sessionId)
+        .listen(
+          (session) => add(SessionUpdateReceived(session)),
+          // A dropped connection or failed refetch must not freeze balances.
+          onError: (_) => _retryWatch(sessionId),
+          onDone: () => _retryWatch(sessionId),
+          cancelOnError: true,
+        );
   }
 
-  Future<void> _onCreateRequested(SessionCreateRequested event, Emitter<SessionState> emit) async {
+  void _retryWatch(String sessionId) {
+    Future<void>.delayed(retryDelay, () {
+      if (isClosed || _watchedSessionId != sessionId) return;
+      _startWatching(sessionId);
+    });
+  }
+
+  Future<void> _stopWatching() async {
+    _watchedSessionId = null;
+    await _sessionSubscription?.cancel();
+    _sessionSubscription = null;
+  }
+
+  /// Shows [message] but keeps the live session on screen.
+  void _emitActionError(String message, Emitter<SessionState> emit) {
+    final previous = state;
+    emit(SessionError(message));
+    if (previous is SessionSuccess) emit(previous);
+  }
+
+  Future<void> _onCreateRequested(
+    SessionCreateRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     emit(SessionLoading());
     try {
       final session = await _repository.createSession(
@@ -159,31 +205,45 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     }
   }
 
-  Future<void> _onJoinRequested(SessionJoinRequested event, Emitter<SessionState> emit) async {
+  Future<void> _onJoinRequested(
+    SessionJoinRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     emit(SessionLoading());
     try {
-      final session = await _repository.joinSession(event.joinCode, event.playerName);
+      final session = await _repository.joinSession(
+        event.joinCode,
+        event.playerName,
+      );
       _startWatching(session.id);
       emit(SessionSuccess(session));
     } catch (e) {
       String errorMessage = 'Failed to join session. Please try again.';
       final errorStr = e.toString().toLowerCase();
-      
-      if (errorStr.contains('invalid_session') || errorStr.contains('not found') || errorStr.contains('no rows')) {
+
+      if (errorStr.contains('invalid_session') ||
+          errorStr.contains('not found') ||
+          errorStr.contains('no rows')) {
         errorMessage = 'Invalid session code. Please check and try again.';
       } else if (errorStr.contains('session_closed')) {
         errorMessage = 'This session is no longer active.';
-      } else if (errorStr.contains('player_kicked') || errorStr.contains('removed from this session')) {
+      } else if (errorStr.contains('player_kicked') ||
+          errorStr.contains('removed from this session')) {
         errorMessage = 'You were removed from this session and cannot rejoin.';
-      } else if (errorStr.contains('socket') || errorStr.contains('network') || errorStr.contains('connection')) {
+      } else if (errorStr.contains('socket') ||
+          errorStr.contains('network') ||
+          errorStr.contains('connection')) {
         errorMessage = 'Network error. Please check your connection.';
       }
-      
+
       emit(SessionError(errorMessage));
     }
   }
 
-  void _onUpdateReceived(SessionUpdateReceived event, Emitter<SessionState> emit) {
+  void _onUpdateReceived(
+    SessionUpdateReceived event,
+    Emitter<SessionState> emit,
+  ) {
     if (_voluntaryLeaveInProgress) return;
 
     final session = event.session;
@@ -191,13 +251,13 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     final myPlayer = session.playerByUserId(userId);
 
     if (myPlayer?.status == 'KICKED') {
-      _sessionSubscription?.cancel();
+      _stopWatching();
       emit(const SessionKicked());
       return;
     }
 
     if (!session.isUserActive(userId)) {
-      _sessionSubscription?.cancel();
+      _stopWatching();
       emit(SessionInitial());
       return;
     }
@@ -205,39 +265,53 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     emit(SessionSuccess(session));
   }
 
-  Future<void> _onEndRequested(SessionEndRequested event, Emitter<SessionState> emit) async {
+  Future<void> _onEndRequested(
+    SessionEndRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     try {
       await _repository.endSession(event.sessionId);
     } catch (e) {
-      emit(SessionError(e.toString()));
+      _emitActionError(_mapSessionError(e), emit);
     }
   }
 
-  Future<void> _onKickRequested(SessionKickRequested event, Emitter<SessionState> emit) async {
+  Future<void> _onKickRequested(
+    SessionKickRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     try {
       await _repository.kickPlayer(event.sessionId, event.targetPlayerId);
     } catch (e) {
-      emit(SessionError(_mapSessionError(e)));
+      _emitActionError(_mapSessionError(e), emit);
     }
   }
 
-  Future<void> _onTransferBankerRequested(SessionTransferBankerRequested event, Emitter<SessionState> emit) async {
+  Future<void> _onTransferBankerRequested(
+    SessionTransferBankerRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     try {
-      await _repository.transferBankerRole(event.sessionId, event.newBankerPlayerId);
+      await _repository.transferBankerRole(
+        event.sessionId,
+        event.newBankerPlayerId,
+      );
     } catch (e) {
-      emit(SessionError(_mapSessionError(e)));
+      _emitActionError(_mapSessionError(e), emit);
     }
   }
 
-  Future<void> _onLeaveRequested(SessionLeaveRequested event, Emitter<SessionState> emit) async {
+  Future<void> _onLeaveRequested(
+    SessionLeaveRequested event,
+    Emitter<SessionState> emit,
+  ) async {
     _voluntaryLeaveInProgress = true;
     try {
       await _repository.leaveSession(event.sessionId);
-      await _sessionSubscription?.cancel();
-      _sessionSubscription = null;
+      await _stopWatching();
       emit(SessionInitial());
     } catch (e) {
-      emit(SessionError(_mapSessionError(e)));
+      _emitActionError(_mapSessionError(e), emit);
     } finally {
       _voluntaryLeaveInProgress = false;
     }
@@ -260,17 +334,21 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   ) async {
     if (state is SessionSuccess) {
       final current = (state as SessionSuccess).session;
-      if (current.joinCode?.toUpperCase() == event.joinCode.trim().toUpperCase()) {
+      if (current.joinCode?.toUpperCase() ==
+          event.joinCode.trim().toUpperCase()) {
         return;
       }
-      await _sessionSubscription?.cancel();
-      _sessionSubscription = null;
+      await _stopWatching();
     }
     emit(SessionLoading());
     try {
       final session = await _repository.fetchSessionByJoinCode(event.joinCode);
       if (session == null) {
-        emit(const SessionError('Session not found. Join again from the home screen.'));
+        emit(
+          const SessionError(
+            'Session not found. Join again from the home screen.',
+          ),
+        );
         return;
       }
       _startWatching(session.id);

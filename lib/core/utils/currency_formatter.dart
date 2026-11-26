@@ -40,7 +40,9 @@ class CurrencyFormatter {
 
     final commaIndex = sepIndex >= 0 ? sepIndex : raw.indexOf('.');
     final before = raw.substring(0, commaIndex);
-    final after = commaIndex < raw.length - 1 ? raw.substring(commaIndex + 1) : '';
+    final after = commaIndex < raw.length - 1
+        ? raw.substring(commaIndex + 1)
+        : '';
     final intPart = int.tryParse(before.isEmpty ? '0' : before) ?? 0;
     final formattedInt = NumberFormat('#,##0', 'en_US').format(intPart);
 

@@ -22,10 +22,7 @@ void main() {
     final input = AmountPadInput();
     input.onKey('1');
     input.onKey(',');
-    expect(
-      CurrencyFormatter.formatPadAmount('\$', input.raw),
-      '\$ 1,',
-    );
+    expect(CurrencyFormatter.formatPadAmount('\$', input.raw), '\$ 1,');
   });
 
   test('formatMoney shows decimals when needed', () {

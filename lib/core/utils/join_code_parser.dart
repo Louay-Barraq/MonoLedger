@@ -15,13 +15,18 @@ class JoinCodeParser {
     final upper = trimmed.toUpperCase();
 
     if (upper.startsWith('MONOLEDGER://JOIN')) {
-      final uri = Uri.tryParse(upper.replaceFirst('MONOLEDGER://', 'monoledger://'));
+      final uri = Uri.tryParse(
+        upper.replaceFirst('MONOLEDGER://', 'monoledger://'),
+      );
       final code = uri?.queryParameters['code'];
       if (code != null) return _normalizeCode(code);
     }
 
     if (upper.contains('CODE=')) {
-      final match = RegExp(r'code=([A-Za-z0-9]{6})', caseSensitive: false).firstMatch(upper);
+      final match = RegExp(
+        r'code=([A-Za-z0-9]{6})',
+        caseSensitive: false,
+      ).firstMatch(upper);
       if (match != null) return _normalizeCode(match.group(1)!);
     }
 

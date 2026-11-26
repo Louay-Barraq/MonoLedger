@@ -89,7 +89,12 @@ class GoRequestLoaded extends GoRequestState {
   }
 
   @override
-  List<Object?> get props => [requests, actionInProgress, statusMessage, statusIsError];
+  List<Object?> get props => [
+    requests,
+    actionInProgress,
+    statusMessage,
+    statusIsError,
+  ];
 }
 
 class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
@@ -97,8 +102,12 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
   StreamSubscription<List<GoSalaryRequest>>? _watchSub;
   String? _activeSessionId;
   List<GoSalaryRequest> _requests = [];
+  final Duration retryDelay;
 
-  GoRequestBloc(this._repository) : super(GoRequestInitial()) {
+  GoRequestBloc(
+    this._repository, {
+    this.retryDelay = const Duration(seconds: 2),
+  }) : super(GoRequestInitial()) {
     on<GoRequestsWatchStarted>(_onWatchStarted);
     on<GoRequestsWatchStopped>(_onWatchStopped);
     on<GoRequestsUpdated>(_onUpdated);
@@ -124,10 +133,27 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
     _requests = [];
     emit(const GoRequestLoaded(requests: []));
 
-    _watchSub = _repository.watchGoRequests(event.sessionId).listen(
-      (list) => add(GoRequestsUpdated(event.sessionId, list)),
-      onError: (_) => add(GoRequestsUpdated(event.sessionId, const [])),
-    );
+    _listen(event.sessionId);
+  }
+
+  void _listen(String sessionId) {
+    _watchSub = _repository
+        .watchGoRequests(sessionId)
+        .listen(
+          (list) => add(GoRequestsUpdated(sessionId, list)),
+          // Keep the last list and reconnect instead of wiping pending requests.
+          onError: (_) => _retryWatch(sessionId),
+          onDone: () => _retryWatch(sessionId),
+          cancelOnError: true,
+        );
+  }
+
+  void _retryWatch(String sessionId) {
+    Future<void>.delayed(retryDelay, () {
+      if (isClosed || _activeSessionId != sessionId) return;
+      _watchSub?.cancel();
+      _listen(sessionId);
+    });
   }
 
   Future<void> _onWatchStopped(
@@ -145,12 +171,14 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
     if (event.sessionId != _activeSessionId) return;
     _requests = event.requests;
     final current = state is GoRequestLoaded ? state as GoRequestLoaded : null;
-    emit(GoRequestLoaded(
-      requests: _requests,
-      actionInProgress: current?.actionInProgress ?? false,
-      statusMessage: current?.statusMessage,
-      statusIsError: current?.statusIsError ?? false,
-    ));
+    emit(
+      GoRequestLoaded(
+        requests: _requests,
+        actionInProgress: current?.actionInProgress ?? false,
+        statusMessage: current?.statusMessage,
+        statusIsError: current?.statusIsError ?? false,
+      ),
+    );
   }
 
   Future<void> _onCollect(
@@ -165,24 +193,30 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
     try {
       final result = await _repository.requestCollectGo(event.sessionId);
       if (result.status == GoRequestStatus.approved) {
-        emit(base.copyWith(
-          actionInProgress: false,
-          statusMessage: 'GO salary collected',
-          statusIsError: false,
-        ));
+        emit(
+          base.copyWith(
+            actionInProgress: false,
+            statusMessage: 'GO salary collected',
+            statusIsError: false,
+          ),
+        );
       } else {
-        emit(base.copyWith(
-          actionInProgress: false,
-          statusMessage: 'Waiting for Banker approval…',
-          statusIsError: false,
-        ));
+        emit(
+          base.copyWith(
+            actionInProgress: false,
+            statusMessage: 'Waiting for Banker approval…',
+            statusIsError: false,
+          ),
+        );
       }
     } catch (e) {
-      emit(base.copyWith(
-        actionInProgress: false,
-        statusMessage: _mapError(e),
-        statusIsError: true,
-      ));
+      emit(
+        base.copyWith(
+          actionInProgress: false,
+          statusMessage: _mapError(e),
+          statusIsError: true,
+        ),
+      );
     }
   }
 
@@ -200,21 +234,30 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
         requestId: event.requestId,
         approve: event.approve,
       );
-      emit(base.copyWith(
-        actionInProgress: false,
-        statusMessage: event.approve ? 'GO request approved' : 'GO request declined',
-        statusIsError: false,
-      ));
+      emit(
+        base.copyWith(
+          actionInProgress: false,
+          statusMessage: event.approve
+              ? 'GO request approved'
+              : 'GO request declined',
+          statusIsError: false,
+        ),
+      );
     } catch (e) {
-      emit(base.copyWith(
-        actionInProgress: false,
-        statusMessage: _mapError(e),
-        statusIsError: true,
-      ));
+      emit(
+        base.copyWith(
+          actionInProgress: false,
+          statusMessage: _mapError(e),
+          statusIsError: true,
+        ),
+      );
     }
   }
 
-  void _onStatusCleared(GoRequestStatusCleared event, Emitter<GoRequestState> emit) {
+  void _onStatusCleared(
+    GoRequestStatusCleared event,
+    Emitter<GoRequestState> emit,
+  ) {
     if (state is! GoRequestLoaded) return;
     emit((state as GoRequestLoaded).copyWith(clearStatus: true));
   }

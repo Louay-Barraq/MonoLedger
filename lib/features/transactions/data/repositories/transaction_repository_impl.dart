@@ -49,8 +49,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<LedgerTransaction> collectGoSalary({required String sessionId}) {
-    return _remoteDataSource.collectGoSalary(sessionId: sessionId);
+  Future<LedgerTransaction> reverseTransaction(String transactionId) {
+    return _remoteDataSource.reverseTransaction(transactionId);
   }
 
   @override

@@ -27,13 +27,13 @@ class GoSalaryRequest extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        sessionId,
-        requesterPlayerId,
-        amount,
-        status,
-        createdAt,
-        resolvedAt,
-        resolvedByPlayerId,
-      ];
+    id,
+    sessionId,
+    requesterPlayerId,
+    amount,
+    status,
+    createdAt,
+    resolvedAt,
+    resolvedByPlayerId,
+  ];
 }

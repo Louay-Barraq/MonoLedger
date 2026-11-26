@@ -16,11 +16,12 @@ class SessionModel extends Session {
     return SessionModel(
       id: json['id'],
       status: json['status'],
-      hostId: json['host_id'],
+      hostId: json['host_id'] as String? ?? '',
       joinCode: json['session_code'],
       createdAt: DateTime.parse(json['created_at']),
       config: json['config'] as Map<String, dynamic>? ?? {},
-      players: (json['players'] as List<dynamic>?)
+      players:
+          (json['players'] as List<dynamic>?)
               ?.map((p) => PlayerModel.fromJson(p as Map<String, dynamic>))
               .toList() ??
           [],

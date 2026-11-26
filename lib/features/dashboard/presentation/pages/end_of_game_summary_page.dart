@@ -6,6 +6,8 @@ import 'package:monoledger/core/widgets/overflow_safe_text.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart';
 import 'package:monoledger/features/home/domain/entities/player.dart';
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
+import 'package:monoledger/features/history/data/history_remote_data_source.dart';
+import 'package:monoledger/init_dependencies.dart';
 
 class EndOfGameSummaryPage extends StatelessWidget {
   final Session session;
@@ -19,7 +21,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
         : session.players.where((p) => p.status != 'KICKED').toList();
     final sortedPlayers = List<Player>.from(standings)
       ..sort((a, b) => b.balance.compareTo(a.balance));
-    
+
     final winner = sortedPlayers.isNotEmpty ? sortedPlayers.first : null;
 
     return Scaffold(
@@ -46,7 +48,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
               ),
             ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
@@ -63,6 +65,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
                         _sectionTitle('SESSION ANALYTICS'),
                         const SizedBox(height: 16),
                         _buildAnalyticsGrid(sortedPlayers),
+                        _GameHighlights(session: session),
                         const SizedBox(height: 40),
                         _sectionTitle('FINAL STANDINGS'),
                         const SizedBox(height: 16),
@@ -75,7 +78,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Fixed Bottom Button
           Positioned(
             bottom: 32,
@@ -134,7 +137,11 @@ class EndOfGameSummaryPage extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.amber.withValues(alpha: 0.2)),
             ),
-            child: const Icon(Icons.emoji_events_rounded, color: Colors.amber, size: 48),
+            child: const Icon(
+              Icons.emoji_events_rounded,
+              color: Colors.amber,
+              size: 48,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -163,7 +170,9 @@ class EndOfGameSummaryPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.backgroundColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+              border: Border.all(
+                color: AppTheme.primaryColor.withValues(alpha: 0.2),
+              ),
             ),
             child: FittedBox(
               fit: BoxFit.scaleDown,
@@ -198,12 +207,12 @@ class EndOfGameSummaryPage extends StatelessWidget {
   Widget _buildAnalyticsGrid(List<Player> players) {
     // Basic calcs
     final totalMoney = players.fold<double>(0, (sum, p) => sum + p.balance);
-    
+
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
-            'Total Volume',
+            'Money in play',
             CurrencyFormatter.formatMoney(session.currency, totalMoney),
             Icons.payments_rounded,
             const Color(0xFF44A5FF),
@@ -222,7 +231,12 @@ class EndOfGameSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       height: 120,
@@ -269,12 +283,14 @@ class EndOfGameSummaryPage extends StatelessWidget {
         final index = entry.key;
         final player = entry.value;
         final isWinner = index == 0;
-        
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isWinner ? AppTheme.surfaceContainerHigh : AppTheme.surfaceContainerLow,
+            color: isWinner
+                ? AppTheme.surfaceContainerHigh
+                : AppTheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -283,14 +299,18 @@ class EndOfGameSummaryPage extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: isWinner ? Colors.amber.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.05),
+                  color: isWinner
+                      ? Colors.amber.withValues(alpha: 0.2)
+                      : Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '${index + 1}',
                   style: GoogleFonts.spaceMono(
-                    color: isWinner ? Colors.amber : Colors.white.withValues(alpha: 0.4),
+                    color: isWinner
+                        ? Colors.amber
+                        : Colors.white.withValues(alpha: 0.4),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -307,9 +327,14 @@ class EndOfGameSummaryPage extends StatelessWidget {
               ),
               RowTrailingValue(
                 maxWidth: 120,
-                text: CurrencyFormatter.formatMoney(session.currency, player.balance),
+                text: CurrencyFormatter.formatMoney(
+                  session.currency,
+                  player.balance,
+                ),
                 style: GoogleFonts.spaceMono(
-                  color: isWinner ? Colors.amber : Colors.white.withValues(alpha: 0.6),
+                  color: isWinner
+                      ? Colors.amber
+                      : Colors.white.withValues(alpha: 0.6),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -339,16 +364,23 @@ class EndOfGameSummaryPage extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+        onPressed: () =>
+            Navigator.of(context).popUntil((route) => route.isFirst),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.black, size: 24),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.black,
+              size: 24,
+            ),
             const SizedBox(width: 12),
             Text(
               'SAVE & EXIT',
@@ -362,6 +394,100 @@ class EndOfGameSummaryPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Highlights from get_session_analytics; hides itself if they cannot load.
+class _GameHighlights extends StatefulWidget {
+  final Session session;
+  const _GameHighlights({required this.session});
+
+  @override
+  State<_GameHighlights> createState() => _GameHighlightsState();
+}
+
+class _GameHighlightsState extends State<_GameHighlights> {
+  late final Future<SessionAnalytics> _analytics =
+      serviceLocator<HistoryRemoteDataSource>().fetchSessionAnalytics(
+        widget.session.id,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<SessionAnalytics>(
+      future: _analytics,
+      builder: (context, snapshot) {
+        final a = snapshot.data;
+        if (a == null) return const SizedBox.shrink();
+        final currency = widget.session.currency;
+        final minutes = a.duration.inMinutes;
+        final lines = <(String, String)>[
+          (
+            'Volume traded',
+            CurrencyFormatter.formatMoney(currency, a.totalVolume),
+          ),
+          (
+            'Game length',
+            minutes >= 60
+                ? '${minutes ~/ 60}h ${minutes % 60}m'
+                : '${minutes}m',
+          ),
+          ('GO collected', '${a.goCollections}x'),
+          if (a.biggestEarner case final h?)
+            (
+              'Biggest earner',
+              '${h.playerName} · ${CurrencyFormatter.formatMoney(currency, h.value)}',
+            ),
+          if (a.biggestSpender case final h?)
+            (
+              'Biggest spender',
+              '${h.playerName} · ${CurrencyFormatter.formatMoney(currency, h.value)}',
+            ),
+          if (a.mostActiveTrader case final h?)
+            ('Most active', '${h.playerName} · ${h.value} moves'),
+        ];
+        return Container(
+          margin: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            children: [
+              for (final (label, value) in lines)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    children: [
+                      Text(
+                        label.toUpperCase(),
+                        style: GoogleFonts.spaceMono(
+                          color: Colors.white.withValues(alpha: 0.4),
+                          fontSize: 10,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          value,
+                          textAlign: TextAlign.end,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.spaceMono(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -22,7 +22,9 @@ class WalletTab extends StatelessWidget {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
         if (state is! SessionSuccess) {
-          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primaryColor),
+          );
         }
 
         final session = state.session;
@@ -32,9 +34,9 @@ class WalletTab extends StatelessWidget {
           ..sort((a, b) => b.balance.compareTo(a.balance));
 
         final currentPlayer = activePlayers.cast<Player?>().firstWhere(
-              (p) => p!.userId == currentUserId,
-              orElse: () => null,
-            );
+          (p) => p!.userId == currentUserId,
+          orElse: () => null,
+        );
 
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -71,21 +73,24 @@ class WalletTab extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _BankActionCard(
-                      label: 'FROM BANK',
-                      icon: Icons.payments_rounded,
-                      onTap: () => context.push(
-                        '/payment-pad',
-                        extra: PaymentPadRoute.bank(
-                          sessionId: session.id,
-                          currency: session.currency,
-                          isPaying: false,
+                  // Only the Banker can take money from the bank (enforced server-side too).
+                  if (currentPlayer?.isBanker ?? false) ...[
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _BankActionCard(
+                        label: 'FROM BANK',
+                        icon: Icons.payments_rounded,
+                        onTap: () => context.push(
+                          '/payment-pad',
+                          extra: PaymentPadRoute.bank(
+                            sessionId: session.id,
+                            currency: session.currency,
+                            isPaying: false,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
               const SizedBox(height: 32),
@@ -116,7 +121,9 @@ class WalletTab extends StatelessWidget {
               if (sortedPlayers.isEmpty)
                 Text(
                   'No players in session yet',
-                  style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5)),
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: 0.5),
+                  ),
                 )
               else
                 ...sortedPlayers.asMap().entries.map((entry) {
@@ -134,15 +141,15 @@ class WalletTab extends StatelessWidget {
                       onTap: isCurrentUser
                           ? null
                           : () => context.push(
-                                '/payment-pad',
-                                extra: PaymentPadRoute.player(
-                                  sessionId: session.id,
-                                  currency: session.currency,
-                                  targetName: player.name,
-                                  recipientPlayerId: player.id,
-                                  isPaying: true,
-                                ),
+                              '/payment-pad',
+                              extra: PaymentPadRoute.player(
+                                sessionId: session.id,
+                                currency: session.currency,
+                                targetName: player.name,
+                                recipientPlayerId: player.id,
+                                isPaying: true,
                               ),
+                            ),
                     ),
                   );
                 }),
@@ -209,13 +216,17 @@ class _BalanceCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.primaryColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                  isPositive
+                      ? Icons.trending_up_rounded
+                      : Icons.trending_down_rounded,
                   color: AppTheme.primaryColor,
                   size: 16,
                 ),
@@ -268,15 +279,17 @@ class _GoSalaryBanner extends StatelessWidget {
                 color: state.statusIsError ? Colors.white : Colors.black,
               ),
             ),
-            backgroundColor:
-                state.statusIsError ? AppTheme.errorColor : AppTheme.primaryColor,
+            backgroundColor: state.statusIsError
+                ? AppTheme.errorColor
+                : AppTheme.primaryColor,
           ),
         );
         context.read<GoRequestBloc>().add(const GoRequestStatusCleared());
       },
       builder: (context, goState) {
         final loaded = goState is GoRequestLoaded ? goState : null;
-        final hasPending = myPlayerId != null &&
+        final hasPending =
+            myPlayerId != null &&
             (loaded?.requests.any(
                   (r) => r.requesterPlayerId == myPlayerId && r.isPending,
                 ) ??
@@ -285,75 +298,85 @@ class _GoSalaryBanner extends StatelessWidget {
         final canTap = enabled && !hasPending && !isBusy;
 
         return GestureDetector(
-        onTap: canTap
-            ? () {
-                context.read<GoRequestBloc>().add(GoCollectRequested(sessionId));
-              }
-            : null,
-        child: Opacity(
-          opacity: canTap ? 1 : 0.55,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          onTap: canTap
+              ? () {
+                  context.read<GoRequestBloc>().add(
+                    GoCollectRequested(sessionId),
+                  );
+                }
+              : null,
+          child: Opacity(
+            opacity: canTap ? 1 : 0.55,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'GO',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.black,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            fontStyle: FontStyle.italic,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                        Text(
+                          hasPending ? 'AWAITING BANKER' : 'COLLECT SALARY',
+                          style: GoogleFonts.spaceMono(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'GO',
+                      RowTrailingValue(
+                        maxWidth: 160,
+                        text: CurrencyFormatter.formatSignedMoney(
+                          currency,
+                          goAmount,
+                          positive: true,
+                        ),
                         style: GoogleFonts.plusJakartaSans(
                           color: Colors.black,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
-                          letterSpacing: -1,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      Text(
-                        hasPending ? 'AWAITING BANKER' : 'COLLECT SALARY',
-                        style: GoogleFonts.spaceMono(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                        ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.black,
+                        size: 24,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 12),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RowTrailingValue(
-                      maxWidth: 160,
-                      text: CurrencyFormatter.formatSignedMoney(currency, goAmount, positive: true),
-                      style: GoogleFonts.plusJakartaSans(
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 24),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
         );
       },
     );
@@ -451,9 +474,15 @@ class _PlayerCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                ),
               ),
-              child: const Icon(Icons.person_rounded, color: AppTheme.primaryColor, size: 26),
+              child: const Icon(
+                Icons.person_rounded,
+                color: AppTheme.primaryColor,
+                size: 26,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -476,11 +505,20 @@ class _PlayerCard extends StatelessWidget {
                       if (isCurrentUser) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withValues(alpha: 0.15),
+                            color: AppTheme.primaryColor.withValues(
+                              alpha: 0.15,
+                            ),
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.4)),
+                            border: Border.all(
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
                           ),
                           child: Text(
                             'YOU',

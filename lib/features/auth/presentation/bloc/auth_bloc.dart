@@ -11,14 +11,18 @@ abstract class AuthState extends Equatable {
 }
 
 class AuthInitial extends AuthState {}
+
 class AuthLoading extends AuthState {}
+
 class AuthAuthenticated extends AuthState {
   final User user;
   const AuthAuthenticated(this.user);
   @override
   List<Object?> get props => [user];
 }
+
 class AuthUnauthenticated extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
@@ -34,8 +38,12 @@ abstract class AuthEvent extends Equatable {
 }
 
 class AuthLoginAnonymouslyRequested extends AuthEvent {}
+
 class AuthLogoutRequested extends AuthEvent {}
+
 class AuthCheckStatusRequested extends AuthEvent {}
+
+class AuthDeleteAccountRequested extends AuthEvent {}
 
 // Bloc
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -45,6 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthCheckStatusRequested>(_onCheckStatus);
     on<AuthLoginAnonymouslyRequested>(_onLoginAnonymously);
     on<AuthLogoutRequested>(_onLogout);
+    on<AuthDeleteAccountRequested>(_onDeleteAccount);
   }
 
   Future<void> _onCheckStatus(
@@ -82,5 +91,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _authRepository.logout();
     emit(AuthUnauthenticated());
+  }
+
+  Future<void> _onDeleteAccount(
+    AuthDeleteAccountRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await _authRepository.deleteAccount();
+      emit(AuthUnauthenticated());
+    } catch (_) {
+      emit(
+        const AuthError(
+          'Could not delete your data. Check your connection and try again.',
+        ),
+      );
+    }
   }
 }

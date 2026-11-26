@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -27,13 +26,6 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
 
   SessionRemoteDataSourceImpl(this._supabaseClient);
 
-  String _generateSessionCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final rnd = Random();
-    return String.fromCharCodes(Iterable.generate(
-        6, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
-  }
-
   @override
   Future<SessionModel> createSession({
     required String currency,
@@ -42,20 +34,20 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     required String bankerName,
   }) async {
     try {
-      final sessionCode = _generateSessionCode();
-      final response = await _supabaseClient.from('sessions').insert({
-        'session_code': sessionCode,
-        'host_id': _supabaseClient.auth.currentUser!.id,
-        'status': 'open',
-        'config': {
-          'currency': currency,
-          'starting_balance': startingBalance,
-          'go_amount': goAmount,
-          'banker_name': bankerName,
+      // Server picks a unique code and adds the host as the Banker player.
+      final response = await _supabaseClient.rpc(
+        'create_session',
+        params: {
+          'p_config': {
+            'currency': currency,
+            'starting_balance': startingBalance,
+            'go_amount': goAmount,
+          },
+          'p_banker_name': bankerName,
         },
-      }).select().single();
+      );
 
-      return SessionModel.fromJson(response);
+      return SessionModel.fromJson(response as Map<String, dynamic>);
     } catch (e, stackTrace) {
       debugPrint('Error creating session: $e\n$stackTrace');
       rethrow;
@@ -65,10 +57,13 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
   @override
   Future<SessionModel> joinSession(String joinCode, String playerName) async {
     try {
-      final response = await _supabaseClient.rpc('join_session_by_code', params: {
-        'p_session_code': joinCode.trim(),
-        'p_player_name': playerName.trim(),
-      });
+      final response = await _supabaseClient.rpc(
+        'join_session_by_code',
+        params: {
+          'p_session_code': joinCode.trim(),
+          'p_player_name': playerName.trim(),
+        },
+      );
 
       var session = SessionModel.fromJson(response as Map<String, dynamic>);
       session = await _ensureActiveMembership(session, playerName.trim());
@@ -107,10 +102,10 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     }
 
     if (me.status == 'LEFT') {
-      final response = await _supabaseClient.rpc('reactivate_left_player', params: {
-        'p_session_id': session.id,
-        'p_player_name': playerName,
-      });
+      final response = await _supabaseClient.rpc(
+        'reactivate_left_player',
+        params: {'p_session_id': session.id, 'p_player_name': playerName},
+      );
       return SessionModel.fromJson(response as Map<String, dynamic>);
     }
 
@@ -123,33 +118,40 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
 
   @override
   Future<void> endSession(String sessionId) async {
-    await _supabaseClient
-        .from('sessions')
-        .update({'status': 'ended'})
-        .eq('id', sessionId);
+    await _supabaseClient.rpc(
+      'end_session',
+      params: {'p_session_id': sessionId},
+    );
   }
 
   @override
   Future<void> kickPlayer(String sessionId, String targetPlayerId) async {
-    await _supabaseClient.rpc('kick_player', params: {
-      'p_session_id': sessionId,
-      'p_target_player_id': targetPlayerId,
-    });
+    await _supabaseClient.rpc(
+      'kick_player',
+      params: {'p_session_id': sessionId, 'p_target_player_id': targetPlayerId},
+    );
   }
 
   @override
-  Future<void> transferBankerRole(String sessionId, String newBankerPlayerId) async {
-    await _supabaseClient.rpc('transfer_banker', params: {
-      'p_session_id': sessionId,
-      'p_new_banker_player_id': newBankerPlayerId,
-    });
+  Future<void> transferBankerRole(
+    String sessionId,
+    String newBankerPlayerId,
+  ) async {
+    await _supabaseClient.rpc(
+      'transfer_banker',
+      params: {
+        'p_session_id': sessionId,
+        'p_new_banker_player_id': newBankerPlayerId,
+      },
+    );
   }
 
   @override
   Future<void> leaveSession(String sessionId) async {
-    await _supabaseClient.rpc('leave_session', params: {
-      'p_session_id': sessionId,
-    });
+    await _supabaseClient.rpc(
+      'leave_session',
+      params: {'p_session_id': sessionId},
+    );
   }
 
   Future<SessionModel> _fetchSessionWithPlayers(String sessionId) async {
@@ -162,10 +164,7 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
         .from('players')
         .select()
         .eq('session_id', sessionId);
-    return SessionModel.fromJson({
-      ...session,
-      'players': players,
-    });
+    return SessionModel.fromJson({...session, 'players': players});
   }
 
   @override
@@ -178,7 +177,9 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
           .maybeSingle();
       if (session == null) return null;
 
-      final fullSession = await _fetchSessionWithPlayers(session['id'] as String);
+      final fullSession = await _fetchSessionWithPlayers(
+        session['id'] as String,
+      );
       final userId = _supabaseClient.auth.currentUser?.id;
       final me = fullSession.playerByUserId(userId);
 
@@ -201,12 +202,12 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
         .from('sessions')
         .stream(primaryKey: ['id'])
         .eq('id', sessionId)
-        .listen((_) => controller.add(null));
+        .listen((_) => controller.add(null), onError: controller.addError);
     final playersSub = _supabaseClient
         .from('players')
         .stream(primaryKey: ['id'])
         .eq('session_id', sessionId)
-        .listen((_) => controller.add(null));
+        .listen((_) => controller.add(null), onError: controller.addError);
 
     try {
       await for (final _ in controller.stream) {

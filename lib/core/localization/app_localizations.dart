@@ -17,9 +17,7 @@ class AppLocalizations {
 
   String _t(String key) {
     final lang = locale.languageCode;
-    return _localizedValues[lang]?[key] ??
-        _localizedValues['en']![key] ??
-        key;
+    return _localizedValues[lang]?[key] ?? _localizedValues['en']![key] ?? key;
   }
 
   // Settings
@@ -56,7 +54,8 @@ class AppLocalizations {
   String get homeCapacityValue => _t('homeCapacityValue');
   String get homeSyncingValue => _t('homeSyncingValue');
 
-  List<FaqEntry> get faqEntries => FaqContent.forLanguageCode(locale.languageCode);
+  List<FaqEntry> get faqEntries =>
+      FaqContent.forLanguageCode(locale.languageCode);
 }
 
 class FaqEntry {
@@ -102,7 +101,7 @@ class FaqContent {
       FaqEntry(
         question: 'Can I leave and rejoin?',
         answer:
-            'Yes. If you leave voluntarily, you can rejoin the same session with the code. Your balance resets to the session starting capital when you rejoin.',
+            'Yes. If you leave voluntarily, you can rejoin the same session with the code. You keep the balance you had when you left.',
       ),
       FaqEntry(
         question: 'What happens if I am kicked?',
@@ -117,7 +116,7 @@ class FaqContent {
       FaqEntry(
         question: 'Which games is it for?',
         answer:
-            'MonoLedger works with any game that uses play money—Monopoly, The Game of Life, and similar titles. Defaults are tuned for Monopoly-style rules.',
+            'MonoLedger works with any board game that uses play money. The defaults (1,500 to start, 200 for passing GO) suit classic property-trading games.',
       ),
       FaqEntry(
         question: 'Who built MonoLedger?',
@@ -154,7 +153,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'settingsAbout': 'About',
     'settingsAboutSubtitle': 'App info and developer',
     'settingsHaptics': 'Haptic feedback',
-    'settingsHapticsSubtitle': 'Vibration on slide-to-pay (coming soon)',
+    'settingsHapticsSubtitle': 'Vibration on slide-to-pay',
     'settingsVersion': 'Version',
     'settingsSectionGeneral': 'GENERAL',
     'settingsSectionSupport': 'SUPPORT',
@@ -170,7 +169,8 @@ const Map<String, Map<String, String>> _localizedValues = {
     'homeCreateSession': 'CREATE SESSION',
     'homeJoinSession': 'JOIN SESSION',
     'homeTagline': 'DIGITAL CURRENCY FOR BOARD GAMES',
-    'homeFooter': 'Supports 2-10 players.\nOptimized for\nMonopoly, Life & more.',
+    'homeFooter':
+        'Supports 2-10 players.\nFor any board game\nthat uses play money.',
     'homeCapacity': 'CAPACITY',
     'homeSyncing': 'SYNCING',
     'homeCapacityValue': '2-10 PLAYERS',
@@ -184,7 +184,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'settingsAbout': 'À propos',
     'settingsAboutSubtitle': 'Infos app et développeur',
     'settingsHaptics': 'Retour haptique',
-    'settingsHapticsSubtitle': 'Vibration au paiement (bientôt)',
+    'settingsHapticsSubtitle': 'Vibration au paiement',
     'settingsVersion': 'Version',
     'settingsSectionGeneral': 'GÉNÉRAL',
     'settingsSectionSupport': 'ASSISTANCE',
@@ -200,7 +200,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'homeCreateSession': 'CRÉER UNE SESSION',
     'homeJoinSession': 'REJOINDRE',
     'homeTagline': 'MONNAIE NUMÉRIQUE POUR JEUX DE SOCIÉTÉ',
-    'homeFooter': '2 à 10 joueurs.\nMonopoly, Life et plus.',
+    'homeFooter': '2 à 10 joueurs.\nPour tout jeu avec de la fausse monnaie.',
     'homeCapacity': 'CAPACITÉ',
     'homeSyncing': 'SYNC',
     'homeCapacityValue': '2-10 JOUEURS',
@@ -214,7 +214,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'settingsAbout': 'Über',
     'settingsAboutSubtitle': 'App & Entwickler',
     'settingsHaptics': 'Haptisches Feedback',
-    'settingsHapticsSubtitle': 'Vibration beim Bezahlen (demnächst)',
+    'settingsHapticsSubtitle': 'Vibration beim Bezahlen',
     'settingsVersion': 'Version',
     'settingsSectionGeneral': 'ALLGEMEIN',
     'settingsSectionSupport': 'HILFE',
@@ -230,7 +230,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'homeCreateSession': 'SESSION ERSTELLEN',
     'homeJoinSession': 'BEITRETEN',
     'homeTagline': 'DIGITALES GELD FÜR BRETTSPIELE',
-    'homeFooter': '2–10 Spieler.\nMonopoly, Life & mehr.',
+    'homeFooter': '2–10 Spieler.\nFür jedes Brettspiel mit Spielgeld.',
     'homeCapacity': 'KAPAZITÄT',
     'homeSyncing': 'SYNC',
     'homeCapacityValue': '2-10 SPIELER',
@@ -244,7 +244,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'settingsAbout': 'حول التطبيق',
     'settingsAboutSubtitle': 'معلومات التطبيق والمطور',
     'settingsHaptics': 'الاهتزاز',
-    'settingsHapticsSubtitle': 'اهتزاز عند الدفع (قريباً)',
+    'settingsHapticsSubtitle': 'اهتزاز عند الدفع',
     'settingsVersion': 'الإصدار',
     'settingsSectionGeneral': 'عام',
     'settingsSectionSupport': 'الدعم',
@@ -260,7 +260,7 @@ const Map<String, Map<String, String>> _localizedValues = {
     'homeCreateSession': 'إنشاء جلسة',
     'homeJoinSession': 'انضمام',
     'homeTagline': 'عملة رقمية لألعاب الطاولة',
-    'homeFooter': 'يدعم 2-10 لاعبين.\nMonopoly وLife والمزيد.',
+    'homeFooter': 'يدعم 2-10 لاعبين.\nلأي لعبة لوحية تستخدم أموال اللعب.',
     'homeCapacity': 'السعة',
     'homeSyncing': 'المزامنة',
     'homeCapacityValue': '2-10 لاعبين',

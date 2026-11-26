@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
-import 'package:monoledger/features/home/domain/entities/session.dart' as domain;
+import 'package:monoledger/features/home/domain/entities/session.dart'
+    as domain;
 import 'package:monoledger/features/home/domain/entities/player.dart';
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
@@ -31,7 +32,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = _session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
+    final isBanker = _session.activePlayers.any(
+      (p) => p.userId == currentUserId && p.isBanker,
+    );
 
     return BlocListener<SessionBloc, SessionState>(
       listenWhen: (prev, curr) =>
@@ -40,68 +43,74 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       listener: (context, state) {
         if (state is SessionError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppTheme.errorColor,
+            ),
           );
         } else if (state is SessionSuccess) {
           setState(() => _session = state.session);
         }
       },
       child: Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+        backgroundColor: AppTheme.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Text(
+            'GAME SETTINGS',
+            style: GoogleFonts.plusJakartaSans(
+              color: AppTheme.primaryColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2,
+            ),
+          ),
+          centerTitle: true,
         ),
-        title: Text(
-          'GAME SETTINGS',
-          style: GoogleFonts.plusJakartaSans(
-            color: AppTheme.primaryColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 2,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Session Code Section
+              _buildSessionCode(context),
+              const SizedBox(height: 32),
+
+              // Fiscal Rules Section
+              _sectionHeader('FISCAL RULES', Icons.account_balance_rounded),
+              const SizedBox(height: 16),
+              _buildFiscalRules(),
+              const SizedBox(height: 32),
+
+              // Players Management Section
+              _sectionHeader('ACTIVE PLAYERS', Icons.group_rounded),
+              const SizedBox(height: 16),
+              _buildPlayersList(context, isBanker, currentUserId),
+              const SizedBox(height: 48),
+
+              // Game Management Section
+              if (isBanker) ...[
+                _sectionHeader(
+                  'GAME MANAGEMENT',
+                  Icons.settings_applications_rounded,
+                ),
+                const SizedBox(height: 16),
+                _buildGameManagement(context),
+              ] else ...[
+                _sectionHeader('EXIT', Icons.exit_to_app_rounded),
+                const SizedBox(height: 16),
+                _buildPlayerExit(context),
+              ],
+              const SizedBox(height: 40),
+            ],
           ),
         ),
-        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Session Code Section
-            _buildSessionCode(context),
-            const SizedBox(height: 32),
-
-            // Fiscal Rules Section
-            _sectionHeader('FISCAL RULES', Icons.account_balance_rounded),
-            const SizedBox(height: 16),
-            _buildFiscalRules(),
-            const SizedBox(height: 32),
-
-            // Players Management Section
-            _sectionHeader('ACTIVE PLAYERS', Icons.group_rounded),
-            const SizedBox(height: 16),
-            _buildPlayersList(context, isBanker, currentUserId),
-            const SizedBox(height: 48),
-
-            // Game Management Section
-            if (isBanker) ...[
-              _sectionHeader('GAME MANAGEMENT', Icons.settings_applications_rounded),
-              const SizedBox(height: 16),
-              _buildGameManagement(context),
-            ] else ...[
-              _sectionHeader('EXIT', Icons.exit_to_app_rounded),
-              const SizedBox(height: 16),
-              _buildPlayerExit(context),
-            ],
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    ),
     );
   }
 
@@ -150,7 +159,10 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
                 );
               }
             },
-            icon: const Icon(Icons.content_copy_rounded, color: AppTheme.primaryColor),
+            icon: const Icon(
+              Icons.content_copy_rounded,
+              color: AppTheme.primaryColor,
+            ),
             style: IconButton.styleFrom(
               backgroundColor: AppTheme.surfaceContainerHigh,
               padding: const EdgeInsets.all(12),
@@ -188,8 +200,19 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       mainAxisSpacing: 16,
       childAspectRatio: 1.5,
       children: [
-        _buildRuleCard('Starting Capital', CurrencyFormatter.formatMoney(_session.currency, _session.startingBalance), Icons.payments_rounded),
-        _buildRuleCard('GO Bonus', CurrencyFormatter.formatMoney(_session.currency, _session.goAmount), Icons.autorenew_rounded),
+        _buildRuleCard(
+          'Starting Capital',
+          CurrencyFormatter.formatMoney(
+            _session.currency,
+            _session.startingBalance,
+          ),
+          Icons.payments_rounded,
+        ),
+        _buildRuleCard(
+          'GO Bonus',
+          CurrencyFormatter.formatMoney(_session.currency, _session.goAmount),
+          Icons.autorenew_rounded,
+        ),
       ],
     );
   }
@@ -200,7 +223,12 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       decoration: BoxDecoration(
         color: AppTheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: AppTheme.primaryColor.withValues(alpha: 0.3), width: 3)),
+        border: Border(
+          left: BorderSide(
+            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+            width: 3,
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +239,10 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
             children: [
               Text(
                 label,
-                style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.4), fontSize: 12),
+                style: GoogleFonts.inter(
+                  color: Colors.white.withValues(alpha: 0.4),
+                  fontSize: 12,
+                ),
               ),
               Icon(icon, color: AppTheme.primaryColor, size: 14),
             ],
@@ -223,7 +254,11 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               alignment: Alignment.centerLeft,
               child: Text(
                 value,
-                style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: GoogleFonts.spaceMono(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -232,7 +267,11 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
     );
   }
 
-  Widget _buildPlayersList(BuildContext context, bool isBanker, String? currentUserId) {
+  Widget _buildPlayersList(
+    BuildContext context,
+    bool isBanker,
+    String? currentUserId,
+  ) {
     final activePlayers = _session.activePlayers;
     return Column(
       children: activePlayers.map((player) {
@@ -241,17 +280,23 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelf ? AppTheme.surfaceContainerHigh : AppTheme.surfaceContainerLow,
+            color: isSelf
+                ? AppTheme.surfaceContainerHigh
+                : AppTheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: (player.isBanker ? AppTheme.primaryColor : Colors.white).withValues(alpha: 0.1),
+                backgroundColor:
+                    (player.isBanker ? AppTheme.primaryColor : Colors.white)
+                        .withValues(alpha: 0.1),
                 child: Text(
                   player.name[0].toUpperCase(),
                   style: TextStyle(
-                    color: player.isBanker ? AppTheme.primaryColor : Colors.white,
+                    color: player.isBanker
+                        ? AppTheme.primaryColor
+                        : Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -285,17 +330,27 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               if (isBanker && !isSelf) ...[
                 IconButton(
                   onPressed: () => _showTransferBankerDialog(context, player),
-                  icon: const Icon(Icons.history_edu_rounded, color: Colors.orangeAccent),
+                  icon: const Icon(
+                    Icons.history_edu_rounded,
+                    color: Colors.orangeAccent,
+                  ),
                   tooltip: 'Transfer Banker Role',
                 ),
                 IconButton(
                   onPressed: () => _showKickDialog(context, player),
-                  icon: const Icon(Icons.person_remove_rounded, color: Colors.redAccent),
+                  icon: const Icon(
+                    Icons.person_remove_rounded,
+                    color: Colors.redAccent,
+                  ),
                   tooltip: 'Kick Player',
                 ),
               ],
               if (!isBanker && player.isBanker)
-                const Icon(Icons.admin_panel_settings_rounded, color: AppTheme.primaryColor, size: 20),
+                const Icon(
+                  Icons.admin_panel_settings_rounded,
+                  color: AppTheme.primaryColor,
+                  size: 20,
+                ),
             ],
           ),
         );
@@ -349,7 +404,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           side: BorderSide(color: color.withValues(alpha: 0.3)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           backgroundColor: color.withValues(alpha: 0.05),
         ),
         child: Row(
@@ -382,22 +439,32 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
           'Transfer Banker role and session host to ${player.name}? You will lose host and Banker privileges.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionTransferBankerRequested(
-                sessionId: _session.id,
-                newBankerPlayerId: player.id,
-              ));
+              context.read<SessionBloc>().add(
+                SessionTransferBankerRequested(
+                  sessionId: _session.id,
+                  newBankerPlayerId: player.id,
+                ),
+              );
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${player.name} is now the Banker and session host.'),
+                  content: Text(
+                    '${player.name} is now the Banker and session host.',
+                  ),
                   backgroundColor: AppTheme.primaryColor,
                 ),
               );
             },
-            child: const Text('TRANSFER', style: TextStyle(color: Colors.orangeAccent)),
+            child: const Text(
+              'TRANSFER',
+              style: TextStyle(color: Colors.orangeAccent),
+            ),
           ),
         ],
       ),
@@ -410,21 +477,33 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
         title: const Text('Kick Player?'),
-        content: Text('Are you sure you want to remove ${player.name} from the session?'),
+        content: Text(
+          'Are you sure you want to remove ${player.name} from the session?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionKickRequested(
-                sessionId: _session.id,
-                targetPlayerId: player.id,
-              ));
+              context.read<SessionBloc>().add(
+                SessionKickRequested(
+                  sessionId: _session.id,
+                  targetPlayerId: player.id,
+                ),
+              );
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${player.name} was removed from the session.')),
+                SnackBar(
+                  content: Text('${player.name} was removed from the session.'),
+                ),
               );
             },
-            child: const Text('KICK', style: TextStyle(color: Colors.redAccent)),
+            child: const Text(
+              'KICK',
+              style: TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
@@ -437,16 +516,24 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
         title: const Text('End Session?'),
-        content: const Text('This will permanently end the game for everyone and move to the summary screen.'),
+        content: const Text(
+          'This will permanently end the game for everyone and move to the summary screen.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
               context.read<SessionBloc>().add(SessionEndRequested(_session.id));
               Navigator.pop(ctx);
               Navigator.pop(context); // Close settings
             },
-            child: const Text('END GAME', style: TextStyle(color: AppTheme.errorColor)),
+            child: const Text(
+              'END GAME',
+              style: TextStyle(color: AppTheme.errorColor),
+            ),
           ),
         ],
       ),
@@ -455,7 +542,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
 
   void _showLeaveSessionDialog(BuildContext context) {
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
-    final isBanker = _session.activePlayers.any((p) => p.userId == currentUserId && p.isBanker);
+    final isBanker = _session.activePlayers.any(
+      (p) => p.userId == currentUserId && p.isBanker,
+    );
     final activeCount = _session.activePlayers.length;
     final hasOthers = activeCount > 1;
 
@@ -466,16 +555,21 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
         title: const Text('Leave Session?'),
         content: Text(
           isBanker
-            ? (hasOthers
-                ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
-                : 'You are the only player. Leaving will end the session for everyone. Continue?')
-            : 'You will leave this session and return to the home screen. Continue?'
+              ? (hasOthers
+                    ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
+                    : 'You are the only player. Leaving will end the session for everyone. Continue?')
+              : 'You will leave this session and return to the home screen. Continue?',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
-              context.read<SessionBloc>().add(SessionLeaveRequested(_session.id));
+              context.read<SessionBloc>().add(
+                SessionLeaveRequested(_session.id),
+              );
               Navigator.pop(ctx);
               Navigator.pop(context); // Close settings
               // Dashboard listener will handle navigation to home
