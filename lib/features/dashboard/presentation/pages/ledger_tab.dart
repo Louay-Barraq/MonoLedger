@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/widgets/overflow_safe_text.dart';
 import 'package:monoledger/features/dashboard/presentation/utils/ledger_display.dart';
@@ -41,7 +42,7 @@ class LedgerTab extends StatelessWidget {
             if (message == null) return;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(message),
+                content: Text(AppLocalizations.of(context).message(message)),
                 backgroundColor: state is TransactionError
                     ? AppTheme.errorColor
                     : AppTheme.surfaceContainerHigh,
@@ -76,7 +77,7 @@ class LedgerTab extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  'Ledger',
+                                  AppLocalizations.of(context).ledgerTitle,
                                   style: GoogleFonts.plusJakartaSans(
                                     color: Colors.white,
                                     fontSize: 36,
@@ -130,7 +131,7 @@ class LedgerTab extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'All session transactions',
+                          AppLocalizations.of(context).ledgerSubtitle,
                           style: GoogleFonts.inter(
                             color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
@@ -155,7 +156,7 @@ class LedgerTab extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Text(
-                        'No transactions yet',
+                        AppLocalizations.of(context).ledgerEmpty,
                         style: GoogleFonts.inter(
                           color: Colors.white.withValues(alpha: 0.5),
                         ),
@@ -173,6 +174,7 @@ class LedgerTab extends StatelessWidget {
                           tx: tx,
                           currency: session.currency,
                           players: session.players,
+                          l10n: AppLocalizations.of(context),
                         );
                         final isReversed = reversedIds.contains(tx.id);
                         final canReverse =
@@ -225,21 +227,18 @@ class LedgerTab extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Reverse transaction?'),
-        content: Text(
-          '$title ($amount) will be undone with an opposite entry in the ledger. '
-          'This can only be done once.',
-        ),
+        title: Text(AppLocalizations.of(context).reverseTitle),
+        content: Text(AppLocalizations.of(context).reverseBody(title, amount)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'REVERSE',
-              style: TextStyle(color: AppTheme.errorColor),
+            child: Text(
+              AppLocalizations.of(context).reverseAction,
+              style: const TextStyle(color: AppTheme.errorColor),
             ),
           ),
         ],
@@ -332,11 +331,11 @@ class _LedgerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onLongPress: onLongPress,
-      child: Opacity(opacity: isReversed ? 0.45 : 1, child: _buildRow()),
+      child: Opacity(opacity: isReversed ? 0.45 : 1, child: _buildRow(context)),
     );
   }
 
-  Widget _buildRow() {
+  Widget _buildRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 18),
       child: Row(
@@ -357,7 +356,9 @@ class _LedgerItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  isReversed ? '$subtitle • REVERSED' : subtitle,
+                  isReversed
+                      ? '$subtitle • ${AppLocalizations.of(context).ledgerReversed}'
+                      : subtitle,
                   style: GoogleFonts.spaceMono(
                     color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 10,

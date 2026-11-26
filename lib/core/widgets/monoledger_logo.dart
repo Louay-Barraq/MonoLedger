@@ -1,10 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
-/// The MonoLedger mark: a hex game token with ledger rows and a cursor cut out.
-/// Construction notes: design/logo-variants.md (variant 08).
+/// The MonoLedger mark: a die with a coin resting on it (board-game money).
+/// One colour, with real cut-outs, so it sits on any background.
+/// Chosen in design/logo-round2.md (variant 03).
 class MonoLedgerLogo extends StatelessWidget {
   final double size;
   final Color color;
@@ -33,51 +32,49 @@ class MonoLedgerLogoPainter extends CustomPainter {
 
   const MonoLedgerLogoPainter(this.color);
 
-  /// The mark as a path in an [s]×[s] box (also used to render icons).
+  /// Share of the box covered by the mark's longer side.
+  static const _fill = 0.84;
+
+  /// The mark as a path centred in an [s]×[s] box (also used to render icons).
   static Path markPath(double s) {
-    final token = _hexagon(s, s * 0.4, s * 0.07);
-    final rowHeight = s * 0.07;
-    final left = s * 0.31;
-    const widths = [0.38, 0.28, 0.16];
-    final cut = Path();
-    for (var i = 0; i < widths.length; i++) {
-      cut.addRRect(
+    // Built on a unit square, then centred and scaled to fit.
+    const dieCentre = Offset(0.40, 0.40);
+    const coinCentre = Offset(0.66, 0.66);
+
+    Path circle(Offset centre, double radius) =>
+        Path()..addOval(Rect.fromCircle(center: centre, radius: radius));
+    Path minus(Path a, Path b) => Path.combine(PathOperation.difference, a, b);
+
+    // Die: a rounded square, tilted, with three pips on the diagonal.
+    var die = Path()
+      ..addRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            left,
-            s * 0.355 + i * s * 0.115,
-            s * widths[i],
-            rowHeight,
-          ),
-          Radius.circular(rowHeight / 2),
+          Rect.fromCircle(center: Offset.zero, radius: 0.22),
+          const Radius.circular(0.07),
         ),
       );
+    for (final pip in const [-0.1, 0.0, 0.1]) {
+      die = minus(die, circle(Offset(pip, pip), 0.04));
     }
-    cut.addRect(Rect.fromLTWH(left + s * 0.2, s * 0.585, s * 0.06, rowHeight));
-    return Path.combine(PathOperation.difference, token, cut);
-  }
+    final tilt = Matrix4.translationValues(dieCentre.dx, dieCentre.dy, 0)
+      ..rotateZ(-0.2);
+    die = die.transform(tilt.storage);
+    // A gap separates the die from the coin in front of it.
+    die = minus(die, circle(coinCentre, 0.23));
 
-  static Path _hexagon(double s, double radius, double corner) {
-    final c = Offset(s / 2, s / 2);
-    final points = [
-      for (var i = 0; i < 6; i++)
-        c + Offset.fromDirection(math.pi / 3 * i - math.pi / 2, radius),
-    ];
-    final path = Path();
-    for (var i = 0; i < 6; i++) {
-      final prev = points[(i + 5) % 6],
-          cur = points[i],
-          next = points[(i + 1) % 6];
-      final a = cur + (prev - cur) * (corner / (prev - cur).distance);
-      final b = cur + (next - cur) * (corner / (next - cur).distance);
-      if (i == 0) {
-        path.moveTo(a.dx, a.dy);
-      } else {
-        path.lineTo(a.dx, a.dy);
-      }
-      path.quadraticBezierTo(cur.dx, cur.dy, b.dx, b.dy);
-    }
-    return path..close();
+    // Coin: a disc with an inner rim.
+    final rim = minus(circle(coinCentre, 0.135), circle(coinCentre, 0.105));
+    final coin = minus(circle(coinCentre, 0.19), rim);
+
+    final mark = Path.combine(PathOperation.union, die, coin);
+    final bounds = mark.getBounds();
+    final scale = s * _fill / bounds.longestSide;
+    final fit = Matrix4.translationValues(s / 2, s / 2, 0)
+      ..multiply(Matrix4.diagonal3Values(scale, scale, 1))
+      ..multiply(
+        Matrix4.translationValues(-bounds.center.dx, -bounds.center.dy, 0),
+      );
+    return mark.transform(fit.storage);
   }
 
   @override

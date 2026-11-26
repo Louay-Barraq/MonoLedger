@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/amount_pad_input.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
@@ -89,20 +90,20 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Large bank payout'),
+        title: Text(AppLocalizations.of(context).padLargePayoutTitle),
         content: Text(
-          'This payout ($formatted) exceeds 50% of total session liquidity. Confirm to proceed.',
+          AppLocalizations.of(context).padLargePayoutBody(formatted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'CONFIRM',
-              style: TextStyle(color: AppTheme.primaryColor),
+            child: Text(
+              AppLocalizations.of(context).commonConfirm,
+              style: const TextStyle(color: AppTheme.primaryColor),
             ),
           ),
         ],
@@ -209,7 +210,7 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    state.message,
+                    AppLocalizations.of(context).message(state.message),
                     style: GoogleFonts.spaceMono(color: Colors.black),
                   ),
                   backgroundColor: AppTheme.primaryColor,
@@ -219,7 +220,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
             } else if (state is TransactionError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message),
+                  content: Text(
+                    AppLocalizations.of(context).message(state.message),
+                  ),
                   backgroundColor: AppTheme.errorColor,
                 ),
               );
@@ -248,7 +251,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                 child: Column(
                   children: [
                     Text(
-                      widget.isPaying ? 'PAYING TO' : 'RECEIVING FROM',
+                      widget.isPaying
+                          ? AppLocalizations.of(context).padPayingTo
+                          : AppLocalizations.of(context).padReceivingFrom,
                       style: GoogleFonts.spaceMono(
                         color: Colors.white.withValues(alpha: 0.5),
                         fontSize: 12,
@@ -258,7 +263,10 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                     ),
                     const SizedBox(height: 8),
                     OverflowSafeText(
-                      widget.targetName.toUpperCase(),
+                      (widget.isBankTarget
+                              ? AppLocalizations.of(context).commonTheBank
+                              : widget.targetName)
+                          .toUpperCase(),
                       style: GoogleFonts.plusJakartaSans(
                         color: AppTheme.primaryColor,
                         fontSize: 32,
@@ -324,49 +332,59 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                         ),
                       ),
                       const SizedBox(height: 12),
+                      // Number pads read 1-2-3 left to right in every language.
                       Expanded(
-                        child: Row(
-                          children: [
-                            _numpadButton('1'),
-                            _numpadButton('2'),
-                            _numpadButton('3'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            _numpadButton('4'),
-                            _numpadButton('5'),
-                            _numpadButton('6'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            _numpadButton('7'),
-                            _numpadButton('8'),
-                            _numpadButton('9'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            _numpadSpecialButton(
-                              'C',
-                              Icons.clear_rounded,
-                              Colors.white.withValues(alpha: 0.2),
-                            ),
-                            _numpadButton(','),
-                            _numpadButton('0'),
-                            _numpadSpecialButton(
-                              '<',
-                              Icons.backspace_outlined,
-                              Colors.white,
-                            ),
-                          ],
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    _numpadButton('1'),
+                                    _numpadButton('2'),
+                                    _numpadButton('3'),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    _numpadButton('4'),
+                                    _numpadButton('5'),
+                                    _numpadButton('6'),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    _numpadButton('7'),
+                                    _numpadButton('8'),
+                                    _numpadButton('9'),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    _numpadSpecialButton(
+                                      'C',
+                                      Icons.clear_rounded,
+                                      Colors.white.withValues(alpha: 0.2),
+                                    ),
+                                    _numpadButton(','),
+                                    _numpadButton('0'),
+                                    _numpadSpecialButton(
+                                      '<',
+                                      Icons.backspace_outlined,
+                                      Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -376,8 +394,10 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                           return SlideToConfirm(
                             key: _slideKey,
                             text: widget.isPaying
-                                ? 'SLIDE TO PAY'
-                                : 'SLIDE TO RECEIVE',
+                                ? AppLocalizations.of(context).padSlideToPay
+                                : AppLocalizations.of(
+                                    context,
+                                  ).padSlideToReceive,
                             baseColor: actionColor,
                             haptics: context.select(
                               (LocaleCubit c) => c.state.hapticsEnabled,
@@ -416,7 +436,7 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
             ),
             child: Center(
               child: Text(
-                digit,
+                isDecimal ? CurrencyFormatter.decimalSeparator : digit,
                 style: GoogleFonts.spaceMono(
                   color: Colors.white,
                   fontSize: 28,

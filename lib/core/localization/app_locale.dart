@@ -5,6 +5,7 @@ enum AppLocale {
   english('en', 'English', '🇬🇧'),
   french('fr', 'Français', '🇫🇷'),
   arabic('ar', 'العربية', '🇸🇦'),
+  spanish('es', 'Español', '🇪🇸'),
   german('de', 'Deutsch', '🇩🇪');
 
   final String code;

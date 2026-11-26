@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/transaction.dart';
@@ -194,7 +195,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         amount: event.amount,
         memo: event.memo,
       );
-      emit(const TransactionSuccess('Transfer completed'));
+      emit(const TransactionSuccess(MessageCode.txTransferDone));
       if (_cachedTransactions.isNotEmpty) {
         emit(TransactionListLoaded(_cachedTransactions));
       }
@@ -217,13 +218,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
           sessionId: event.sessionId,
           amount: event.amount,
         );
-        emit(const TransactionSuccess('Paid to the Bank'));
+        emit(const TransactionSuccess(MessageCode.txPaidBank));
       } else {
         await _repository.receiveFromBank(
           sessionId: event.sessionId,
           amount: event.amount,
         );
-        emit(const TransactionSuccess('Received from the Bank'));
+        emit(const TransactionSuccess(MessageCode.txReceivedBank));
       }
       if (_cachedTransactions.isNotEmpty) {
         emit(TransactionListLoaded(_cachedTransactions));
@@ -243,7 +244,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     emit(TransactionLoading());
     try {
       await _repository.reverseTransaction(event.transactionId);
-      emit(const TransactionSuccess('Transaction reversed'));
+      emit(const TransactionSuccess(MessageCode.txReversed));
     } catch (e) {
       emit(TransactionError(_mapError(e)));
     }
@@ -253,29 +254,29 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   String _mapError(Object e) {
     final msg = e.toString().toLowerCase();
     if (msg.contains('insufficient_funds')) {
-      return 'Insufficient funds for this transfer.';
+      return MessageCode.insufficientFunds;
     }
     if (msg.contains('session_closed')) {
-      return 'This session is no longer active.';
+      return MessageCode.sessionClosed;
     }
     if (msg.contains('not_in_session')) {
-      return 'You are not an active member of this session.';
+      return MessageCode.notInSession;
     }
     if (msg.contains('cannot_pay_self')) {
-      return 'You cannot pay yourself.';
+      return MessageCode.cannotPaySelf;
     }
     if (msg.contains('player_not_found')) {
-      return 'Recipient not found in this session.';
+      return MessageCode.recipientNotFound;
     }
     if (msg.contains('already_reversed')) {
-      return 'This transaction was already reversed.';
+      return MessageCode.alreadyReversed;
     }
     if (msg.contains('cannot_reverse_reversal')) {
-      return 'A reversal cannot be reversed.';
+      return MessageCode.cannotReverseReversal;
     }
     if (msg.contains('only_banker')) {
-      return 'Only the Banker can do this.';
+      return MessageCode.onlyBanker;
     }
-    return 'Transaction failed. Please try again.';
+    return MessageCode.generic;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/core/widgets/overflow_safe_text.dart';
@@ -35,10 +36,13 @@ class PlayersTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _BankCard(bankerName: banker?.name ?? 'The Bank'),
+              _BankCard(
+                bankerName:
+                    banker?.name ?? AppLocalizations.of(context).commonTheBank,
+              ),
               const SizedBox(height: 24),
               Text(
-                'PLAYERS',
+                AppLocalizations.of(context).playersTitle,
                 style: GoogleFonts.spaceMono(
                   color: Colors.white.withValues(alpha: 0.4),
                   fontSize: 12,
@@ -49,7 +53,7 @@ class PlayersTab extends StatelessWidget {
               const SizedBox(height: 16),
               if (activePlayers.isEmpty)
                 Text(
-                  'No active players',
+                  AppLocalizations.of(context).playersNone,
                   style: GoogleFonts.inter(
                     color: Colors.white.withValues(alpha: 0.5),
                   ),
@@ -123,7 +127,7 @@ class _BankCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'THE BANK',
+                  AppLocalizations.of(context).playersBankCard,
                   style: GoogleFonts.plusJakartaSans(
                     color: Colors.white,
                     fontSize: 18,
@@ -131,7 +135,7 @@ class _BankCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Banker: $bankerName',
+                  AppLocalizations.of(context).playersBankerName(bankerName),
                   style: GoogleFonts.spaceMono(
                     color: Colors.white.withValues(alpha: 0.4),
                     fontSize: 12,
@@ -195,7 +199,7 @@ class _PlayerListItem extends StatelessWidget {
                 ),
                 if (isBanker)
                   Text(
-                    'BANKER',
+                    AppLocalizations.of(context).commonBanker,
                     style: GoogleFonts.spaceMono(
                       color: AppTheme.primaryColor,
                       fontSize: 10,

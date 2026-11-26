@@ -1,4 +1,6 @@
-# MonoLedger logo exploration
+# MonoLedger logo exploration, round 1
+
+> Superseded: the owner chose a different mark in round 2 (`logo-round2.md`).
 
 Brief: an ownable symbol for a board-game money app. Playful game-night energy,
 precise like a ledger, inside the existing dark "neon terminal" system
@@ -31,7 +33,7 @@ Renders: `design/logo-variants/NN-name.png` (512px) and `NN-name-48.png`
 - **Symbol:** a pointy-top hexagon (radius 40% of the box, corners rounded at
   7%) = a board-game token. Cut out of it: three left-aligned ledger rows
   (38 / 28 / 16% wide, 7% tall, pill ends) and a square terminal cursor after
-  the last row. Geometry lives in `lib/core/widgets/monoledger_logo.dart`.
+  the last row. (No longer in the app.)
 - **Colour tokens:** mint #14F195 on #0B0D0F (primary and reverse); single-colour
   black #000000 or white #FFFFFF (the cut-outs stay transparent).
 - **Application notes:** launcher icon (adaptive foreground fits the safe zone;

@@ -66,12 +66,12 @@ class SettingsPage extends StatelessWidget {
             onTap: () => context.push('/settings/about'),
           ),
           const SizedBox(height: 32),
-          const _SectionHeader(title: 'PRIVACY'),
+          _SectionHeader(title: l10n.settingsSectionPrivacy),
           const SizedBox(height: 12),
           _SettingsNavTile(
             icon: Icons.privacy_tip_outlined,
-            title: 'Privacy policy',
-            subtitle: 'What MonoLedger stores and why',
+            title: l10n.settingsPrivacyPolicy,
+            subtitle: l10n.settingsPrivacyPolicySubtitle,
             onTap: () => launchUrl(
               Uri.parse(AppConfig.privacyPolicyUrl),
               mode: LaunchMode.externalApplication,
@@ -82,7 +82,7 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 32),
           Center(
             child: Text(
-              '${l10n.settingsVersion} 1.0.0',
+              l10n.settingsVersion('1.0.0'),
               style: GoogleFonts.spaceMono(
                 color: Colors.white.withValues(alpha: 0.35),
                 fontSize: 12,
@@ -286,27 +286,23 @@ class _DeleteDataTile extends StatelessWidget {
   const _DeleteDataTile();
 
   Future<void> _confirm(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Delete my data?'),
-        content: const Text(
-          'This deletes your MonoLedger account, your profile and your game history. '
-          'You leave any game you are in. In games other people played with you, '
-          'your entries stay as "Deleted player" so their ledgers still add up. '
-          'This cannot be undone.',
-        ),
+        title: Text(l10n.deleteDataTitle),
+        content: Text(l10n.deleteDataBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('CANCEL'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'DELETE',
-              style: TextStyle(color: AppTheme.errorColor),
+            child: Text(
+              l10n.commonDelete,
+              style: const TextStyle(color: AppTheme.errorColor),
             ),
           ),
         ],
@@ -329,7 +325,9 @@ class _DeleteDataTile extends StatelessWidget {
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                AppLocalizations.of(context).message(state.message),
+              ),
               backgroundColor: AppTheme.errorColor,
             ),
           );
@@ -337,10 +335,10 @@ class _DeleteDataTile extends StatelessWidget {
       },
       builder: (context, state) => _SettingsNavTile(
         icon: Icons.delete_forever_outlined,
-        title: 'Delete my data',
+        title: AppLocalizations.of(context).settingsDeleteData,
         subtitle: state is AuthLoading
-            ? 'Deleting…'
-            : 'Delete your account and game history',
+            ? AppLocalizations.of(context).settingsDeleting
+            : AppLocalizations.of(context).settingsDeleteDataSubtitle,
         onTap: state is AuthLoading ? () {} : () => _confirm(context),
       ),
     );

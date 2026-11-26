@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:monoledger/core/localization/app_locale.dart';
 import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
@@ -135,6 +136,9 @@ class MonoLedgerApp extends StatelessWidget {
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {
+          // Numbers follow the app language. Arabic keeps Western digits.
+          final language = localeState.locale.languageCode;
+          Intl.defaultLocale = language == 'ar' ? 'en_US' : language;
           return MaterialApp.router(
             title: 'MonoLedger',
             theme: AppTheme.darkTheme,

@@ -1,45 +1,19 @@
 # Google Play release guide
 
-Status (26 Nov 2026): database migrations pushed, upload key configured,
-GitHub Pages set to `main` → `/docs` (the legal pages go live once this branch
-is merged), screenshots and graphics in `store/`. What's left is the Play
-Console itself.
+Status (26 Nov 2026): database migrations pushed, upload key configured, legal
+pages live on GitHub Pages, listings and screenshots for four languages ready in
+`fastlane/metadata/android/`, with the Die and coin icon and a feature graphic
+per language. What's left is the Play Console itself.
 
-## 1. One-time setup (you)
+## 1. Before the first upload
 
-1. **Push the pending database migrations.** Three migrations have run locally
-   and in the tests but not on the live project yet:
-   `20260604040000_capture_dashboard_objects`, `20261126120000_go_cleanup_profiles_reversal`,
-   `20261126130000_delete_my_account`.
-
-   ```bash
-   supabase db push --include-all
-   ```
-
-   The app's reversal, Past games stats, GO cleanup and **Delete my data**
-   (required by Play) depend on them.
-
-2. **Publish the legal pages.** GitHub → repo Settings → Pages → Source:
-   "Deploy from a branch", branch `main`, folder `/docs`. The URLs become:
-   - Privacy policy: https://louay-barraq.github.io/MonoLedger/privacy-policy.html
-   - Delete data: https://louay-barraq.github.io/MonoLedger/delete-data.html
-
-   These are already the defaults in `lib/core/config/app_config.dart`. If you
-   host them elsewhere, pass `--dart-define=PRIVACY_POLICY_URL=...` and
-   `--dart-define=DELETE_DATA_URL=...` when building.
-
-3. **Create the upload key** (keep the file and passwords safe and out of git):
-
-   ```bash
-   keytool -genkey -v -keystore ~/monoledger-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-   ```
-
-   Copy `android/key.properties.example` to `android/key.properties` and fill it
-   in. Turn on **Play App Signing** in the Play Console (default for new apps).
-
-4. **Check the application ID.** It is `com.louaybarraq.monoledger`. It can't
-   change after the first upload; edit `android/app/build.gradle.kts` (and the
-   `MainActivity.kt` package/folder) now if you want a different one.
+- **Application ID** is `com.louaybarraq.monoledger`. It can't change after the
+  first upload.
+- **Upload key:** `android/key.properties` points at your keystore (git-ignored).
+  Back the keystore and passwords up somewhere safe. Turn on **Play App Signing**.
+- **Legal pages:**
+  - Privacy policy: https://louay-barraq.github.io/MonoLedger/privacy-policy.html
+  - Delete data: https://louay-barraq.github.io/MonoLedger/delete-data.html
 
 ## 2. Build
 
@@ -48,37 +22,12 @@ flutter build appbundle --release
 ```
 
 Upload `build/app/outputs/bundle/release/app-release.aab`. Bump `version:` in
-`pubspec.yaml` (for example `1.0.1+2`) for every new upload.
+`pubspec.yaml` (for example `1.0.1+2`) for every new upload, and add a matching
+`changelogs/<versionCode>.txt` per language.
 
 ## 3. Store listing
 
-**App name:** MonoLedger
-
-**Short description (80 max):**
-> Replace paper money in board games with a live shared ledger for every player.
-
-**Full description:**
-> MonoLedger replaces the paper money in your board games with a live, shared ledger on every player's phone.
->
-> • Host a game in seconds: pick a currency symbol, starting money and GO salary.
-> • Friends join with a 6-character code or by scanning a QR code.
-> • Pay other players or the bank with a quick keypad and slide-to-confirm.
-> • The Banker approves GO salary, can undo a mistaken payment, and manages players.
-> • Every payment shows up instantly in a shared ledger, so disputes take seconds.
-> • See final standings, game highlights and your past games.
->
-> No sign-up, no ads, no tracking. MonoLedger tracks pretend money only; it does not handle real money.
-
-**Graphics (in `store/`):** `icon-512.png` (512×512), `feature-graphic.png`
-(1024×500) and 7 phone screenshots in `store/screenshots/` (1080×2160, taken
-from a real game on a Pixel 7a emulator): welcome, home, wallet, GO approval,
-payment pad, ledger, end summary. Logo rationale: `design/logo-variants.md`.
-
-**Category:** Board (or Tools). **Tags:** board games, score keeper.
-
-**Trademarks:** don't name other companies' games (for example "Monopoly") in
-the listing or screenshots. The app's own text and README no longer name other
-games; keep it that way.
+All listing text, ASO notes, category and tags: [store-listing.md](store-listing.md).
 
 ## 4. App content answers
 

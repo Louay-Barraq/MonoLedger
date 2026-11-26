@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/core/widgets/overflow_safe_text.dart';
@@ -60,14 +61,18 @@ class EndOfGameSummaryPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20),
-                        if (winner != null) _buildWinnerCard(winner),
+                        if (winner != null) _buildWinnerCard(context, winner),
                         const SizedBox(height: 40),
-                        _sectionTitle('SESSION ANALYTICS'),
+                        _sectionTitle(
+                          AppLocalizations.of(context).summaryAnalytics,
+                        ),
                         const SizedBox(height: 16),
-                        _buildAnalyticsGrid(sortedPlayers),
+                        _buildAnalyticsGrid(context, sortedPlayers),
                         _GameHighlights(session: session),
                         const SizedBox(height: 40),
-                        _sectionTitle('FINAL STANDINGS'),
+                        _sectionTitle(
+                          AppLocalizations.of(context).summaryStandings,
+                        ),
                         const SizedBox(height: 16),
                         _buildRankings(sortedPlayers),
                         const SizedBox(height: 120),
@@ -112,7 +117,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildWinnerCard(Player winner) {
+  Widget _buildWinnerCard(BuildContext context, Player winner) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(32),
@@ -145,7 +150,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'GRAND CHAMPION',
+            AppLocalizations.of(context).summaryChampion,
             style: GoogleFonts.spaceMono(
               color: Colors.amber,
               fontSize: 12,
@@ -204,7 +209,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAnalyticsGrid(List<Player> players) {
+  Widget _buildAnalyticsGrid(BuildContext context, List<Player> players) {
     // Basic calcs
     final totalMoney = players.fold<double>(0, (sum, p) => sum + p.balance);
 
@@ -212,7 +217,7 @@ class EndOfGameSummaryPage extends StatelessWidget {
       children: [
         Expanded(
           child: _buildStatCard(
-            'Money in play',
+            AppLocalizations.of(context).summaryMoneyInPlay,
             CurrencyFormatter.formatMoney(session.currency, totalMoney),
             Icons.payments_rounded,
             const Color(0xFF44A5FF),
@@ -221,8 +226,8 @@ class EndOfGameSummaryPage extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildStatCard(
-            'Participants',
-            '${players.length} Players',
+            AppLocalizations.of(context).summaryParticipants,
+            AppLocalizations.of(context).summaryPlayerCount(players.length),
             Icons.group_rounded,
             Colors.amber,
           ),
@@ -382,13 +387,16 @@ class EndOfGameSummaryPage extends StatelessWidget {
               size: 24,
             ),
             const SizedBox(width: 12),
-            Text(
-              'SAVE & EXIT',
-              style: GoogleFonts.plusJakartaSans(
-                color: Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1,
+            Flexible(
+              child: Text(
+                AppLocalizations.of(context).summarySaveExit,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
+                ),
               ),
             ),
           ],
@@ -422,30 +430,34 @@ class _GameHighlightsState extends State<_GameHighlights> {
         if (a == null) return const SizedBox.shrink();
         final currency = widget.session.currency;
         final minutes = a.duration.inMinutes;
+        final l10n = AppLocalizations.of(context);
         final lines = <(String, String)>[
           (
-            'Volume traded',
+            l10n.summaryVolume,
             CurrencyFormatter.formatMoney(currency, a.totalVolume),
           ),
           (
-            'Game length',
+            l10n.summaryLength,
             minutes >= 60
-                ? '${minutes ~/ 60}h ${minutes % 60}m'
-                : '${minutes}m',
+                ? l10n.summaryHoursMinutes(minutes ~/ 60, minutes % 60)
+                : l10n.summaryMinutes(minutes),
           ),
-          ('GO collected', '${a.goCollections}x'),
+          (l10n.summaryGoCollected, l10n.summaryTimes(a.goCollections)),
           if (a.biggestEarner case final h?)
             (
-              'Biggest earner',
+              l10n.summaryBiggestEarner,
               '${h.playerName} · ${CurrencyFormatter.formatMoney(currency, h.value)}',
             ),
           if (a.biggestSpender case final h?)
             (
-              'Biggest spender',
+              l10n.summaryBiggestSpender,
               '${h.playerName} · ${CurrencyFormatter.formatMoney(currency, h.value)}',
             ),
           if (a.mostActiveTrader case final h?)
-            ('Most active', '${h.playerName} · ${h.value} moves'),
+            (
+              l10n.summaryMostActive,
+              l10n.summaryMoves(h.playerName, h.value.toInt()),
+            ),
         ];
         return Container(
           margin: const EdgeInsets.only(top: 16),

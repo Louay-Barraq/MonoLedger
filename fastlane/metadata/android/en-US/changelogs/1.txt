@@ -1,0 +1,1 @@
+First release: live game money on every phone, QR join, slide to pay, Banker approvals and reversals, shared ledger, end-of-game stats, and five languages.

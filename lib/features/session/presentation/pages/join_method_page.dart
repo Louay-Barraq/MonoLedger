@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
 class JoinMethodPage extends StatelessWidget {
@@ -38,7 +39,7 @@ class JoinMethodPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'CONNECTION',
+                AppLocalizations.of(context).joinHeader,
                 style: GoogleFonts.spaceMono(
                   color: AppTheme.primaryColor,
                   fontSize: 10,
@@ -48,7 +49,7 @@ class JoinMethodPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Join Session',
+                AppLocalizations.of(context).joinTitle,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -58,7 +59,7 @@ class JoinMethodPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter the session code manually or scan the host\'s QR code.',
+                AppLocalizations.of(context).joinSubtitle,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   color: Colors.white.withValues(alpha: 0.6),
@@ -67,15 +68,15 @@ class JoinMethodPage extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               _MethodButton(
-                label: 'ENTER CODE',
-                subtitle: 'Type the 6-character code',
+                label: AppLocalizations.of(context).joinEnterCode,
+                subtitle: AppLocalizations.of(context).joinEnterCodeSubtitle,
                 icon: Icons.pin_outlined,
                 onTap: () => context.push('/join-session/code'),
               ),
               const SizedBox(height: 16),
               _MethodButton(
-                label: 'SCAN QR CODE',
-                subtitle: 'Use your camera to scan',
+                label: AppLocalizations.of(context).joinScanQr,
+                subtitle: AppLocalizations.of(context).joinScanQrSubtitle,
                 icon: Icons.qr_code_scanner_rounded,
                 onTap: () => context.push('/join-session/scan'),
               ),

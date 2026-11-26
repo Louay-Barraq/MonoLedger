@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/qr_utils.dart';
 import 'package:monoledger/core/widgets/session_removal_dialog.dart';
@@ -198,18 +199,18 @@ class _DashboardPageState extends State<DashboardPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Leave Session?'),
+        title: Text(AppLocalizations.of(context).leaveTitle),
         content: Text(
           isBanker
               ? (activeCount > 1
-                    ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
-                    : 'You are the only player. Leaving will end the session. Continue?')
-              : 'You will leave this session and return to the home screen. Continue?',
+                    ? AppLocalizations.of(context).leaveBodyBanker
+                    : AppLocalizations.of(context).leaveBodyLast)
+              : AppLocalizations.of(context).leaveBody,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -218,9 +219,9 @@ class _DashboardPageState extends State<DashboardPage> {
               );
               Navigator.pop(ctx);
             },
-            child: const Text(
-              'LEAVE',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppLocalizations.of(context).leaveAction,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],

@@ -2,7 +2,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class ThousandsSeparatorInputFormatter extends TextInputFormatter {
-  static final NumberFormat _formatter = NumberFormat('#,###');
+  // Not cached: the grouping separator follows the current language.
+  static NumberFormat get _formatter => NumberFormat('#,###');
 
   @override
   TextEditingValue formatEditUpdate(

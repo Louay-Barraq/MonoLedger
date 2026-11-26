@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/join_code_parser.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
@@ -67,7 +68,9 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
           if (state is SessionError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text(
+                  AppLocalizations.of(context).message(state.message),
+                ),
                 backgroundColor: AppTheme.errorColor,
               ),
             );
@@ -87,7 +90,7 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'SESSION CODE',
+                    AppLocalizations.of(context).joinCodeHeader,
                     style: GoogleFonts.spaceMono(
                       color: AppTheme.primaryColor,
                       fontSize: 10,
@@ -98,7 +101,7 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      'Enter Code',
+                      AppLocalizations.of(context).joinCodeTitle,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -109,7 +112,7 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter the 6-character connect code and your name to join.',
+                    AppLocalizations.of(context).joinCodeSubtitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 14,
@@ -118,13 +121,16 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _InputFieldLabel(label: 'SESSION CODE'),
+                  _InputFieldLabel(
+                    label: AppLocalizations.of(context).joinCodeLabel,
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _codeController,
                     keyboardType: TextInputType.text,
                     textCapitalization: TextCapitalization.characters,
                     maxLength: 6,
+                    textDirection: TextDirection.ltr,
                     style: GoogleFonts.spaceMono(
                       fontSize: 28,
                       letterSpacing: 8,
@@ -163,7 +169,9 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _InputFieldLabel(label: 'YOUR NAME'),
+                  _InputFieldLabel(
+                    label: AppLocalizations.of(context).joinNameLabel,
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _nameController,
@@ -172,7 +180,7 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                       fontWeight: FontWeight.w600,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Name',
+                      hintText: AppLocalizations.of(context).joinNameHint,
                       hintStyle: GoogleFonts.plusJakartaSans(
                         color: Colors.white.withValues(alpha: 0.2),
                       ),
@@ -225,10 +233,13 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                                   ),
                                 );
                               } else {
-                                String message =
-                                    'Please enter a valid 6-character code.';
+                                var message = AppLocalizations.of(
+                                  context,
+                                ).joinCodeInvalid;
                                 if (name.isEmpty) {
-                                  message = 'Please enter your name.';
+                                  message = AppLocalizations.of(
+                                    context,
+                                  ).joinNameRequired;
                                 }
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -248,7 +259,7 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.black)
                           : Text(
-                              'CONFIRM JOIN',
+                              AppLocalizations.of(context).joinConfirm,
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,

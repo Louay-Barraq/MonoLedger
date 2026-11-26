@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monoledger/core/utils/join_code_parser.dart';
@@ -36,7 +37,7 @@ class QrUtils {
                     ),
                   ),
                   Text(
-                    'JOIN CODE',
+                    AppLocalizations.of(context).qrJoinCode,
                     style: GoogleFonts.spaceMono(
                       color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 12,
@@ -94,7 +95,7 @@ class QrUtils {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Code copied to clipboard!',
+                              AppLocalizations.of(context).codeCopied,
                               style: GoogleFonts.spaceMono(color: Colors.black),
                             ),
                             backgroundColor: AppTheme.primaryColor,
@@ -103,7 +104,7 @@ class QrUtils {
                       },
                       icon: const Icon(Icons.copy_rounded, color: Colors.black),
                       label: Text(
-                        'COPY CODE',
+                        AppLocalizations.of(context).qrCopyCode,
                         style: GoogleFonts.plusJakartaSans(
                           color: Colors.black,
                           fontWeight: FontWeight.w800,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/features/transactions/domain/entities/transaction.dart';
 import 'package:monoledger/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
@@ -61,7 +62,7 @@ void main() {
     ),
     expect: () => [
       isA<TransactionLoading>(),
-      const TransactionError('Only the Banker can do this.'),
+      const TransactionError(MessageCode.onlyBanker),
     ],
   );
 
@@ -154,7 +155,7 @@ void main() {
     act: (b) => b.add(const TransactionReverseRequested('tx1')),
     expect: () => [
       isA<TransactionLoading>(),
-      const TransactionSuccess('Transaction reversed'),
+      const TransactionSuccess(MessageCode.txReversed),
       const TransactionListLoaded([]),
     ],
   );
@@ -170,7 +171,7 @@ void main() {
     act: (b) => b.add(const TransactionReverseRequested('tx1')),
     expect: () => [
       isA<TransactionLoading>(),
-      const TransactionError('This transaction was already reversed.'),
+      const TransactionError(MessageCode.alreadyReversed),
       const TransactionListLoaded([]),
     ],
   );

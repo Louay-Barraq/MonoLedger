@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/widgets/go_approval_banner.dart';
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
@@ -31,7 +32,7 @@ class GoApprovalBannerHost extends StatelessWidget {
             if (pending.isEmpty) return const SizedBox.shrink();
 
             final request = pending.first;
-            String playerName = 'Player';
+            String playerName = AppLocalizations.of(context).commonPlayer;
             for (final p in session.activePlayers) {
               if (p.id == request.requesterPlayerId) {
                 playerName = p.name;

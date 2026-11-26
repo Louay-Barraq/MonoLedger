@@ -1,0 +1,44 @@
+MonoLedger est le banquier de vos soirées jeux de société. L'application remplace les billets par un livre de comptes partagé, mis à jour en direct sur le téléphone de chaque joueur : payez un loyer, touchez un salaire et consultez les soldes sans compter un seul billet.
+
+Un joueur crée la partie et devient le Banquier. Les autres rejoignent avec un code à 6 caractères ou en scannant un QR code. Aucune inscription, aucun e-mail, aucun mot de passe.
+
+PAYEZ EN QUELQUES SECONDES
+• Envoyez de l'argent fictif à un joueur ou à la banque avec un grand clavier.
+• Glissez pour confirmer : aucun envoi par erreur.
+• Boutons rapides pour les billets courants et montants à virgule.
+• Une confirmation supplémentaire protège les très gros versements de la banque.
+
+TOUS LES SOLDES EN DIRECT
+• Les soldes se mettent à jour sur chaque téléphone dès qu'un paiement a lieu.
+• Le classement des joueurs montre qui mène.
+• L'historique partagé indique qui a payé qui, combien et quand.
+
+LE BANQUIER GARDE LA MAIN
+• Acceptez ou refusez les demandes de salaire au passage par la case départ.
+• Versez de l'argent depuis la banque.
+• Annulez un paiement erroné : la correction est visible par tous.
+• Transmettez le rôle de Banquier, retirez un joueur ou terminez la partie.
+
+VOS RÈGLES DU JEU
+• Choisissez le symbole monétaire, le capital de départ et le montant du salaire.
+• Un compteur d'argent numérique pour les jeux d'achat de propriétés, les jeux de vie et tout jeu de plateau avec de l'argent fictif.
+• Pensé pour une tablée d'amis ou en famille, de 2 à 10 joueurs.
+
+SACREZ LE VAINQUEUR
+• Classement final avec le gagnant en tête.
+• Temps forts de la partie : argent échangé, plus gros gain, plus grosse dépense et joueur le plus actif.
+• Écran des parties passées avec vos parties jouées, victoires et résultats.
+
+FAIT POUR LES SOIRÉES JEUX
+• Interface sombre et contrastée, lisible autour de la table.
+• Disponible en français, anglais, arabe, espagnol et allemand.
+• Vibration facultative.
+• Sans publicité.
+
+CONFIDENTIALITÉ
+MonoLedger utilise un compte anonyme et ne conserve que le nécessaire à la partie : le nom que vous saisissez, les réglages, les paiements et les soldes. L'appareil photo sert uniquement à scanner le QR code d'une partie et reste facultatif. Vous pouvez supprimer vos données depuis l'application à tout moment.
+
+BON À SAVOIR
+MonoLedger a besoin d'une connexion internet pour synchroniser les téléphones. L'application gère uniquement de l'argent fictif pour le jeu : elle ne peut ni détenir, ni envoyer, ni recevoir de l'argent réel, et n'est pas une application bancaire ou de paiement. MonoLedger est une application compagnon indépendante, sans lien avec un éditeur de jeux de société.
+
+Rangez les billets dans la boîte : MonoLedger devient la banque de votre jeu.

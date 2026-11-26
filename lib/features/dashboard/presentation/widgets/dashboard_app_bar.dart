@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
 class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -33,7 +34,7 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'ROOM CODE',
+            AppLocalizations.of(context).dashboardRoomCode,
             style: GoogleFonts.spaceMono(
               color: Colors.white.withValues(alpha: 0.5),
               fontSize: 10,
@@ -43,6 +44,7 @@ class DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           Text(
             '#$sessionCode',
+            textDirection: TextDirection.ltr,
             style: GoogleFonts.spaceMono(
               color: AppTheme.primaryColor,
               fontSize: 20,

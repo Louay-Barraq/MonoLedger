@@ -1,0 +1,1 @@
+Première version : argent de jeu en direct sur chaque téléphone, QR code, paiement par glissement, validations et annulations du Banquier, historique partagé, statistiques et cinq langues.

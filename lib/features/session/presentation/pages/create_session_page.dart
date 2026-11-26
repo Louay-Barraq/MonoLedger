@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/core/utils/thousands_separator_formatter.dart';
@@ -43,7 +44,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   }
 
   void _onCustomCapitalSubmitted(String value) {
-    final cleanValue = value.replaceAll(',', '');
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
     final amount = int.tryParse(cleanValue);
     if (amount != null && amount > 0) {
       setState(() {
@@ -55,7 +56,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   }
 
   void _onCustomCapitalChanged(String value) {
-    final cleanValue = value.replaceAll(',', '');
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
     final amount = int.tryParse(cleanValue);
     if (amount != null && amount > 0) {
       setState(() {
@@ -65,7 +66,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   }
 
   void _onCustomGoAmountSubmitted(String value) {
-    final cleanValue = value.replaceAll(',', '');
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
     final amount = int.tryParse(cleanValue);
     if (amount != null && amount > 0) {
       setState(() {
@@ -76,7 +77,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   }
 
   void _onCustomGoAmountChanged(String value) {
-    final cleanValue = value.replaceAll(',', '');
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
     final amount = int.tryParse(cleanValue);
     if (amount != null && amount > 0) {
       setState(() {
@@ -114,7 +115,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
           if (state is SessionError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
+                content: Text(
+                  AppLocalizations.of(context).message(state.message),
+                ),
                 backgroundColor: AppTheme.errorColor,
               ),
             );
@@ -134,7 +137,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'INITIAL SETUP',
+                    AppLocalizations.of(context).createHeader,
                     style: GoogleFonts.spaceMono(
                       color: AppTheme.primaryColor,
                       fontSize: 10,
@@ -145,7 +148,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      'Create Session',
+                      AppLocalizations.of(context).createTitle,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -156,7 +159,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Configure the fiscal rules for your upcoming digital ledger session.',
+                    AppLocalizations.of(context).createSubtitle,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 14,
@@ -167,7 +170,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   const SizedBox(height: 40),
 
                   // Your Name
-                  _sectionTitle('YOUR NAME'),
+                  _sectionTitle(AppLocalizations.of(context).createYourName),
                   const SizedBox(height: 12),
                   TextField(
                     focusNode: _nameFocusNode,
@@ -182,7 +185,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     },
                     style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
                     decoration: InputDecoration(
-                      hintText: 'Enter banker name',
+                      hintText: AppLocalizations.of(context).createNameHint,
                       hintStyle: GoogleFonts.inter(
                         color: Colors.white.withValues(alpha: 0.2),
                       ),
@@ -219,7 +222,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   const SizedBox(height: 32),
 
                   // Currency Symbol
-                  _sectionTitle('CURRENCY SYMBOL'),
+                  _sectionTitle(AppLocalizations.of(context).createCurrency),
                   const SizedBox(height: 12),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -243,7 +246,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _sectionTitle('STARTING CAPITAL'),
+                      _sectionTitle(
+                        AppLocalizations.of(context).createStartingCapital,
+                      ),
                       Text(
                         CurrencyFormatter.formatMoney(
                           _currencySymbol,
@@ -265,7 +270,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       Expanded(
                         child: _capitalCard(
                           1500,
-                          'STANDARD START',
+                          AppLocalizations.of(context).createPresetStandard,
                           _startingCapital == 1500 && !_isCustomCapital,
                         ),
                       ),
@@ -273,7 +278,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       Expanded(
                         child: _capitalCard(
                           2000,
-                          'PRO TIER',
+                          AppLocalizations.of(context).createPresetPro,
                           _startingCapital == 2000 && !_isCustomCapital,
                         ),
                       ),
@@ -285,7 +290,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       Expanded(
                         child: _capitalCard(
                           3000,
-                          'CAPITALIST',
+                          AppLocalizations.of(context).createPresetCapitalist,
                           _startingCapital == 3000 && !_isCustomCapital,
                         ),
                       ),
@@ -293,7 +298,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                       Expanded(
                         child: _capitalCard(
                           5000,
-                          'WHALE MODE',
+                          AppLocalizations.of(context).createPresetWhale,
                           _startingCapital == 5000 && !_isCustomCapital,
                         ),
                       ),
@@ -322,7 +327,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         fontSize: 18,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'ENTER AMOUNT',
+                        hintText: AppLocalizations.of(
+                          context,
+                        ).createEnterAmount,
                         hintStyle: GoogleFonts.spaceMono(
                           color: Colors.white.withValues(alpha: 0.2),
                         ),
@@ -375,7 +382,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         ),
                         child: Center(
                           child: Text(
-                            'CUSTOM AMOUNT',
+                            AppLocalizations.of(context).createCustomAmount,
                             style: GoogleFonts.spaceMono(
                               color: AppTheme.primaryColor,
                               fontWeight: FontWeight.bold,
@@ -392,7 +399,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _sectionTitle('GO AMOUNT'),
+                      _sectionTitle(
+                        AppLocalizations.of(context).createGoAmount,
+                      ),
                       Text(
                         CurrencyFormatter.formatMoney(
                           _currencySymbol,
@@ -461,7 +470,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         fontSize: 18,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'ENTER AMOUNT',
+                        hintText: AppLocalizations.of(
+                          context,
+                        ).createEnterAmount,
                         hintStyle: GoogleFonts.spaceMono(
                           color: Colors.white.withValues(alpha: 0.2),
                         ),
@@ -514,7 +525,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         ),
                         child: Center(
                           child: Text(
-                            'CUSTOM AMOUNT',
+                            AppLocalizations.of(context).createCustomAmount,
                             style: GoogleFonts.spaceMono(
                               color: AppTheme.primaryColor,
                               fontWeight: FontWeight.bold,
@@ -537,21 +548,25 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                               final name = _bankerName.trim();
                               if (name.isEmpty) {
                                 _showValidationError(
-                                  'Please enter your name to continue.',
+                                  AppLocalizations.of(
+                                    context,
+                                  ).createNameRequired,
                                 );
                                 return;
                               }
 
                               if (_startingCapital <= 0) {
                                 _showValidationError(
-                                  'Starting capital must be greater than 0.',
+                                  AppLocalizations.of(
+                                    context,
+                                  ).createCapitalInvalid,
                                 );
                                 return;
                               }
 
                               if (_goAmount < 0) {
                                 _showValidationError(
-                                  'GO amount cannot be negative.',
+                                  AppLocalizations.of(context).createGoInvalid,
                                 );
                                 return;
                               }
@@ -587,12 +602,16 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  'CREATE & START',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                    letterSpacing: 1,
+                                Flexible(
+                                  child: Text(
+                                    AppLocalizations.of(context).createSubmit,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                      letterSpacing: 1,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),

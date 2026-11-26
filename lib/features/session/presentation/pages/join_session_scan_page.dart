@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/join_code_parser.dart';
 
@@ -56,7 +57,7 @@ class _JoinSessionScanPageState extends State<JoinSessionScanPage> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'SCAN QR',
+          AppLocalizations.of(context).scanTitle,
           style: GoogleFonts.spaceMono(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -71,7 +72,7 @@ class _JoinSessionScanPageState extends State<JoinSessionScanPage> {
           Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              'Point your camera at the host\'s session QR code',
+              AppLocalizations.of(context).scanHint,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: Colors.white.withValues(alpha: 0.6),

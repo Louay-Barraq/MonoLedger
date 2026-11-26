@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/go_salary_request.dart';
@@ -196,7 +197,7 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
         emit(
           base.copyWith(
             actionInProgress: false,
-            statusMessage: 'GO salary collected',
+            statusMessage: MessageCode.goCollected,
             statusIsError: false,
           ),
         );
@@ -204,7 +205,7 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
         emit(
           base.copyWith(
             actionInProgress: false,
-            statusMessage: 'Waiting for Banker approval…',
+            statusMessage: MessageCode.goWaiting,
             statusIsError: false,
           ),
         );
@@ -238,8 +239,8 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
         base.copyWith(
           actionInProgress: false,
           statusMessage: event.approve
-              ? 'GO request approved'
-              : 'GO request declined',
+              ? MessageCode.goApproved
+              : MessageCode.goDeclined,
           statusIsError: false,
         ),
       );
@@ -265,14 +266,14 @@ class GoRequestBloc extends Bloc<GoRequestEvent, GoRequestState> {
   String _mapError(Object e) {
     final msg = e.toString().toLowerCase();
     if (msg.contains('go_request_pending')) {
-      return 'You already have a pending GO request.';
+      return MessageCode.goPending;
     }
     if (msg.contains('only_banker')) {
-      return 'Only the Banker can approve GO requests.';
+      return MessageCode.onlyBanker;
     }
     if (msg.contains('session_closed')) {
-      return 'This session is no longer active.';
+      return MessageCode.sessionClosed;
     }
-    return 'GO request failed. Please try again.';
+    return MessageCode.generic;
   }
 }
