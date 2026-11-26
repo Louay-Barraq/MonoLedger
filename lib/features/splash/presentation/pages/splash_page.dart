@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -80,11 +81,7 @@ class _SplashPageState extends State<SplashPage> {
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.account_balance_wallet_outlined,
-                          color: AppTheme.primaryColor,
-                          size: 40,
-                        ),
+                        child: const Center(child: MonoLedgerLogo(size: 52)),
                       )
                       .animate(onPlay: (controller) => controller.repeat())
                       .shimmer(duration: 2.seconds, color: Colors.white24)

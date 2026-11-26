@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/localization/app_localizations.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
 class AboutPage extends StatelessWidget {
@@ -52,11 +53,7 @@ class AboutPage extends StatelessWidget {
                     width: 2,
                   ),
                 ),
-                child: const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: AppTheme.primaryColor,
-                  size: 44,
-                ),
+                child: const Center(child: MonoLedgerLogo(size: 56)),
               ),
             ),
             const SizedBox(height: 28),

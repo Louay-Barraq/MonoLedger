@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:monoledger/core/localization/app_localizations.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
 
@@ -189,11 +190,7 @@ class _LogoSection extends StatelessWidget {
           ),
         ],
       ),
-      child: const Icon(
-        Icons.account_balance_wallet_rounded,
-        color: AppTheme.primaryColor,
-        size: 40,
-      ),
+      child: const Center(child: MonoLedgerLogo(size: 52)),
     ).animate().fadeIn(duration: 600.ms).scale(delay: 200.ms);
   }
 }

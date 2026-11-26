@@ -1,4 +1,4 @@
-// Renders the launcher icon from the app's own logo (wallet glyph + brand colours).
+// Renders the launcher icon, store icon and feature graphic from the MonoLedger mark.
 // Run: flutter test tool/render_icon_test.dart   → writes assets/icon/*.png
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 
 const _green = Color(0xFF14F195);
 const _background = Color(0xFF0B0D0F);
@@ -71,11 +72,7 @@ void main() {
     await tester.runAsync(_loadMaterialIcons);
     await tester.runAsync(_loadRoboto);
 
-    const glyph = Icon(
-      Icons.account_balance_wallet_rounded,
-      color: _green,
-      size: 560,
-    );
+    const glyph = MonoLedgerLogo(size: 900, color: _green);
 
     // Full icon (legacy launchers, Play listing 512px is resized from this).
     await _render(
@@ -89,13 +86,8 @@ void main() {
     // Adaptive foreground: glyph inside the 66% safe zone, transparent around it.
     await _render(
       tester,
-      const Center(
-        child: Icon(
-          Icons.account_balance_wallet_rounded,
-          color: _green,
-          size: 440,
-        ),
-      ),
+      // Hexagon corners stay within the 33% radius safe circle of adaptive masks.
+      const Center(child: MonoLedgerLogo(size: 780, color: _green)),
       'assets/icon/icon_foreground.png',
     );
 
@@ -108,11 +100,7 @@ void main() {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.account_balance_wallet_rounded,
-              color: _green,
-              size: 200,
-            ),
+            MonoLedgerLogo(size: 260, color: _green),
             SizedBox(width: 40),
             Column(
               mainAxisSize: MainAxisSize.min,

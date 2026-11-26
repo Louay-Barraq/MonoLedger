@@ -1,7 +1,9 @@
 # Google Play release guide
 
-Everything the repo can do for a Play release is done. The steps below need
-your accounts or a decision only you can make.
+Status (26 Nov 2026): database migrations pushed, upload key configured,
+GitHub Pages set to `main` → `/docs` (the legal pages go live once this branch
+is merged), screenshots and graphics in `store/`. What's left is the Play
+Console itself.
 
 ## 1. One-time setup (you)
 
@@ -67,9 +69,10 @@ Upload `build/app/outputs/bundle/release/app-release.aab`. Bump `version:` in
 >
 > No sign-up, no ads, no tracking. MonoLedger tracks pretend money only; it does not handle real money.
 
-**Graphics (in `store/`):** `icon-512.png` (512×512) and `feature-graphic.png`
-(1024×500). You still need 2–8 **phone screenshots**. Take them from an Android
-phone or emulator during a real game: wallet, payment pad, ledger, end summary.
+**Graphics (in `store/`):** `icon-512.png` (512×512), `feature-graphic.png`
+(1024×500) and 7 phone screenshots in `store/screenshots/` (1080×2160, taken
+from a real game on a Pixel 7a emulator): welcome, home, wallet, GO approval,
+payment pad, ledger, end summary. Logo rationale: `design/logo-variants.md`.
 
 **Category:** Board (or Tools). **Tags:** board games, score keeper.
 

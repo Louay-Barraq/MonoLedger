@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
 
@@ -22,7 +23,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       title: 'WELCOME TO\nMONOLEDGER',
       description:
           'The ultimate digital currency companion for your favorite board games.',
-      icon: Icons.account_balance_wallet_rounded,
+      icon: null, // brand mark
     ),
     const OnboardingStep(
       title: 'REAL-TIME\nSYNCING',
@@ -68,11 +69,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                     ),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: Icon(
-                                    _steps[index].icon,
-                                    size: 80,
-                                    color: AppTheme.primaryColor,
-                                  ),
+                                  child: _steps[index].icon == null
+                                      ? const MonoLedgerLogo(size: 96)
+                                      : Icon(
+                                          _steps[index].icon,
+                                          size: 80,
+                                          color: AppTheme.primaryColor,
+                                        ),
                                 )
                                 .animate(key: ValueKey('icon_$index'))
                                 .scale(
@@ -279,7 +282,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
 class OnboardingStep {
   final String title;
   final String description;
-  final IconData icon;
+
+  /// null shows the MonoLedger logo.
+  final IconData? icon;
 
   const OnboardingStep({
     required this.title,
