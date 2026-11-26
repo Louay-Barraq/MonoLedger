@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
 class SlideToConfirm extends StatefulWidget {
@@ -65,8 +66,11 @@ class SlideToConfirmState extends State<SlideToConfirm>
   void _onDragUpdate(DragUpdateDetails details, double maxWidth) {
     if (_isConfirmed || _isProcessing || !widget.enabled) return;
 
+    // In right-to-left languages the handle starts on the right.
+    final direction = Directionality.of(context) == TextDirection.rtl ? -1 : 1;
+
     setState(() {
-      _dragValue += details.primaryDelta! / (maxWidth - 64);
+      _dragValue += direction * details.primaryDelta! / (maxWidth - 64);
       _dragValue = _dragValue.clamp(0.0, 1.0);
     });
 
@@ -140,7 +144,13 @@ class SlideToConfirmState extends State<SlideToConfirm>
         final double trackWidth = maxWidth - 8;
         final double slideRange = trackWidth - handleSize;
         final double currentPosition = _dragValue * slideRange;
-        final displayText = _isProcessing ? 'PROCESSING...' : widget.text;
+        final displayText = _isProcessing
+            ? (Localizations.of<AppLocalizations>(
+                    context,
+                    AppLocalizations,
+                  )?.padProcessing ??
+                  'PROCESSING...')
+            : widget.text;
 
         return Opacity(
           opacity: widget.enabled ? 1 : 0.5,
@@ -170,8 +180,8 @@ class SlideToConfirmState extends State<SlideToConfirm>
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 4,
+                  PositionedDirectional(
+                    start: 4,
                     top: 4,
                     bottom: 4,
                     width: currentPosition + handleSize,
@@ -182,8 +192,8 @@ class SlideToConfirmState extends State<SlideToConfirm>
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 4 + currentPosition,
+                  PositionedDirectional(
+                    start: 4 + currentPosition,
                     top: 4,
                     bottom: 4,
                     child: GestureDetector(

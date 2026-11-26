@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
@@ -201,7 +202,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
       _startWatching(session.id);
       emit(SessionSuccess(session));
     } catch (e) {
-      emit(SessionError(e.toString()));
+      emit(const SessionError(MessageCode.generic));
     }
   }
 
@@ -218,24 +219,25 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
       _startWatching(session.id);
       emit(SessionSuccess(session));
     } catch (e) {
-      String errorMessage = 'Failed to join session. Please try again.';
+      var errorMessage = MessageCode.generic;
       final errorStr = e.toString().toLowerCase();
 
       if (errorStr.contains('invalid_session') ||
           errorStr.contains('not found') ||
           errorStr.contains('no rows')) {
-        errorMessage = 'Invalid session code. Please check and try again.';
+        errorMessage = MessageCode.invalidSession;
       } else if (errorStr.contains('session_closed')) {
-        errorMessage = 'This session is no longer active.';
-      } else if (errorStr.contains('player_kicked') ||
-          errorStr.contains('removed from this session')) {
-        errorMessage = 'You were removed from this session and cannot rejoin.';
+        errorMessage = MessageCode.sessionClosed;
+      } else if (errorStr.contains('player_kicked')) {
+        errorMessage = MessageCode.kicked;
       } else if (errorStr.contains('socket') ||
           errorStr.contains('network') ||
           errorStr.contains('connection')) {
-        errorMessage = 'Network error. Please check your connection.';
+        errorMessage = MessageCode.network;
       }
 
+      // The data source already throws a MessageCode for known cases.
+      if (e is String) errorMessage = e;
       emit(SessionError(errorMessage));
     }
   }
@@ -320,12 +322,12 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
   String _mapSessionError(Object e) {
     final msg = e.toString().toLowerCase();
     if (msg.contains('only_banker') || msg.contains('only the banker')) {
-      return 'Only the Banker can perform this action.';
+      return MessageCode.onlyBanker;
     }
     if (msg.contains('player_not_found')) {
-      return 'That player is no longer in the session.';
+      return MessageCode.recipientNotFound;
     }
-    return 'Session action failed. Please try again.';
+    return MessageCode.generic;
   }
 
   Future<void> _onResumeByCodeRequested(
@@ -344,17 +346,13 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     try {
       final session = await _repository.fetchSessionByJoinCode(event.joinCode);
       if (session == null) {
-        emit(
-          const SessionError(
-            'Session not found. Join again from the home screen.',
-          ),
-        );
+        emit(const SessionError(MessageCode.sessionNotFound));
         return;
       }
       _startWatching(session.id);
       emit(SessionSuccess(session));
     } catch (e) {
-      emit(SessionError(e.toString()));
+      emit(const SessionError(MessageCode.generic));
     }
   }
 }

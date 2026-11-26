@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/features/home/domain/entities/session.dart';
 import 'package:monoledger/features/home/domain/repositories/session_repository.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
@@ -72,7 +73,7 @@ void main() {
     expect: () => [
       isA<SessionLoading>(),
       SessionSuccess(session),
-      const SessionError('That player is no longer in the session.'),
+      const SessionError(MessageCode.recipientNotFound),
       SessionSuccess(session),
     ],
   );

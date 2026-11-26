@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/core/widgets/overflow_safe_text.dart';
@@ -61,7 +62,7 @@ class WalletTab extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _BankActionCard(
-                      label: 'PAY BANK',
+                      label: AppLocalizations.of(context).walletPayBank,
                       icon: Icons.account_balance_rounded,
                       onTap: () => context.push(
                         '/payment-pad',
@@ -78,7 +79,7 @@ class WalletTab extends StatelessWidget {
                     const SizedBox(width: 16),
                     Expanded(
                       child: _BankActionCard(
-                        label: 'FROM BANK',
+                        label: AppLocalizations.of(context).walletFromBank,
                         icon: Icons.payments_rounded,
                         onTap: () => context.push(
                           '/payment-pad',
@@ -98,7 +99,7 @@ class WalletTab extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Players',
+                    AppLocalizations.of(context).walletPlayers,
                     style: GoogleFonts.plusJakartaSans(
                       color: Colors.white,
                       fontSize: 24,
@@ -107,7 +108,9 @@ class WalletTab extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${activePlayers.length} ACTIVE',
+                    AppLocalizations.of(
+                      context,
+                    ).walletActiveCount(activePlayers.length),
                     style: GoogleFonts.spaceMono(
                       color: Colors.white.withValues(alpha: 0.4),
                       fontSize: 11,
@@ -120,7 +123,7 @@ class WalletTab extends StatelessWidget {
               const SizedBox(height: 16),
               if (sortedPlayers.isEmpty)
                 Text(
-                  'No players in session yet',
+                  AppLocalizations.of(context).walletNoPlayers,
                   style: GoogleFonts.inter(
                     color: Colors.white.withValues(alpha: 0.5),
                   ),
@@ -191,7 +194,7 @@ class _BalanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'CURRENT BALANCE',
+            AppLocalizations.of(context).walletCurrentBalance,
             style: GoogleFonts.spaceMono(
               color: Colors.white.withValues(alpha: 0.5),
               fontSize: 11,
@@ -206,7 +209,8 @@ class _BalanceCard extends StatelessWidget {
               color: Colors.white,
               fontSize: 48,
               fontWeight: FontWeight.w800,
-              letterSpacing: -2,
+              // Tighter tracking hides the thousands space in French.
+              letterSpacing: -0.5,
             ),
             maxLines: 2,
           ),
@@ -232,7 +236,10 @@ class _BalanceCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${isPositive ? '+' : ''}$pctChange% vs START',
+                  AppLocalizations.of(context).walletVsStart(
+                    // A left-to-right mark keeps "+23%" in order in Arabic.
+                    '\u200E${isPositive ? '+' : ''}$pctChange',
+                  ),
                   style: GoogleFonts.spaceMono(
                     color: AppTheme.primaryColor,
                     fontSize: 12,
@@ -274,7 +281,7 @@ class _GoSalaryBanner extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              state.statusMessage!,
+              AppLocalizations.of(context).message(state.statusMessage!),
               style: GoogleFonts.spaceMono(
                 color: state.statusIsError ? Colors.white : Colors.black,
               ),
@@ -327,7 +334,7 @@ class _GoSalaryBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'GO',
+                          AppLocalizations.of(context).walletGo,
                           style: GoogleFonts.plusJakartaSans(
                             color: Colors.black,
                             fontSize: 32,
@@ -337,7 +344,13 @@ class _GoSalaryBanner extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          hasPending ? 'AWAITING BANKER' : 'COLLECT SALARY',
+                          hasPending
+                              ? AppLocalizations.of(
+                                  context,
+                                ).walletAwaitingBanker
+                              : AppLocalizations.of(
+                                  context,
+                                ).walletCollectSalary,
                           style: GoogleFonts.spaceMono(
                             color: Colors.black.withValues(alpha: 0.6),
                             fontSize: 10,
@@ -521,7 +534,7 @@ class _PlayerCard extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'YOU',
+                            AppLocalizations.of(context).commonYou,
                             style: GoogleFonts.spaceMono(
                               color: AppTheme.primaryColor,
                               fontSize: 9,
@@ -534,7 +547,7 @@ class _PlayerCard extends StatelessWidget {
                   ),
                   if (!isCurrentUser)
                     Text(
-                      'TAP TO PAY',
+                      AppLocalizations.of(context).walletTapToPay,
                       style: GoogleFonts.spaceMono(
                         color: Colors.white.withValues(alpha: 0.35),
                         fontSize: 9,
@@ -552,7 +565,7 @@ class _PlayerCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
               ),
-              secondary: 'RANK #$rank',
+              secondary: AppLocalizations.of(context).walletRank(rank),
               secondaryStyle: GoogleFonts.spaceMono(
                 color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 9,

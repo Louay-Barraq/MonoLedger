@@ -98,8 +98,14 @@ class RowTrailingValue extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: maxWidth),
       child: FittedBox(
         fit: BoxFit.scaleDown,
-        alignment: Alignment.centerRight,
-        child: Text(text, textAlign: TextAlign.right, style: style),
+        alignment: AlignmentDirectional.centerEnd,
+        // Amounts keep "+\$ 200" order in right-to-left languages.
+        child: Text(
+          text,
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.right,
+          style: style,
+        ),
       ),
     );
   }

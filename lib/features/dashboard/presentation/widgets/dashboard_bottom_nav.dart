@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 
 class DashboardBottomNav extends StatelessWidget {
@@ -33,19 +34,19 @@ class DashboardBottomNav extends StatelessWidget {
             children: [
               _NavItem(
                 icon: Icons.account_balance_wallet_rounded,
-                label: 'WALLET',
+                label: AppLocalizations.of(context).navWallet,
                 isSelected: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
               _NavItem(
                 icon: Icons.receipt_long_rounded,
-                label: 'LEDGER',
+                label: AppLocalizations.of(context).navLedger,
                 isSelected: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
               _NavItem(
                 icon: Icons.group_rounded,
-                label: 'PLAYERS',
+                label: AppLocalizations.of(context).navPlayers,
                 isSelected: currentIndex == 2,
                 onTap: () => onTap(2),
               ),

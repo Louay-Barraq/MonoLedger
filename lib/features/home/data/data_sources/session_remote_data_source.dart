@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/session_extensions.dart';
@@ -73,13 +74,13 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
       if (e is PostgrestException) {
         final msg = e.message.toLowerCase();
         if (msg.contains('invalid_session')) {
-          throw 'Invalid session code. Please check and try again.';
+          throw MessageCode.invalidSession;
         }
         if (msg.contains('session_closed')) {
-          throw 'This session is no longer active.';
+          throw MessageCode.sessionClosed;
         }
         if (msg.contains('player_kicked')) {
-          throw 'You were removed from this session and cannot rejoin.';
+          throw MessageCode.kicked;
         }
       }
       if (e is String) rethrow;
@@ -98,7 +99,7 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     if (me == null) return session;
 
     if (me.status == 'KICKED') {
-      throw 'You were removed from this session and cannot rejoin.';
+      throw MessageCode.kicked;
     }
 
     if (me.status == 'LEFT') {
@@ -110,7 +111,7 @@ class SessionRemoteDataSourceImpl implements SessionRemoteDataSource {
     }
 
     if (me.status != 'ACTIVE') {
-      throw 'Unable to rejoin this session.';
+      throw MessageCode.rejoin;
     }
 
     return session;

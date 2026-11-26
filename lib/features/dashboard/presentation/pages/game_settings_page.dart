@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
@@ -44,7 +45,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
         if (state is SessionError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Text(
+                AppLocalizations.of(context).message(state.message),
+              ),
               backgroundColor: AppTheme.errorColor,
             ),
           );
@@ -62,7 +65,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'GAME SETTINGS',
+            AppLocalizations.of(context).settingsGameTitle,
             style: GoogleFonts.plusJakartaSans(
               color: AppTheme.primaryColor,
               fontSize: 18,
@@ -82,13 +85,19 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               const SizedBox(height: 32),
 
               // Fiscal Rules Section
-              _sectionHeader('FISCAL RULES', Icons.account_balance_rounded),
+              _sectionHeader(
+                AppLocalizations.of(context).settingsGameRules,
+                Icons.account_balance_rounded,
+              ),
               const SizedBox(height: 16),
               _buildFiscalRules(),
               const SizedBox(height: 32),
 
               // Players Management Section
-              _sectionHeader('ACTIVE PLAYERS', Icons.group_rounded),
+              _sectionHeader(
+                AppLocalizations.of(context).settingsGamePlayers,
+                Icons.group_rounded,
+              ),
               const SizedBox(height: 16),
               _buildPlayersList(context, isBanker, currentUserId),
               const SizedBox(height: 48),
@@ -96,13 +105,16 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               // Game Management Section
               if (isBanker) ...[
                 _sectionHeader(
-                  'GAME MANAGEMENT',
+                  AppLocalizations.of(context).settingsGameManagement,
                   Icons.settings_applications_rounded,
                 ),
                 const SizedBox(height: 16),
                 _buildGameManagement(context),
               ] else ...[
-                _sectionHeader('EXIT', Icons.exit_to_app_rounded),
+                _sectionHeader(
+                  AppLocalizations.of(context).settingsGameExit,
+                  Icons.exit_to_app_rounded,
+                ),
                 const SizedBox(height: 16),
                 _buildPlayerExit(context),
               ],
@@ -129,7 +141,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'SESSION CODE',
+                AppLocalizations.of(context).settingsGameSessionCode,
                 style: GoogleFonts.spaceMono(
                   color: Colors.white.withValues(alpha: 0.4),
                   fontSize: 10,
@@ -140,6 +152,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               const SizedBox(height: 4),
               Text(
                 '#${_session.joinCode}',
+                textDirection: TextDirection.ltr,
                 style: GoogleFonts.spaceMono(
                   color: AppTheme.primaryColor,
                   fontSize: 32,
@@ -155,7 +168,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               if (code != null) {
                 Clipboard.setData(ClipboardData(text: code));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Code copied to clipboard')),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context).codeCopied),
+                  ),
                 );
               }
             },
@@ -201,7 +216,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       childAspectRatio: 1.5,
       children: [
         _buildRuleCard(
-          'Starting Capital',
+          AppLocalizations.of(context).settingsGameStartingCapital,
           CurrencyFormatter.formatMoney(
             _session.currency,
             _session.startingBalance,
@@ -209,7 +224,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
           Icons.payments_rounded,
         ),
         _buildRuleCard(
-          'GO Bonus',
+          AppLocalizations.of(context).settingsGameGoBonus,
           CurrencyFormatter.formatMoney(_session.currency, _session.goAmount),
           Icons.autorenew_rounded,
         ),
@@ -316,7 +331,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
                     ),
                     if (player.isBanker)
                       Text(
-                        'BANKER',
+                        AppLocalizations.of(context).commonBanker,
                         style: GoogleFonts.spaceMono(
                           color: AppTheme.primaryColor,
                           fontSize: 9,
@@ -334,7 +349,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
                     Icons.history_edu_rounded,
                     color: Colors.orangeAccent,
                   ),
-                  tooltip: 'Transfer Banker Role',
+                  tooltip: AppLocalizations.of(
+                    context,
+                  ).settingsGameTransferTooltip,
                 ),
                 IconButton(
                   onPressed: () => _showKickDialog(context, player),
@@ -342,7 +359,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
                     Icons.person_remove_rounded,
                     color: Colors.redAccent,
                   ),
-                  tooltip: 'Kick Player',
+                  tooltip: AppLocalizations.of(context).settingsGameKickTooltip,
                 ),
               ],
               if (!isBanker && player.isBanker)
@@ -362,14 +379,14 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
     return Column(
       children: [
         _actionButton(
-          label: 'LEAVE SESSION',
+          label: AppLocalizations.of(context).settingsGameLeave,
           icon: Icons.exit_to_app_rounded,
           color: Colors.white,
           onPressed: () => _showLeaveSessionDialog(context),
         ),
         const SizedBox(height: 16),
         _actionButton(
-          label: 'END SESSION',
+          label: AppLocalizations.of(context).settingsGameEnd,
           icon: Icons.cancel_rounded,
           color: AppTheme.errorColor,
           onPressed: () => _showEndGameDialog(context),
@@ -382,7 +399,7 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
     return Column(
       children: [
         _actionButton(
-          label: 'LEAVE SESSION',
+          label: AppLocalizations.of(context).settingsGameLeave,
           icon: Icons.exit_to_app_rounded,
           color: Colors.white,
           onPressed: () => _showLeaveSessionDialog(context),
@@ -434,14 +451,12 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Transfer ownership?'),
-        content: Text(
-          'Transfer Banker role and session host to ${player.name}? You will lose host and Banker privileges.',
-        ),
+        title: Text(AppLocalizations.of(context).transferTitle(player.name)),
+        content: Text(AppLocalizations.of(context).transferBody(player.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -455,15 +470,15 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${player.name} is now the Banker and session host.',
+                    AppLocalizations.of(context).transferDone(player.name),
                   ),
                   backgroundColor: AppTheme.primaryColor,
                 ),
               );
             },
-            child: const Text(
-              'TRANSFER',
-              style: TextStyle(color: Colors.orangeAccent),
+            child: Text(
+              AppLocalizations.of(context).transferAction,
+              style: const TextStyle(color: Colors.orangeAccent),
             ),
           ),
         ],
@@ -476,14 +491,12 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Kick Player?'),
-        content: Text(
-          'Are you sure you want to remove ${player.name} from the session?',
-        ),
+        title: Text(AppLocalizations.of(context).kickTitle),
+        content: Text(AppLocalizations.of(context).kickBody(player.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -496,13 +509,15 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('${player.name} was removed from the session.'),
+                  content: Text(
+                    AppLocalizations.of(context).kickDone(player.name),
+                  ),
                 ),
               );
             },
-            child: const Text(
-              'KICK',
-              style: TextStyle(color: Colors.redAccent),
+            child: Text(
+              AppLocalizations.of(context).kickAction,
+              style: const TextStyle(color: Colors.redAccent),
             ),
           ),
         ],
@@ -515,14 +530,12 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('End Session?'),
-        content: const Text(
-          'This will permanently end the game for everyone and move to the summary screen.',
-        ),
+        title: Text(AppLocalizations.of(context).endTitle),
+        content: Text(AppLocalizations.of(context).endBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -530,9 +543,9 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               Navigator.pop(ctx);
               Navigator.pop(context); // Close settings
             },
-            child: const Text(
-              'END GAME',
-              style: TextStyle(color: AppTheme.errorColor),
+            child: Text(
+              AppLocalizations.of(context).endAction,
+              style: const TextStyle(color: AppTheme.errorColor),
             ),
           ),
         ],
@@ -552,18 +565,18 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceContainerHigh,
-        title: const Text('Leave Session?'),
+        title: Text(AppLocalizations.of(context).leaveTitle),
         content: Text(
           isBanker
               ? (hasOthers
-                    ? 'As the Banker, leaving will assign Banker and host to another player at random. Continue?'
-                    : 'You are the only player. Leaving will end the session for everyone. Continue?')
-              : 'You will leave this session and return to the home screen. Continue?',
+                    ? AppLocalizations.of(context).leaveBodyBanker
+                    : AppLocalizations.of(context).leaveBodyLast)
+              : AppLocalizations.of(context).leaveBody,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context).commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -574,7 +587,10 @@ class _GameSettingsPageState extends State<GameSettingsPage> {
               Navigator.pop(context); // Close settings
               // Dashboard listener will handle navigation to home
             },
-            child: const Text('LEAVE', style: TextStyle(color: Colors.white)),
+            child: Text(
+              AppLocalizations.of(context).leaveAction,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

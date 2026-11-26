@@ -1,0 +1,1 @@
+Primera versión: dinero de juego en vivo en cada móvil, unión por QR, pago deslizando, aprobaciones y anulaciones del Banquero, historial compartido, estadísticas y cinco idiomas.

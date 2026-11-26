@@ -1,0 +1,44 @@
+MonoLedger is the banker for your board game night. It replaces paper play money with a live, shared money ledger on every player's phone, so you can pay rent, collect salaries and check balances without counting a single bill.
+
+One player creates a game and becomes the Banker. Everyone else joins with a 6-character code or by scanning a QR code. No sign-up, no email, no password.
+
+PAY IN SECONDS
+• Send game money to another player or to the bank with a large number pad.
+• Slide to confirm, so nothing is sent by accident.
+• Quick amount buttons for common bills, plus decimal amounts.
+• An extra confirmation protects very large bank payouts.
+
+EVERY BALANCE, LIVE
+• All balances update on every phone as soon as a payment happens.
+• A player ranking shows who is ahead.
+• The shared transaction ledger records who paid whom, how much and when.
+
+THE BANKER STAYS IN CHARGE
+• Approve or decline salary requests when players pass the start space.
+• Pay money out from the bank.
+• Reverse a mistaken payment. The correction appears in the ledger for everyone to see.
+• Pass the Banker role to another player, remove a player or end the game.
+
+YOUR GAME, YOUR RULES
+• Choose the currency symbol, the starting money and the salary amount.
+• Works as a digital money tracker for property trading games, life simulation games and any tabletop game that uses play money.
+• Built for a table of friends or family, 2 to 10 players.
+
+CROWN THE WINNER
+• Final standings with the winner on top.
+• Game highlights: money traded, biggest earner, biggest spender and most active player.
+• Past games screen with your games played, wins and results.
+
+MADE FOR GAME NIGHT
+• Dark, high-contrast design that is easy to read at the table.
+• Available in English, French, Arabic (right-to-left), Spanish and German.
+• Optional vibration feedback.
+• No ads.
+
+PRIVACY
+MonoLedger uses an anonymous account and stores only what a game needs: the display name you type, game settings, payments and balances. The camera is used only to scan a game's QR code and is optional. You can delete your data inside the app at any time.
+
+GOOD TO KNOW
+MonoLedger needs an internet connection so all phones stay in sync. It tracks pretend money for games only: it cannot hold, send or receive real money, and it is not a banking or payment app. MonoLedger is an independent companion app and is not affiliated with any board game publisher.
+
+Put the paper money back in the box and let MonoLedger be your game bank.

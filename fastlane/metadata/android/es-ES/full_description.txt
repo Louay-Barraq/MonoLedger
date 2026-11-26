@@ -1,0 +1,44 @@
+MonoLedger es el banquero de tus noches de juegos de mesa. Sustituye los billetes de mentira por un libro de cuentas compartido y en vivo en el móvil de cada jugador, para pagar alquileres, cobrar sueldos y consultar saldos sin contar un solo billete.
+
+Un jugador crea la partida y es el Banquero. Los demás se unen con un código de 6 caracteres o escaneando un código QR. Sin registro, sin correo y sin contraseña.
+
+PAGA EN SEGUNDOS
+• Envía dinero ficticio a otro jugador o a la banca con un teclado grande.
+• Desliza para confirmar y evita envíos por error.
+• Botones rápidos para los billetes habituales y cantidades con decimales.
+• Una confirmación extra protege los pagos muy grandes de la banca.
+
+SALDOS EN TIEMPO REAL
+• Todos los saldos se actualizan en cada móvil en cuanto hay un pago.
+• La clasificación muestra quién va ganando.
+• El historial compartido registra quién pagó a quién, cuánto y cuándo.
+
+EL BANQUERO MANDA
+• Aprueba o rechaza las solicitudes de sueldo al pasar por la casilla de salida.
+• Paga dinero desde la banca.
+• Anula un pago equivocado: la corrección aparece en el historial para todos.
+• Pasa el rol de Banquero, expulsa a un jugador o termina la partida.
+
+TUS PROPIAS REGLAS
+• Elige el símbolo de moneda, el dinero inicial y el sueldo.
+• Un contador de dinero digital para juegos de compra de propiedades, juegos de simulación de vida y cualquier juego de tablero con dinero ficticio.
+• Pensado para jugar en grupo, de 2 a 10 jugadores.
+
+CORONA AL GANADOR
+• Clasificación final con el ganador en lo más alto.
+• Momentos destacados: dinero movido, quién más ganó, quién más gastó y el jugador más activo.
+• Pantalla de partidas anteriores con tus partidas, victorias y resultados.
+
+HECHO PARA JUGAR
+• Diseño oscuro y de alto contraste, fácil de leer en la mesa.
+• Disponible en español, inglés, francés, árabe y alemán.
+• Vibración opcional.
+• Sin anuncios.
+
+PRIVACIDAD
+MonoLedger usa una cuenta anónima y guarda solo lo que la partida necesita: el nombre que escribes, los ajustes, los pagos y los saldos. La cámara solo se usa para escanear el código QR de una partida y es opcional. Puedes eliminar tus datos desde la app cuando quieras.
+
+A TENER EN CUENTA
+MonoLedger necesita conexión a internet para mantener los móviles sincronizados. Solo gestiona dinero ficticio para juegos: no puede guardar, enviar ni recibir dinero real, y no es una app bancaria ni de pagos. MonoLedger es una app complementaria independiente y no está afiliada a ninguna editorial de juegos de mesa.
+
+Guarda los billetes en la caja y deja que MonoLedger sea la banca de tu juego.

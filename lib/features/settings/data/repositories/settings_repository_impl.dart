@@ -1,3 +1,5 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import '../../../../core/localization/app_locale.dart';
 import '../../domain/repositories/settings_repository.dart';
 import '../datasources/settings_local_data_source.dart';
@@ -9,7 +11,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<AppLocale> getSavedLocale() async {
-    final code = await _local.getLanguageCode();
+    // No choice saved yet: follow the phone's language if we support it.
+    final code =
+        await _local.getLanguageCode() ??
+        PlatformDispatcher.instance.locale.languageCode;
     return AppLocale.fromCode(code);
   }
 

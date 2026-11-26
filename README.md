@@ -109,7 +109,8 @@ supabase/
 docs/
   privacy-policy.html   Public privacy policy (GitHub Pages)
   delete-data.html      Public data-deletion instructions
-  play-store-release.md Google Play release checklist and listing text
+  play-store-release.md Google Play release checklist
+  store-listing.md      Store listing and ASO notes (4 languages)
   functionalities_rules.md
   technical_details.md
   coding_standards.md

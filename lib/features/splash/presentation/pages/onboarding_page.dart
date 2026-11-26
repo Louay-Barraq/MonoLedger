@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
@@ -18,29 +19,27 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingStep> _steps = [
-    const OnboardingStep(
-      title: 'WELCOME TO\nMONOLEDGER',
-      description:
-          'The ultimate digital currency companion for your favorite board games.',
+  List<OnboardingStep> _stepsFor(AppLocalizations l10n) => [
+    OnboardingStep(
+      title: l10n.onboardingTitle1,
+      description: l10n.onboardingBody1,
       icon: null, // brand mark
     ),
-    const OnboardingStep(
-      title: 'REAL-TIME\nSYNCING',
-      description:
-          'Every player stays in sync with live updates. No more manual calculations or paper money chaos.',
+    OnboardingStep(
+      title: l10n.onboardingTitle2,
+      description: l10n.onboardingBody2,
       icon: Icons.flash_on_rounded,
     ),
-    const OnboardingStep(
-      title: 'SECURE &\nPRIVATE',
-      description:
-          'Your session data is encrypted and secure. Focus on the game, we\'ll handle the numbers.',
+    OnboardingStep(
+      title: l10n.onboardingTitle3,
+      description: l10n.onboardingBody3,
       icon: Icons.security_rounded,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final steps = _stepsFor(AppLocalizations.of(context));
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: Stack(
@@ -54,7 +53,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     controller: _pageController,
                     onPageChanged: (index) =>
                         setState(() => _currentPage = index),
-                    itemCount: _steps.length,
+                    itemCount: steps.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.all(40.0),
@@ -69,10 +68,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                     ),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: _steps[index].icon == null
+                                  child: steps[index].icon == null
                                       ? const MonoLedgerLogo(size: 96)
                                       : Icon(
-                                          _steps[index].icon,
+                                          steps[index].icon,
                                           size: 80,
                                           color: AppTheme.primaryColor,
                                         ),
@@ -94,15 +93,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                     children: [
                                       TextSpan(
                                         text:
-                                            '${_steps[index].title.split('\n')[0]}\n',
+                                            '${steps[index].title.split('\n')[0]}\n',
                                         style: const TextStyle(
                                           color: Colors.white,
                                         ),
                                       ),
                                       TextSpan(
-                                        text: _steps[index].title.split(
-                                          '\n',
-                                        )[1],
+                                        text: steps[index].title.split('\n')[1],
                                         style: const TextStyle(
                                           color: AppTheme.primaryColor,
                                         ),
@@ -115,7 +112,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 .slideX(begin: 0.2, end: 0),
                             const SizedBox(height: 24),
                             Text(
-                                  _steps[index].description,
+                                  steps[index].description,
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.plusJakartaSans(
                                     color: Colors.white.withValues(alpha: 0.6),
@@ -139,7 +136,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          _steps.length,
+                          steps.length,
                           (index) => AnimatedContainer(
                             duration: 300.ms,
                             margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -167,7 +164,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             } else if (state is AuthError) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(state.message),
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    ).message(state.message),
+                                  ),
                                   backgroundColor: AppTheme.errorColor,
                                 ),
                               );
@@ -179,8 +180,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 if (_currentPage > 0)
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 12.0,
+                                      padding: const EdgeInsetsDirectional.only(
+                                        end: 12.0,
                                       ),
                                       child: ElevatedButton(
                                         onPressed: () {
@@ -217,7 +218,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                         ? null
                                         : () {
                                             if (_currentPage <
-                                                _steps.length - 1) {
+                                                steps.length - 1) {
                                               _pageController.nextPage(
                                                 duration: 300.ms,
                                                 curve: Curves.easeInOut,
@@ -251,9 +252,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                             ),
                                           )
                                         : Text(
-                                            _currentPage == _steps.length - 1
-                                                ? 'START EXPERIENCE'
-                                                : 'CONTINUE',
+                                            _currentPage == steps.length - 1
+                                                ? AppLocalizations.of(
+                                                    context,
+                                                  ).onboardingStart
+                                                : AppLocalizations.of(
+                                                    context,
+                                                  ).commonContinue,
+                                            textAlign: TextAlign.center,
                                             style: GoogleFonts.plusJakartaSans(
                                               fontWeight: FontWeight.w800,
                                               fontSize: 14,

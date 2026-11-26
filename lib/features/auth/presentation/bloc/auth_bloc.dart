@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -78,10 +79,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (user != null) {
         emit(AuthAuthenticated(user));
       } else {
-        emit(const AuthError('System initialization failed.'));
+        emit(const AuthError(MessageCode.authInitFailed));
       }
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(const AuthError(MessageCode.authInitFailed));
     }
   }
 
@@ -102,11 +103,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _authRepository.deleteAccount();
       emit(AuthUnauthenticated());
     } catch (_) {
-      emit(
-        const AuthError(
-          'Could not delete your data. Check your connection and try again.',
-        ),
-      );
+      emit(const AuthError(MessageCode.deleteDataFailed));
     }
   }
 }

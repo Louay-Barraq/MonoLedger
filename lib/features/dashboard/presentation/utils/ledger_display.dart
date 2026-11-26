@@ -1,3 +1,4 @@
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/features/home/domain/entities/player.dart';
 import 'package:monoledger/features/transactions/domain/entities/transaction.dart';
@@ -25,19 +26,21 @@ String _playerName(Map<String, String> names, String? id, String fallback) {
   return names[id] ?? fallback;
 }
 
-String _formatRelativeTime(DateTime createdAt) {
+String _formatRelativeTime(AppLocalizations l10n, DateTime createdAt) {
   final diff = DateTime.now().difference(createdAt);
-  if (diff.inMinutes < 1) return 'Just now';
-  if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-  if (diff.inHours < 24) return '${diff.inHours}h ago';
-  return '${diff.inDays}d ago';
+  if (diff.inMinutes < 1) return l10n.ledgerJustNow;
+  if (diff.inMinutes < 60) return l10n.ledgerMinutesAgo(diff.inMinutes);
+  if (diff.inHours < 24) return l10n.ledgerHoursAgo(diff.inHours);
+  return l10n.ledgerDaysAgo(diff.inDays);
 }
 
 LedgerDisplayItem ledgerDisplayItem({
   required LedgerTransaction tx,
   required String currency,
   required List<Player> players,
+  required AppLocalizations l10n,
 }) {
+  final player = l10n.commonPlayer.toUpperCase();
   final names = {for (final p in players) p.id: p.name};
   final signedAmount = switch (tx.type) {
     TransactionType.payBank => CurrencyFormatter.formatSignedMoney(
@@ -57,29 +60,30 @@ LedgerDisplayItem ledgerDisplayItem({
     case TransactionType.collectGo:
       return LedgerDisplayItem(
         type: tx.type,
-        title: 'From The Bank',
-        subtitle: 'PASSED GO • ${_playerName(names, tx.toPlayerId, 'PLAYER')}',
-        timeLabel: _formatRelativeTime(tx.createdAt),
+        title: l10n.ledgerFromBank,
+        subtitle:
+            '${l10n.memoPassedGo} • ${_playerName(names, tx.toPlayerId, player)}',
+        timeLabel: _formatRelativeTime(l10n, tx.createdAt),
         amountLabel: signedAmount,
         isPositive: true,
       );
     case TransactionType.fromBank:
       return LedgerDisplayItem(
         type: tx.type,
-        title: 'From The Bank',
+        title: l10n.ledgerFromBank,
         subtitle:
-            '${(tx.memo ?? 'FROM BANK').toUpperCase()} • ${_playerName(names, tx.toPlayerId, 'PLAYER')}',
-        timeLabel: _formatRelativeTime(tx.createdAt),
+            '${l10n.memo(tx.memo, 'FROM BANK')} • ${_playerName(names, tx.toPlayerId, player)}',
+        timeLabel: _formatRelativeTime(l10n, tx.createdAt),
         amountLabel: signedAmount,
         isPositive: true,
       );
     case TransactionType.payBank:
       return LedgerDisplayItem(
         type: tx.type,
-        title: 'To The Bank',
+        title: l10n.ledgerToBank,
         subtitle:
-            '${(tx.memo ?? 'PAY BANK').toUpperCase()} • ${_playerName(names, tx.fromPlayerId, 'PLAYER')}',
-        timeLabel: _formatRelativeTime(tx.createdAt),
+            '${l10n.memo(tx.memo, 'PAY BANK')} • ${_playerName(names, tx.fromPlayerId, player)}',
+        timeLabel: _formatRelativeTime(l10n, tx.createdAt),
         amountLabel: signedAmount,
         isPositive: false,
       );
@@ -89,8 +93,8 @@ LedgerDisplayItem ledgerDisplayItem({
       return LedgerDisplayItem(
         type: tx.type,
         title: '$from → $to',
-        subtitle: (tx.memo ?? 'TRANSFER').toUpperCase(),
-        timeLabel: _formatRelativeTime(tx.createdAt),
+        subtitle: l10n.memo(tx.memo, 'TRANSFER'),
+        timeLabel: _formatRelativeTime(l10n, tx.createdAt),
         amountLabel: signedAmount,
         isPositive: false,
       );

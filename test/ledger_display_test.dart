@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/features/dashboard/presentation/utils/ledger_display.dart';
 import 'package:monoledger/features/home/domain/entities/player.dart';
 import 'package:monoledger/features/transactions/domain/entities/transaction.dart';
@@ -36,6 +39,7 @@ void main() {
       tx: tx(TransactionType.payBank, from: 'p1', memo: 'PAY BANK'),
       currency: r'$',
       players: players,
+      l10n: lookupAppLocalizations(const Locale('en')),
     );
     expect(item.subtitle, 'PAY BANK • Pat');
     expect(item.isPositive, isFalse);
@@ -46,6 +50,7 @@ void main() {
       tx: tx(TransactionType.fromBank, to: 'p1', memo: 'REVERSAL'),
       currency: r'$',
       players: players,
+      l10n: lookupAppLocalizations(const Locale('en')),
     );
     expect(item.subtitle, 'REVERSAL • Pat');
     expect(item.isPositive, isTrue);

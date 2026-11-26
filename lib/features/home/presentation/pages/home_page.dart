@@ -132,9 +132,9 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 // Buttons go last so they sit above the full-screen scroll view.
-                Positioned(
+                PositionedDirectional(
                   top: 8,
-                  left: 16,
+                  start: 16,
                   child: IconButton(
                     icon: const Icon(
                       Icons.settings_rounded,
@@ -145,16 +145,16 @@ class HomePage extends StatelessWidget {
                     onPressed: () => context.push('/settings'),
                   ),
                 ),
-                Positioned(
+                PositionedDirectional(
                   top: 8,
-                  right: 16,
+                  end: 16,
                   child: IconButton(
                     icon: const Icon(
                       Icons.history_rounded,
                       color: AppTheme.primaryColor,
                       size: 26,
                     ),
-                    tooltip: 'Past games',
+                    tooltip: AppLocalizations.of(context).homePastGames,
                     onPressed: () => context.push('/history'),
                   ),
                 ),

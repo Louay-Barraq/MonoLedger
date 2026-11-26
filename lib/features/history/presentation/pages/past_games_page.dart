@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 import 'package:monoledger/features/history/data/history_remote_data_source.dart';
@@ -18,7 +19,7 @@ class PastGamesPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'PAST GAMES',
+          AppLocalizations.of(context).historyTitle,
           style: GoogleFonts.plusJakartaSans(
             color: Colors.white,
             fontWeight: FontWeight.w800,
@@ -34,7 +35,7 @@ class PastGamesPage extends StatelessWidget {
           HistoryError() => Center(
             child: TextButton(
               onPressed: () => context.read<HistoryCubit>().load(),
-              child: const Text('Could not load your games. Tap to retry.'),
+              child: Text(AppLocalizations.of(context).historyLoadFailed),
             ),
           ),
           HistoryLoaded(:final stats, :final games) => RefreshIndicator(
@@ -47,7 +48,7 @@ class PastGamesPage extends StatelessWidget {
                 const SizedBox(height: 32),
                 if (games.isEmpty)
                   Text(
-                    'Finished games will show up here.',
+                    AppLocalizations.of(context).historyEmpty,
                     style: GoogleFonts.inter(
                       color: Colors.white.withValues(alpha: 0.5),
                     ),
@@ -71,9 +72,15 @@ class _StatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _stat('GAMES', '${stats.gamesPlayed}'),
-        _stat('WINS', '${stats.wins}'),
-        _stat('AS BANKER', '${stats.bankerGames}'),
+        _stat(
+          AppLocalizations.of(context).historyGames,
+          '${stats.gamesPlayed}',
+        ),
+        _stat(AppLocalizations.of(context).historyWins, '${stats.wins}'),
+        _stat(
+          AppLocalizations.of(context).historyAsBanker,
+          '${stats.bankerGames}',
+        ),
       ],
     );
   }
@@ -121,7 +128,9 @@ class _PastGameTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final date = game.endedAt == null
         ? ''
-        : DateFormat.yMMMd().add_jm().format(game.endedAt!);
+        : DateFormat.yMMMd(
+            AppLocalizations.of(context).localeName,
+          ).add_jm().format(game.endedAt!);
     final isWin = game.rank == 1;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -152,7 +161,9 @@ class _PastGameTile extends StatelessWidget {
               children: [
                 Text(
                   game.wasBanker
-                      ? '${game.playerName} • BANKER'
+                      ? AppLocalizations.of(
+                          context,
+                        ).historyBankerTag(game.playerName)
                       : game.playerName,
                   style: GoogleFonts.plusJakartaSans(
                     color: Colors.white,

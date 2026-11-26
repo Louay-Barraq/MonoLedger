@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/widgets/monoledger_logo.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/features/auth/presentation/bloc/auth_bloc.dart';
@@ -118,7 +119,7 @@ class _SplashPageState extends State<SplashPage> {
                   const SizedBox(height: 12),
                   // Version / Loading subtitle
                   Text(
-                        'DIGITAL CURRENCY FOR BOARD GAMES',
+                        AppLocalizations.of(context).homeTagline,
                         style: GoogleFonts.inter(
                           color: Colors.white.withValues(alpha: 0.5),
                           fontSize: 10,

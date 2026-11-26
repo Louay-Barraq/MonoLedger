@@ -1,5 +1,6 @@
-// Renders the launcher icon, store icon and feature graphic from the MonoLedger mark.
-// Run: flutter test tool/render_icon_test.dart   → writes assets/icon/*.png
+// Renders the launcher icon, store icon and the localized feature graphics from
+// the MonoLedger mark.
+// Run: flutter test tool/render_icon_test.dart, then dart run flutter_launcher_icons
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -12,29 +13,10 @@ import 'package:monoledger/core/widgets/monoledger_logo.dart';
 const _green = Color(0xFF14F195);
 const _background = Color(0xFF0B0D0F);
 
-Future<void> _loadMaterialIcons() async {
-  final sdk =
-      Platform.environment['FLUTTER_ROOT'] ??
-      File(
-        Platform.resolvedExecutable,
-      ).parent.parent.parent.parent.parent.parent.path;
-  final font = File(
-    '$sdk/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
-  );
-  final loader = FontLoader('MaterialIcons')
-    ..addFont(Future.value(ByteData.view(font.readAsBytesSync().buffer)));
-  await loader.load();
-}
-
-Future<void> _loadRoboto() async {
-  final sdk =
-      Platform.environment['FLUTTER_ROOT'] ??
-      File(
-        Platform.resolvedExecutable,
-      ).parent.parent.parent.parent.parent.parent.path;
-  final font = File('$sdk/bin/cache/artifacts/material_fonts/Roboto-Bold.ttf');
-  final loader = FontLoader('Roboto')
-    ..addFont(Future.value(ByteData.view(font.readAsBytesSync().buffer)));
+Future<void> _loadFont(String family, String path) async {
+  final bytes = File(path).readAsBytesSync();
+  final loader = FontLoader(family)
+    ..addFont(Future.value(ByteData.view(bytes.buffer)));
   await loader.load();
 }
 
@@ -43,11 +25,12 @@ Future<void> _render(
   Widget child,
   String path, {
   Size size = const Size(1024, 1024),
+  TextDirection direction = TextDirection.ltr,
 }) async {
   final key = GlobalKey();
   await tester.pumpWidget(
     Directionality(
-      textDirection: TextDirection.ltr,
+      textDirection: direction,
       child: Center(
         child: RepaintBoundary(
           key: key,
@@ -65,82 +48,126 @@ Future<void> _render(
   });
 }
 
+/// Play listing language → feature graphic tagline.
+const _taglines = {
+  'en-US': 'Board-game money, on every phone.',
+  'fr-FR': "L'argent de vos jeux, sur chaque mobile.",
+  'es-ES': 'El dinero de tus juegos, en cada móvil.',
+  'ar': 'أموال ألعابك على كل هاتف',
+};
+
+class _FeatureGraphic extends StatelessWidget {
+  const _FeatureGraphic({required this.tagline, required this.family});
+
+  final String tagline;
+  final String family;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: _background,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const MonoLedgerLogo(size: 280, color: _green),
+              const SizedBox(width: 40),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Mono',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        TextSpan(
+                          text: 'Ledger',
+                          style: TextStyle(color: _green),
+                        ),
+                      ],
+                    ),
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(
+                      fontFamily: 'Latin',
+                      fontSize: 96,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    tagline,
+                    style: TextStyle(
+                      fontFamily: family,
+                      fontSize: 34,
+                      color: const Color(0xB3FFFFFF),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 void main() {
-  testWidgets('render launcher icon', (tester) async {
+  testWidgets('render icons and feature graphics', (tester) async {
     tester.view.physicalSize = const Size(1024, 1024);
     tester.view.devicePixelRatio = 1;
-    await tester.runAsync(_loadMaterialIcons);
-    await tester.runAsync(_loadRoboto);
+    final sdk = Platform.environment['FLUTTER_ROOT']!;
+    await tester.runAsync(() async {
+      await _loadFont(
+        'Latin',
+        '$sdk/bin/cache/artifacts/material_fonts/Roboto-Bold.ttf',
+      );
+      // macOS system font with Arabic glyphs.
+      await _loadFont(
+        'Arabic',
+        '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
+      );
+    });
 
-    const glyph = MonoLedgerLogo(size: 900, color: _green);
-
-    // Full icon (legacy launchers, Play listing 512px is resized from this).
+    // Full icon (legacy launchers; the 512px store icons are resized from it).
     await _render(
       tester,
       const DecoratedBox(
         decoration: BoxDecoration(color: _background),
-        child: Center(child: glyph),
+        child: Center(child: MonoLedgerLogo(size: 900, color: _green)),
       ),
       'assets/icon/icon.png',
     );
-    // Adaptive foreground: glyph inside the 66% safe zone, transparent around it.
+    // Adaptive foreground. flutter_launcher_icons insets it by 16%, which keeps
+    // this size inside the safe circle of round launcher masks.
     await _render(
       tester,
-      // Hexagon corners stay within the 33% radius safe circle of adaptive masks.
-      const Center(child: MonoLedgerLogo(size: 780, color: _green)),
+      const Center(child: MonoLedgerLogo(size: 840, color: _green)),
       'assets/icon/icon_foreground.png',
     );
 
-    // Play Store feature graphic (1024x500).
+    // Play Store feature graphics (1024x500).
     tester.view.physicalSize = const Size(1024, 500);
-    await _render(
-      tester,
-      const DecoratedBox(
-        decoration: BoxDecoration(color: _background),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            MonoLedgerLogo(size: 260, color: _green),
-            SizedBox(width: 40),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Mono',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      TextSpan(
-                        text: 'Ledger',
-                        style: TextStyle(color: _green),
-                      ),
-                    ],
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 96,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Board-game money, on every phone.',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 34,
-                    color: Color(0xB3FFFFFF),
-                  ),
-                ),
-              ],
-            ),
-          ],
+    for (final entry in _taglines.entries) {
+      final arabic = entry.key == 'ar';
+      final images = Directory('fastlane/metadata/android/${entry.key}/images')
+        ..createSync(recursive: true);
+      await _render(
+        tester,
+        _FeatureGraphic(
+          tagline: entry.value,
+          family: arabic ? 'Arabic' : 'Latin',
         ),
-      ),
-      'store/feature-graphic.png',
-      size: const Size(1024, 500),
-    );
+        '${images.path}/featureGraphic.png',
+        size: const Size(1024, 500),
+        direction: arabic ? TextDirection.rtl : TextDirection.ltr,
+      );
+    }
   });
 }

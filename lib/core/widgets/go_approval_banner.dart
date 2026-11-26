@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monoledger/core/localization/app_localizations.dart';
 import 'package:monoledger/core/theme/app_theme.dart';
 import 'package:monoledger/core/utils/currency_formatter.dart';
 
@@ -69,7 +70,7 @@ class GoApprovalBanner extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'PASSED GO',
+                            AppLocalizations.of(context).goPassed,
                             style: GoogleFonts.spaceMono(
                               color: AppTheme.primaryColor,
                               fontSize: 10,
@@ -93,6 +94,7 @@ class GoApprovalBanner extends StatelessWidget {
                               amount,
                               positive: true,
                             ),
+                            textDirection: TextDirection.ltr,
                             style: GoogleFonts.spaceMono(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 13,
@@ -109,7 +111,7 @@ class GoApprovalBanner extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _ActionButton(
-                        label: 'DECLINE',
+                        label: AppLocalizations.of(context).goDecline,
                         color: const Color(0xFFFF5252),
                         onTap: isLoading ? null : onDecline,
                       ),
@@ -117,7 +119,7 @@ class GoApprovalBanner extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _ActionButton(
-                        label: 'APPROVE',
+                        label: AppLocalizations.of(context).goApprove,
                         color: const Color(0xFF34C759),
                         onTap: isLoading ? null : onApprove,
                       ),
