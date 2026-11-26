@@ -20,7 +20,7 @@ abstract interface class TransactionRepository {
     String? memo,
   });
 
-  Future<LedgerTransaction> collectGoSalary({required String sessionId});
+  Future<LedgerTransaction> reverseTransaction(String transactionId);
 
   Future<List<LedgerTransaction>> fetchTransactions(String sessionId);
 

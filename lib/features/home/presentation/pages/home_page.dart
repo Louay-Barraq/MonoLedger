@@ -24,22 +24,12 @@ class HomePage extends StatelessWidget {
           SafeArea(
             child: Stack(
               children: [
-                Positioned(
-                  top: 8,
-                  left: 16,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.settings_rounded,
-                      color: AppTheme.primaryColor,
-                      size: 26,
-                    ),
-                    tooltip: l10n.settingsTitle,
-                    onPressed: () => context.push('/settings'),
-                  ),
-                ),
                 Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 40,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -71,7 +61,8 @@ class HomePage extends StatelessWidget {
                                 icon: Icons.add_circle,
                                 isPrimary: true,
                                 isLoading: false,
-                                onPressed: () => context.push('/create-session'),
+                                onPressed: () =>
+                                    context.push('/create-session'),
                               ),
                               const SizedBox(height: 16),
                               _LandingButton(
@@ -128,13 +119,42 @@ class HomePage extends StatelessWidget {
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppTheme.primaryColor.withValues(alpha: index == 1 ? 1 : 0.2),
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: index == 1 ? 1 : 0.2,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ],
                     ),
+                  ),
+                ),
+                // Buttons go last so they sit above the full-screen scroll view.
+                Positioned(
+                  top: 8,
+                  left: 16,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.settings_rounded,
+                      color: AppTheme.primaryColor,
+                      size: 26,
+                    ),
+                    tooltip: l10n.settingsTitle,
+                    onPressed: () => context.push('/settings'),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 16,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.history_rounded,
+                      color: AppTheme.primaryColor,
+                      size: 26,
+                    ),
+                    tooltip: 'Past games',
+                    onPressed: () => context.push('/history'),
                   ),
                 ),
               ],
@@ -195,8 +215,14 @@ class _TitleSection extends StatelessWidget {
               letterSpacing: -1,
             ),
             children: const [
-              TextSpan(text: 'Mono', style: TextStyle(color: Colors.white)),
-              TextSpan(text: 'Ledger', style: TextStyle(color: AppTheme.primaryColor)),
+              TextSpan(
+                text: 'Mono',
+                style: TextStyle(color: Colors.white),
+              ),
+              TextSpan(
+                text: 'Ledger',
+                style: TextStyle(color: AppTheme.primaryColor),
+              ),
             ],
           ),
         ),
@@ -238,10 +264,14 @@ class _LandingButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary ? AppTheme.primaryColor : const Color(0xFF1C2026),
+          backgroundColor: isPrimary
+              ? AppTheme.primaryColor
+              : const Color(0xFF1C2026),
           foregroundColor: isPrimary ? Colors.black : Colors.white,
           elevation: isPrimary ? 8 : 0,
-          shadowColor: isPrimary ? AppTheme.primaryColor.withValues(alpha: 0.5) : Colors.transparent,
+          shadowColor: isPrimary
+              ? AppTheme.primaryColor.withValues(alpha: 0.5)
+              : Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -254,7 +284,10 @@ class _LandingButton extends StatelessWidget {
               const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                ),
               )
             else ...[
               const Spacer(),
@@ -333,9 +366,7 @@ class _DotGridBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DotPainter(),
-    );
+    return CustomPaint(painter: _DotPainter());
   }
 }
 

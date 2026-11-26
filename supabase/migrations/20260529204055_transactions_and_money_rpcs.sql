@@ -1,9 +1,4 @@
--- MonoLedger: transactions table and money-movement RPCs
--- Applied to project kmceonhtubcrrzfpoxra as migration transactions_and_money_rpcs
-
--- Transaction types: player_to_player, pay_bank, from_bank, collect_go
-
--- Replace legacy schema (sender_id/receiver_id/description) if present
+-- Replace legacy transactions schema (sender_id/receiver_id) with typed ledger + RPCs
 DROP TABLE IF EXISTS public.transactions CASCADE;
 
 CREATE TABLE public.transactions (
@@ -18,12 +13,11 @@ CREATE TABLE public.transactions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_transactions_session_id ON public.transactions(session_id);
-CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON public.transactions(session_id, created_at DESC);
+CREATE INDEX idx_transactions_session_id ON public.transactions(session_id);
+CREATE INDEX idx_transactions_created_at ON public.transactions(session_id, created_at DESC);
 
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 
--- Session members can read transactions for their session
 CREATE POLICY transactions_select_session_members ON public.transactions
   FOR SELECT
   USING (
@@ -35,12 +29,10 @@ CREATE POLICY transactions_select_session_members ON public.transactions
     )
   );
 
--- Inserts only via SECURITY DEFINER functions
 CREATE POLICY transactions_no_direct_insert ON public.transactions
   FOR INSERT
   WITH CHECK (false);
 
--- Helper: resolve current player in session
 CREATE OR REPLACE FUNCTION public.current_player_in_session(p_session_id UUID)
 RETURNS public.players
 LANGUAGE plpgsql
@@ -65,10 +57,11 @@ BEGIN
 END;
 $$;
 
--- Helper: ensure session is open
 CREATE OR REPLACE FUNCTION public.assert_session_open(p_session_id UUID)
 RETURNS void
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_status TEXT;
@@ -218,5 +211,4 @@ GRANT EXECUTE ON FUNCTION public.pay_bank(UUID, NUMERIC, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.receive_from_bank(UUID, NUMERIC, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.collect_go_salary(UUID) TO authenticated;
 
--- Enable realtime for transactions
-ALTER PUBLICATION supabase_realtime ADD TABLE public.transactions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.transactions;;

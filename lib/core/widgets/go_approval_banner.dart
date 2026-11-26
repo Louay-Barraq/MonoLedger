@@ -57,7 +57,11 @@ class GoApprovalBanner extends StatelessWidget {
                         color: AppTheme.primaryColor,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.paid_rounded, color: Colors.black, size: 24),
+                      child: const Icon(
+                        Icons.paid_rounded,
+                        color: Colors.black,
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -84,7 +88,11 @@ class GoApprovalBanner extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            CurrencyFormatter.formatSignedMoney(currency, amount, positive: true),
+                            CurrencyFormatter.formatSignedMoney(
+                              currency,
+                              amount,
+                              positive: true,
+                            ),
                             style: GoogleFonts.spaceMono(
                               color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 13,
@@ -142,11 +150,7 @@ class _ActionButton extends StatelessWidget {
   final Color color;
   final VoidCallback? onTap;
 
-  const _ActionButton({
-    required this.label,
-    required this.color,
-    this.onTap,
-  });
+  const _ActionButton({required this.label, required this.color, this.onTap});
 
   @override
   Widget build(BuildContext context) {

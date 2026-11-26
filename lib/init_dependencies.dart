@@ -22,6 +22,7 @@ import 'package:monoledger/features/settings/data/datasources/settings_local_dat
 import 'package:monoledger/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:monoledger/features/settings/domain/repositories/settings_repository.dart';
 import 'package:monoledger/features/settings/presentation/cubit/locale_cubit.dart';
+import 'package:monoledger/features/history/data/history_remote_data_source.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -40,6 +41,9 @@ Future<void> initDependencies() async {
   _initHome();
   _initTransactions();
   _initGoRequests();
+  serviceLocator.registerLazySingleton(
+    () => HistoryRemoteDataSource(serviceLocator()),
+  );
   await _initSettings();
 }
 
@@ -50,9 +54,7 @@ void _initAuth() {
   serviceLocator.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(serviceLocator()),
   );
-  serviceLocator.registerFactory(
-    () => AuthBloc(serviceLocator()),
-  );
+  serviceLocator.registerFactory(() => AuthBloc(serviceLocator()));
 }
 
 void _initHome() {
@@ -62,9 +64,7 @@ void _initHome() {
   serviceLocator.registerLazySingleton<SessionRepository>(
     () => SessionRepositoryImpl(serviceLocator()),
   );
-  serviceLocator.registerFactory(
-    () => SessionBloc(serviceLocator()),
-  );
+  serviceLocator.registerFactory(() => SessionBloc(serviceLocator()));
 }
 
 void _initTransactions() {
@@ -74,9 +74,7 @@ void _initTransactions() {
   serviceLocator.registerLazySingleton<TransactionRepository>(
     () => TransactionRepositoryImpl(serviceLocator()),
   );
-  serviceLocator.registerFactory(
-    () => TransactionBloc(serviceLocator()),
-  );
+  serviceLocator.registerFactory(() => TransactionBloc(serviceLocator()));
 }
 
 void _initGoRequests() {
@@ -86,9 +84,7 @@ void _initGoRequests() {
   serviceLocator.registerLazySingleton<GoRequestRepository>(
     () => GoRequestRepositoryImpl(serviceLocator()),
   );
-  serviceLocator.registerFactory(
-    () => GoRequestBloc(serviceLocator()),
-  );
+  serviceLocator.registerFactory(() => GoRequestBloc(serviceLocator()));
 }
 
 Future<void> _initSettings() async {

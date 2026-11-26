@@ -18,7 +18,10 @@ class DashboardBottomNav extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceContainerLow,
         border: Border(
-          top: BorderSide(color: Colors.white.withValues(alpha: 0.06), width: 1),
+          top: BorderSide(
+            color: Colors.white.withValues(alpha: 0.06),
+            width: 1,
+          ),
         ),
       ),
       child: SafeArea(
@@ -81,12 +84,16 @@ class _NavItem extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.15) : Colors.transparent,
+                color: isSelected
+                    ? AppTheme.primaryColor.withValues(alpha: 0.15)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? AppTheme.primaryColor : Colors.white.withValues(alpha: 0.4),
+                color: isSelected
+                    ? AppTheme.primaryColor
+                    : Colors.white.withValues(alpha: 0.4),
                 size: 22,
               ),
             ),
@@ -94,7 +101,9 @@ class _NavItem extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.spaceMono(
-                color: isSelected ? AppTheme.primaryColor : Colors.white.withValues(alpha: 0.4),
+                color: isSelected
+                    ? AppTheme.primaryColor
+                    : Colors.white.withValues(alpha: 0.4),
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1,

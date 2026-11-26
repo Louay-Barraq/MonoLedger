@@ -7,10 +7,7 @@ void main() {
   });
 
   test('parse monoledger URI', () {
-    expect(
-      JoinCodeParser.parse('monoledger://join?code=XYZ789'),
-      'XYZ789',
-    );
+    expect(JoinCodeParser.parse('monoledger://join?code=XYZ789'), 'XYZ789');
   });
 
   test('encodeForQr builds URI', () {

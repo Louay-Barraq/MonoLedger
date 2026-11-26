@@ -29,6 +29,8 @@ import 'package:monoledger/features/settings/presentation/cubit/locale_cubit.dar
 import 'package:monoledger/features/settings/presentation/pages/settings_page.dart';
 import 'package:monoledger/features/settings/presentation/pages/help_page.dart';
 import 'package:monoledger/features/settings/presentation/pages/about_page.dart';
+import 'package:monoledger/features/history/presentation/cubit/history_cubit.dart';
+import 'package:monoledger/features/history/presentation/pages/past_games_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,18 +41,12 @@ void main() async {
 final _router = GoRouter(
   initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashPage(),
-    ),
+    GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingPage(),
     ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) => const HomePage(),
-    ),
+    GoRoute(path: '/home', builder: (context, state) => const HomePage()),
     GoRoute(
       path: '/create-session',
       builder: (context, state) => const CreateSessionPage(),
@@ -80,7 +76,8 @@ final _router = GoRouter(
     GoRoute(
       path: '/payment-pad',
       builder: (context, state) {
-        final Map<String, dynamic> args = state.extra as Map<String, dynamic>? ?? {};
+        final Map<String, dynamic> args =
+            state.extra as Map<String, dynamic>? ?? {};
         return PaymentPadPage(
           targetName: args[PaymentPadRoute.targetName] as String? ?? 'Unknown',
           isPaying: args[PaymentPadRoute.isPaying] as bool? ?? true,
@@ -106,17 +103,18 @@ final _router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/history',
+      builder: (context, state) => BlocProvider(
+        create: (_) => HistoryCubit(serviceLocator())..load(),
+        child: const PastGamesPage(),
+      ),
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
       routes: [
-        GoRoute(
-          path: 'help',
-          builder: (context, state) => const HelpPage(),
-        ),
-        GoRoute(
-          path: 'about',
-          builder: (context, state) => const AboutPage(),
-        ),
+        GoRoute(path: 'help', builder: (context, state) => const HelpPage()),
+        GoRoute(path: 'about', builder: (context, state) => const AboutPage()),
       ],
     ),
   ],
@@ -129,21 +127,11 @@ class MonoLedgerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => serviceLocator<AuthBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => serviceLocator<SessionBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => serviceLocator<TransactionBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => serviceLocator<GoRequestBloc>(),
-        ),
-        BlocProvider.value(
-          value: serviceLocator<LocaleCubit>(),
-        ),
+        BlocProvider(create: (context) => serviceLocator<AuthBloc>()),
+        BlocProvider(create: (context) => serviceLocator<SessionBloc>()),
+        BlocProvider(create: (context) => serviceLocator<TransactionBloc>()),
+        BlocProvider(create: (context) => serviceLocator<GoRequestBloc>()),
+        BlocProvider.value(value: serviceLocator<LocaleCubit>()),
       ],
       child: BlocBuilder<LocaleCubit, LocaleState>(
         builder: (context, localeState) {

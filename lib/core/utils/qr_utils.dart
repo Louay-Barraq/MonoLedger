@@ -7,7 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:monoledger/core/utils/join_code_parser.dart';
 
 class QrUtils {
-  static String joinPayload(String sessionCode) => JoinCodeParser.encodeForQr(sessionCode);
+  static String joinPayload(String sessionCode) =>
+      JoinCodeParser.encodeForQr(sessionCode);
 
   static void showQrBottomSheet(BuildContext context, String code) {
     showModalBottomSheet(

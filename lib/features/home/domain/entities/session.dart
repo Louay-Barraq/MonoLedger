@@ -22,9 +22,18 @@ class Session extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, status, hostId, joinCode, createdAt, players, config];
+  List<Object?> get props => [
+    id,
+    status,
+    hostId,
+    joinCode,
+    createdAt,
+    players,
+    config,
+  ];
 
   String get currency => config['currency']?.toString() ?? '\$';
-  int get startingBalance => (config['starting_balance'] as num?)?.toInt() ?? 1500;
+  int get startingBalance =>
+      (config['starting_balance'] as num?)?.toInt() ?? 1500;
   int get goAmount => (config['go_amount'] as num?)?.toInt() ?? 200;
 }

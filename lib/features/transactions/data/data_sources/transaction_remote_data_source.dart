@@ -22,7 +22,7 @@ abstract interface class TransactionRemoteDataSource {
     String? memo,
   });
 
-  Future<TransactionModel> collectGoSalary({required String sessionId});
+  Future<TransactionModel> reverseTransaction(String transactionId);
 
   Future<List<TransactionModel>> fetchTransactions(String sessionId);
 
@@ -46,12 +46,15 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
     String? memo,
   }) async {
     try {
-      final response = await _client.rpc('transfer_to_player', params: {
-        'p_session_id': sessionId,
-        'p_to_player_id': toPlayerId,
-        'p_amount': amount,
-        'p_memo': memo,
-      });
+      final response = await _client.rpc(
+        'transfer_to_player',
+        params: {
+          'p_session_id': sessionId,
+          'p_to_player_id': toPlayerId,
+          'p_amount': amount,
+          'p_memo': memo,
+        },
+      );
       return _fromRpcRow(response as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('transfer_to_player: $e\n$st');
@@ -66,11 +69,10 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
     String? memo,
   }) async {
     try {
-      final response = await _client.rpc('pay_bank', params: {
-        'p_session_id': sessionId,
-        'p_amount': amount,
-        'p_memo': memo,
-      });
+      final response = await _client.rpc(
+        'pay_bank',
+        params: {'p_session_id': sessionId, 'p_amount': amount, 'p_memo': memo},
+      );
       return _fromRpcRow(response as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('pay_bank: $e\n$st');
@@ -85,11 +87,10 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
     String? memo,
   }) async {
     try {
-      final response = await _client.rpc('receive_from_bank', params: {
-        'p_session_id': sessionId,
-        'p_amount': amount,
-        'p_memo': memo,
-      });
+      final response = await _client.rpc(
+        'receive_from_bank',
+        params: {'p_session_id': sessionId, 'p_amount': amount, 'p_memo': memo},
+      );
       return _fromRpcRow(response as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('receive_from_bank: $e\n$st');
@@ -98,14 +99,15 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
   }
 
   @override
-  Future<TransactionModel> collectGoSalary({required String sessionId}) async {
+  Future<TransactionModel> reverseTransaction(String transactionId) async {
     try {
-      final response = await _client.rpc('collect_go_salary', params: {
-        'p_session_id': sessionId,
-      });
+      final response = await _client.rpc(
+        'reverse_transaction',
+        params: {'p_tx_id': transactionId},
+      );
       return _fromRpcRow(response as Map<String, dynamic>);
     } catch (e, st) {
-      debugPrint('collect_go_salary: $e\n$st');
+      debugPrint('reverse_transaction: $e\n$st');
       rethrow;
     }
   }
@@ -127,12 +129,12 @@ class TransactionRemoteDataSourceImpl implements TransactionRemoteDataSource {
   Stream<List<TransactionModel>> watchTransactions(String sessionId) async* {
     yield await fetchTransactions(sessionId);
 
-    await for (final _ in _client
-        .from('transactions')
-        .stream(primaryKey: ['id'])
-        .eq('session_id', sessionId)) {
+    await for (final _
+        in _client
+            .from('transactions')
+            .stream(primaryKey: ['id'])
+            .eq('session_id', sessionId)) {
       yield await fetchTransactions(sessionId);
     }
   }
-
 }

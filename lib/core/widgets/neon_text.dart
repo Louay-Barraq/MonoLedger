@@ -22,7 +22,10 @@ class NeonText extends StatelessWidget {
         color: color,
         shadows: [
           Shadow(color: color.withValues(alpha: 0.8), blurRadius: blurRadius),
-          Shadow(color: color.withValues(alpha: 0.5), blurRadius: blurRadius * 2),
+          Shadow(
+            color: color.withValues(alpha: 0.5),
+            blurRadius: blurRadius * 2,
+          ),
         ],
       ),
     );

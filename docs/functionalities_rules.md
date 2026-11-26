@@ -18,7 +18,6 @@ A player can:
 - View their current balance.
 - Pay another player.
 - Pay money to the bank.
-- Receive money from the bank.
 - Request GO salary.
 - View the shared transaction ledger.
 - Leave the session.
@@ -27,6 +26,7 @@ A player can:
 
 The Banker is the session owner/administrator. The Banker can do everything a player can, plus:
 
+- Receive money from the bank.
 - Approve or decline GO salary requests from other players.
 - Transfer the Banker role to another active player.
 - Kick players from the session.
@@ -58,7 +58,7 @@ Players can join an open session by:
 - Typing the 6-character join code.
 - Scanning the session QR code.
 
-Players who voluntarily left can rejoin if the backend permits it. Players who were kicked cannot rejoin the same session.
+Players who voluntarily left can rejoin and keep the balance they left with. Players who were kicked cannot rejoin the same session.
 
 ### Live Session Sync
 
@@ -91,7 +91,7 @@ MonoLedger supports four transaction types:
 
 - Player to player: one player pays another active player.
 - Pay bank: a player pays money out to the bank.
-- From bank: a player receives money from the bank.
+- From bank: the Banker receives money from the bank.
 - Collect GO: a player receives the configured GO salary.
 
 ### GO Salary
@@ -140,7 +140,9 @@ When a session is ended, the app routes players to the end summary screen. The s
 
 - Transactions must go through server-side Supabase RPCs.
 - A player cannot pay themselves.
-- A player cannot pay more than their current balance.
+- A player cannot pay more than their current balance, even with payments sent at the same moment.
+- Only the Banker can take money from the bank or end the game.
+- Clients cannot update players or sessions directly; every change goes through an RPC.
 - Inactive, kicked, or missing players cannot receive player-to-player transfers.
 - Closed sessions cannot accept new transactions.
 - Large bank payouts above 50 percent of total player liquidity require an extra confirmation in the app.

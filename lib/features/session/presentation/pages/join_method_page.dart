@@ -14,7 +14,11 @@ class JoinMethodPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.primaryColor, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.primaryColor,
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -142,7 +146,10 @@ class _MethodButton extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: AppTheme.primaryColor),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppTheme.primaryColor,
+              ),
             ],
           ),
         ),

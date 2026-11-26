@@ -107,4 +107,4 @@ CREATE TRIGGER trigger_banker_inheritance
 CREATE TRIGGER trigger_banker_inheritance_delete
   AFTER DELETE ON public.players
   FOR EACH ROW
-  EXECUTE FUNCTION public.handle_banker_inheritance();
+  EXECUTE FUNCTION public.handle_banker_inheritance();;

@@ -24,9 +24,6 @@ class AppTheme {
     ),
     textTheme: GoogleFonts.plusJakartaSansTextTheme(
       ThemeData.dark().textTheme,
-    ).apply(
-      bodyColor: Colors.white,
-      displayColor: Colors.white,
-    ),
+    ).apply(bodyColor: Colors.white, displayColor: Colors.white),
   );
 }

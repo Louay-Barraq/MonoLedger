@@ -1,6 +1,4 @@
--- Allow players who LEFT to rejoin (status -> ACTIVE).
--- Block players who were KICKED from rejoining.
--- Applied to project kmceonhtubcrrzfpoxra as migration fix_join_session_rejoin
+-- Allow players who LEFT to rejoin; block KICKED players from rejoining.
 
 DROP FUNCTION IF EXISTS public.join_session_by_code(text, text);
 DROP FUNCTION IF EXISTS public.reactivate_left_player(uuid, text);
@@ -105,7 +103,6 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.join_session_by_code(TEXT, TEXT) TO authenticated;
 
--- Fallback RPC used by the app if join returns a LEFT row before migration is applied everywhere.
 CREATE OR REPLACE FUNCTION public.reactivate_left_player(
   p_session_id UUID,
   p_player_name TEXT
@@ -171,4 +168,4 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.reactivate_left_player(UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.reactivate_left_player(UUID, TEXT) TO authenticated;;

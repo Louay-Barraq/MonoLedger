@@ -72,11 +72,7 @@ class RowTrailingAmount extends StatelessWidget {
         ),
         if (secondary != null) ...[
           const SizedBox(height: 3),
-          Text(
-            secondary!,
-            textAlign: TextAlign.right,
-            style: secondaryStyle,
-          ),
+          Text(secondary!, textAlign: TextAlign.right, style: secondaryStyle),
         ],
       ],
     );
@@ -103,11 +99,7 @@ class RowTrailingValue extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerRight,
-        child: Text(
-          text,
-          textAlign: TextAlign.right,
-          style: style,
-        ),
+        child: Text(text, textAlign: TextAlign.right, style: style),
       ),
     );
   }

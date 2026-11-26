@@ -43,7 +43,10 @@ class SessionRepositoryImpl implements SessionRepository {
   }
 
   @override
-  Future<void> transferBankerRole(String sessionId, String newBankerPlayerId) async {
+  Future<void> transferBankerRole(
+    String sessionId,
+    String newBankerPlayerId,
+  ) async {
     await _remoteDataSource.transferBankerRole(sessionId, newBankerPlayerId);
   }
 

@@ -11,6 +11,9 @@ class SlideToConfirm extends StatefulWidget {
   final Color containerColor;
   final bool enabled;
 
+  /// Follows the Haptic feedback setting.
+  final bool haptics;
+
   const SlideToConfirm({
     super.key,
     this.onConfirm,
@@ -19,13 +22,15 @@ class SlideToConfirm extends StatefulWidget {
     this.baseColor = AppTheme.primaryColor,
     this.containerColor = const Color(0xFF14181F),
     this.enabled = true,
+    this.haptics = true,
   }) : assert(onConfirm != null || onConfirmAsync != null);
 
   @override
   State<SlideToConfirm> createState() => SlideToConfirmState();
 }
 
-class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProviderStateMixin {
+class SlideToConfirmState extends State<SlideToConfirm>
+    with SingleTickerProviderStateMixin {
   double _dragValue = 0.0;
   bool _isConfirmed = false;
   bool _isProcessing = false;
@@ -66,7 +71,7 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
     });
 
     if (_dragValue > 0.5 && _dragValue < 0.55) {
-      HapticFeedback.selectionClick();
+      if (widget.haptics) HapticFeedback.selectionClick();
     }
   }
 
@@ -78,7 +83,7 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
         _dragValue = 1.0;
         _isProcessing = true;
       });
-      HapticFeedback.mediumImpact();
+      if (widget.haptics) HapticFeedback.mediumImpact();
 
       bool success = true;
       try {
@@ -98,9 +103,9 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
           _isConfirmed = true;
           _isProcessing = false;
         });
-        HapticFeedback.heavyImpact();
+        if (widget.haptics) HapticFeedback.heavyImpact();
       } else {
-        HapticFeedback.vibrate();
+        if (widget.haptics) HapticFeedback.vibrate();
         reset();
       }
     } else {
@@ -109,10 +114,13 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
   }
 
   void _animateBack() {
-    _controller.duration = Duration(milliseconds: (300 * _dragValue).clamp(150, 300).toInt());
-    final animation = Tween<double>(begin: _dragValue, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    _controller.duration = Duration(
+      milliseconds: (300 * _dragValue).clamp(150, 300).toInt(),
     );
+    final animation = Tween<double>(
+      begin: _dragValue,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     animation.addListener(() {
       if (mounted) {
@@ -179,7 +187,8 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
                     top: 4,
                     bottom: 4,
                     child: GestureDetector(
-                      onHorizontalDragUpdate: (details) => _onDragUpdate(details, maxWidth),
+                      onHorizontalDragUpdate: (details) =>
+                          _onDragUpdate(details, maxWidth),
                       onHorizontalDragEnd: _onDragEnd,
                       child: Container(
                         width: handleSize,
@@ -195,7 +204,9 @@ class SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvide
                           ],
                         ),
                         child: Icon(
-                          _isConfirmed ? Icons.check_rounded : Icons.chevron_right_rounded,
+                          _isConfirmed
+                              ? Icons.check_rounded
+                              : Icons.chevron_right_rounded,
                           color: Colors.black,
                           size: 32,
                         ),

@@ -44,11 +44,11 @@ class BankPaymentSubmitted extends TransactionEvent {
   List<Object?> get props => [sessionId, amount, isPaying];
 }
 
-class CollectGoSalaryRequested extends TransactionEvent {
-  final String sessionId;
-  const CollectGoSalaryRequested({required this.sessionId});
+class TransactionReverseRequested extends TransactionEvent {
+  final String transactionId;
+  const TransactionReverseRequested(this.transactionId);
   @override
-  List<Object?> get props => [sessionId];
+  List<Object?> get props => [transactionId];
 }
 
 class TransactionsWatchStarted extends TransactionEvent {
@@ -107,11 +107,15 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   StreamSubscription<List<LedgerTransaction>>? _watchSub;
   String? _activeSessionId;
   List<LedgerTransaction> _cachedTransactions = [];
+  final Duration retryDelay;
 
-  TransactionBloc(this._repository) : super(TransactionInitial()) {
+  TransactionBloc(
+    this._repository, {
+    this.retryDelay = const Duration(seconds: 2),
+  }) : super(TransactionInitial()) {
     on<TransferSubmitted>(_onTransferSubmitted);
     on<BankPaymentSubmitted>(_onBankPaymentSubmitted);
-    on<CollectGoSalaryRequested>(_onCollectGoSalary);
+    on<TransactionReverseRequested>(_onReverseRequested);
     on<TransactionsWatchStarted>(_onWatchStarted);
     on<TransactionsWatchStopped>(_onWatchStopped);
     on<TransactionsUpdated>(_onTransactionsUpdated);
@@ -135,10 +139,27 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     _cachedTransactions = [];
     emit(const TransactionListLoaded([]));
 
-    _watchSub = _repository.watchTransactions(event.sessionId).listen(
-      (txs) => add(TransactionsUpdated(event.sessionId, txs)),
-      onError: (_) => add(TransactionsUpdated(event.sessionId, const [])),
-    );
+    _listen(event.sessionId);
+  }
+
+  void _listen(String sessionId) {
+    _watchSub = _repository
+        .watchTransactions(sessionId)
+        .listen(
+          (txs) => add(TransactionsUpdated(sessionId, txs)),
+          // Keep the last ledger on screen and reconnect instead of wiping it.
+          onError: (_) => _retryWatch(sessionId),
+          onDone: () => _retryWatch(sessionId),
+          cancelOnError: true,
+        );
+  }
+
+  void _retryWatch(String sessionId) {
+    Future<void>.delayed(retryDelay, () {
+      if (isClosed || _activeSessionId != sessionId) return;
+      _watchSub?.cancel();
+      _listen(sessionId);
+    });
   }
 
   Future<void> _onWatchStopped(
@@ -192,10 +213,16 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     emit(TransactionLoading());
     try {
       if (event.isPaying) {
-        await _repository.payBank(sessionId: event.sessionId, amount: event.amount);
+        await _repository.payBank(
+          sessionId: event.sessionId,
+          amount: event.amount,
+        );
         emit(const TransactionSuccess('Paid to the Bank'));
       } else {
-        await _repository.receiveFromBank(sessionId: event.sessionId, amount: event.amount);
+        await _repository.receiveFromBank(
+          sessionId: event.sessionId,
+          amount: event.amount,
+        );
         emit(const TransactionSuccess('Received from the Bank'));
       }
       if (_cachedTransactions.isNotEmpty) {
@@ -209,23 +236,18 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
   }
 
-  Future<void> _onCollectGoSalary(
-    CollectGoSalaryRequested event,
+  Future<void> _onReverseRequested(
+    TransactionReverseRequested event,
     Emitter<TransactionState> emit,
   ) async {
     emit(TransactionLoading());
     try {
-      await _repository.collectGoSalary(sessionId: event.sessionId);
-      emit(const TransactionSuccess('GO salary collected'));
-      if (_cachedTransactions.isNotEmpty) {
-        emit(TransactionListLoaded(_cachedTransactions));
-      }
+      await _repository.reverseTransaction(event.transactionId);
+      emit(const TransactionSuccess('Transaction reversed'));
     } catch (e) {
       emit(TransactionError(_mapError(e)));
-      if (_cachedTransactions.isNotEmpty) {
-        emit(TransactionListLoaded(_cachedTransactions));
-      }
     }
+    emit(TransactionListLoaded(_cachedTransactions));
   }
 
   String _mapError(Object e) {
@@ -244,6 +266,15 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     }
     if (msg.contains('player_not_found')) {
       return 'Recipient not found in this session.';
+    }
+    if (msg.contains('already_reversed')) {
+      return 'This transaction was already reversed.';
+    }
+    if (msg.contains('cannot_reverse_reversal')) {
+      return 'A reversal cannot be reversed.';
+    }
+    if (msg.contains('only_banker')) {
+      return 'Only the Banker can do this.';
     }
     return 'Transaction failed. Please try again.';
   }

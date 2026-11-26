@@ -16,8 +16,9 @@ void main() {
 
   setUp(() {
     repository = MockSettingsRepository();
-    when(() => repository.getSavedLocale())
-        .thenAnswer((_) async => AppLocale.english);
+    when(
+      () => repository.getSavedLocale(),
+    ).thenAnswer((_) async => AppLocale.english);
     when(() => repository.getHapticsEnabled()).thenAnswer((_) async => true);
     when(() => repository.saveLocale(any())).thenAnswer((_) async {});
     when(() => repository.setHapticsEnabled(any())).thenAnswer((_) async {});
@@ -35,8 +36,9 @@ void main() {
       ),
     ],
     setUp: () {
-      when(() => repository.getSavedLocale())
-          .thenAnswer((_) async => AppLocale.french);
+      when(
+        () => repository.getSavedLocale(),
+      ).thenAnswer((_) async => AppLocale.french);
     },
   );
 
@@ -45,9 +47,7 @@ void main() {
     build: () => LocaleCubit(repository),
     seed: () => LocaleState(locale: AppLocale.english.locale, loaded: true),
     act: (cubit) => cubit.setLocale(AppLocale.arabic),
-    expect: () => [
-      LocaleState(locale: AppLocale.arabic.locale, loaded: true),
-    ],
+    expect: () => [LocaleState(locale: AppLocale.arabic.locale, loaded: true)],
     verify: (_) {
       verify(() => repository.saveLocale(AppLocale.arabic)).called(1);
     },

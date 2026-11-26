@@ -17,11 +17,7 @@ class LocaleState extends Equatable {
 
   AppLocale get appLocale => AppLocale.fromLocale(locale);
 
-  LocaleState copyWith({
-    Locale? locale,
-    bool? hapticsEnabled,
-    bool? loaded,
-  }) {
+  LocaleState copyWith({Locale? locale, bool? hapticsEnabled, bool? loaded}) {
     return LocaleState(
       locale: locale ?? this.locale,
       hapticsEnabled: hapticsEnabled ?? this.hapticsEnabled,
@@ -37,16 +33,14 @@ class LocaleCubit extends Cubit<LocaleState> {
   final SettingsRepository _repository;
 
   LocaleCubit(this._repository)
-      : super(LocaleState(locale: AppLocale.english.locale));
+    : super(LocaleState(locale: AppLocale.english.locale));
 
   Future<void> load() async {
     final saved = await _repository.getSavedLocale();
     final haptics = await _repository.getHapticsEnabled();
-    emit(LocaleState(
-      locale: saved.locale,
-      hapticsEnabled: haptics,
-      loaded: true,
-    ));
+    emit(
+      LocaleState(locale: saved.locale, hapticsEnabled: haptics, loaded: true),
+    );
   }
 
   Future<void> setLocale(AppLocale appLocale) async {

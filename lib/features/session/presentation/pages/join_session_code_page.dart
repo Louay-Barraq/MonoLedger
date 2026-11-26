@@ -45,7 +45,11 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.primaryColor, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.primaryColor,
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -62,10 +66,15 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
         listener: (context, state) {
           if (state is SessionError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppTheme.errorColor,
+              ),
             );
           } else if (state is SessionSuccess) {
-            context.pushReplacement('/dashboard?code=${state.session.joinCode}');
+            context.pushReplacement(
+              '/dashboard?code=${state.session.joinCode}',
+            );
           }
         },
         builder: (context, state) {
@@ -133,15 +142,21 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                       fillColor: const Color(0xFF14181F),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: AppTheme.primaryColor),
+                        borderSide: const BorderSide(
+                          color: AppTheme.primaryColor,
+                        ),
                       ),
                       counterText: '',
                       contentPadding: const EdgeInsets.symmetric(vertical: 24),
@@ -152,24 +167,38 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _nameController,
-                    style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Name',
-                      hintStyle: GoogleFonts.plusJakartaSans(color: Colors.white.withValues(alpha: 0.2)),
+                      hintStyle: GoogleFonts.plusJakartaSans(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
                       filled: true,
                       fillColor: const Color(0xFF14181F),
-                      prefixIcon: const Icon(Icons.person_outline, color: AppTheme.primaryColor),
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                        color: AppTheme.primaryColor,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: AppTheme.primaryColor),
+                        borderSide: const BorderSide(
+                          color: AppTheme.primaryColor,
+                        ),
                       ),
                     ),
                   ),
@@ -183,16 +212,21 @@ class _JoinSessionCodePageState extends State<JoinSessionCodePage> {
                               final code = _codeController.text.toUpperCase();
                               final name = _nameController.text.trim();
                               if (code.length == 6 && name.isNotEmpty) {
-                                context.read<TransactionBloc>().add(const TransactionsWatchStopped());
-                                context.read<GoRequestBloc>().add(const GoRequestsWatchStopped());
+                                context.read<TransactionBloc>().add(
+                                  const TransactionsWatchStopped(),
+                                );
+                                context.read<GoRequestBloc>().add(
+                                  const GoRequestsWatchStopped(),
+                                );
                                 context.read<SessionBloc>().add(
-                                      SessionJoinRequested(
-                                        joinCode: code,
-                                        playerName: name,
-                                      ),
-                                    );
+                                  SessionJoinRequested(
+                                    joinCode: code,
+                                    playerName: name,
+                                  ),
+                                );
                               } else {
-                                String message = 'Please enter a valid 6-character code.';
+                                String message =
+                                    'Please enter a valid 6-character code.';
                                 if (name.isEmpty) {
                                   message = 'Please enter your name.';
                                 }

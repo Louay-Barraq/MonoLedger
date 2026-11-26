@@ -15,7 +15,7 @@ class PlayerModel extends Player {
     return PlayerModel(
       id: json['id'],
       sessionId: json['session_id'],
-      userId: json['user_id'],
+      userId: json['user_id'] as String? ?? '',
       name: json['name'] ?? 'Unknown',
       balance: (json['balance'] as num).toDouble(),
       isBanker: json['is_banker'] ?? false,

@@ -17,7 +17,11 @@ class AboutPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.primaryColor, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.primaryColor,
+            size: 20,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -56,10 +60,7 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 28),
-            _AboutSection(
-              title: l10n.aboutAppHeading,
-              body: l10n.aboutAppBody,
-            ),
+            _AboutSection(title: l10n.aboutAppHeading, body: l10n.aboutAppBody),
             const SizedBox(height: 24),
             _AboutSection(
               title: l10n.aboutDeveloperHeading,

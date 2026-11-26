@@ -20,5 +20,13 @@ class Player extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, sessionId, userId, name, balance, isBanker, status];
+  List<Object?> get props => [
+    id,
+    sessionId,
+    userId,
+    name,
+    balance,
+    isBanker,
+    status,
+  ];
 }

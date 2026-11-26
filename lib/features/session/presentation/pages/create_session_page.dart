@@ -24,8 +24,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
   int _goAmount = 200;
   bool _isCustomCapital = false;
   bool _isCustomGoAmount = false;
-  final TextEditingController _customCapitalController = TextEditingController();
-  final TextEditingController _customGoAmountController = TextEditingController();
+  final TextEditingController _customCapitalController =
+      TextEditingController();
+  final TextEditingController _customGoAmountController =
+      TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _capitalFocusNode = FocusNode();
   final FocusNode _goFocusNode = FocusNode();
@@ -91,7 +93,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.primaryColor),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.primaryColor,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -108,10 +113,15 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
         listener: (context, state) {
           if (state is SessionError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: AppTheme.errorColor),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppTheme.errorColor,
+              ),
             );
           } else if (state is SessionSuccess) {
-            context.pushReplacement('/dashboard?code=${state.session.joinCode}');
+            context.pushReplacement(
+              '/dashboard?code=${state.session.joinCode}',
+            );
           }
         },
         builder: (context, state) {
@@ -173,25 +183,36 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     style: GoogleFonts.inter(color: Colors.white, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'Enter banker name',
-                      hintStyle: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.2)),
+                      hintStyle: GoogleFonts.inter(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
                       filled: true,
                       fillColor: const Color(0xFF14181F),
                       contentPadding: const EdgeInsets.all(20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.05),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: AppTheme.primaryColor),
+                        borderSide: const BorderSide(
+                          color: AppTheme.primaryColor,
+                        ),
                       ),
                       suffixIcon: Padding(
                         padding: const EdgeInsets.only(right: 16),
-                        child: Icon(Icons.fingerprint, color: Colors.white.withValues(alpha: 0.2)),
+                        child: Icon(
+                          Icons.fingerprint,
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
                       ),
                     ),
                   ),
@@ -204,7 +225,7 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                      _currencyChip('\$', _currencySymbol == '\$'),
+                        _currencyChip('\$', _currencySymbol == '\$'),
                         const SizedBox(width: 12),
                         _currencyChip('€', _currencySymbol == '€'),
                         const SizedBox(width: 12),
@@ -224,7 +245,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     children: [
                       _sectionTitle('STARTING CAPITAL'),
                       Text(
-                        CurrencyFormatter.formatMoney(_currencySymbol, _startingCapital),
+                        CurrencyFormatter.formatMoney(
+                          _currencySymbol,
+                          _startingCapital,
+                        ),
                         style: GoogleFonts.spaceMono(
                           color: AppTheme.primaryColor,
                           fontSize: 18,
@@ -234,25 +258,49 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Cards Grid
                   Row(
                     children: [
-                      Expanded(child: _capitalCard(1500, 'STANDARD START', _startingCapital == 1500 && !_isCustomCapital)),
+                      Expanded(
+                        child: _capitalCard(
+                          1500,
+                          'STANDARD START',
+                          _startingCapital == 1500 && !_isCustomCapital,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _capitalCard(2000, 'PRO TIER', _startingCapital == 2000 && !_isCustomCapital)),
+                      Expanded(
+                        child: _capitalCard(
+                          2000,
+                          'PRO TIER',
+                          _startingCapital == 2000 && !_isCustomCapital,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _capitalCard(3000, 'CAPITALIST', _startingCapital == 3000 && !_isCustomCapital)),
+                      Expanded(
+                        child: _capitalCard(
+                          3000,
+                          'CAPITALIST',
+                          _startingCapital == 3000 && !_isCustomCapital,
+                        ),
+                      ),
                       const SizedBox(width: 16),
-                      Expanded(child: _capitalCard(5000, 'WHALE MODE', _startingCapital == 5000 && !_isCustomCapital)),
+                      Expanded(
+                        child: _capitalCard(
+                          5000,
+                          'WHALE MODE',
+                          _startingCapital == 5000 && !_isCustomCapital,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Custom Capital Button/Input
                   // Custom Capital Button/Input
                   if (_isCustomCapital)
@@ -269,25 +317,39 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           _customGoAmountController.clear();
                         });
                       },
-                      style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 18),
+                      style: GoogleFonts.spaceMono(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'ENTER AMOUNT',
-                        hintStyle: GoogleFonts.spaceMono(color: Colors.white.withValues(alpha: 0.2)),
+                        hintStyle: GoogleFonts.spaceMono(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF14181F),
                         suffixText: _currencySymbol,
-                        suffixStyle: GoogleFonts.spaceMono(color: AppTheme.primaryColor),
+                        suffixStyle: GoogleFonts.spaceMono(
+                          color: AppTheme.primaryColor,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                            width: 2,
+                          ),
                         ),
                       ),
                       onChanged: _onCustomCapitalChanged,
@@ -307,7 +369,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF14181F),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
                         ),
                         child: Center(
                           child: Text(
@@ -330,7 +394,10 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                     children: [
                       _sectionTitle('GO AMOUNT'),
                       Text(
-                        CurrencyFormatter.formatMoney(_currencySymbol, _goAmount),
+                        CurrencyFormatter.formatMoney(
+                          _currencySymbol,
+                          _goAmount,
+                        ),
                         style: GoogleFonts.spaceMono(
                           color: AppTheme.primaryColor,
                           fontSize: 18,
@@ -342,13 +409,37 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: _capitalCard(100, '100', _goAmount == 100 && !_isCustomGoAmount)),
+                      Expanded(
+                        child: _capitalCard(
+                          100,
+                          '100',
+                          _goAmount == 100 && !_isCustomGoAmount,
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: _capitalCard(200, '200', _goAmount == 200 && !_isCustomGoAmount)),
+                      Expanded(
+                        child: _capitalCard(
+                          200,
+                          '200',
+                          _goAmount == 200 && !_isCustomGoAmount,
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: _capitalCard(400, '400', _goAmount == 400 && !_isCustomGoAmount)),
+                      Expanded(
+                        child: _capitalCard(
+                          400,
+                          '400',
+                          _goAmount == 400 && !_isCustomGoAmount,
+                        ),
+                      ),
                       const SizedBox(width: 12),
-                      Expanded(child: _capitalCard(500, '500', _goAmount == 500 && !_isCustomGoAmount)),
+                      Expanded(
+                        child: _capitalCard(
+                          500,
+                          '500',
+                          _goAmount == 500 && !_isCustomGoAmount,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -365,25 +456,39 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           _customCapitalController.clear();
                         });
                       },
-                      style: GoogleFonts.spaceMono(color: Colors.white, fontSize: 18),
+                      style: GoogleFonts.spaceMono(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
                       decoration: InputDecoration(
                         hintText: 'ENTER AMOUNT',
-                        hintStyle: GoogleFonts.spaceMono(color: Colors.white.withValues(alpha: 0.2)),
+                        hintStyle: GoogleFonts.spaceMono(
+                          color: Colors.white.withValues(alpha: 0.2),
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF14181F),
                         suffixText: _currencySymbol,
-                        suffixStyle: GoogleFonts.spaceMono(color: AppTheme.primaryColor),
+                        suffixStyle: GoogleFonts.spaceMono(
+                          color: AppTheme.primaryColor,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
+                          borderSide: const BorderSide(
+                            color: AppTheme.primaryColor,
+                            width: 2,
+                          ),
                         ),
                       ),
                       onChanged: _onCustomGoAmountChanged,
@@ -403,7 +508,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF14181F),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
                         ),
                         child: Center(
                           child: Text(
@@ -429,22 +536,32 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           : () {
                               final name = _bankerName.trim();
                               if (name.isEmpty) {
-                                _showValidationError('Please enter your name to continue.');
+                                _showValidationError(
+                                  'Please enter your name to continue.',
+                                );
                                 return;
                               }
-                              
+
                               if (_startingCapital <= 0) {
-                                _showValidationError('Starting capital must be greater than 0.');
+                                _showValidationError(
+                                  'Starting capital must be greater than 0.',
+                                );
                                 return;
                               }
 
                               if (_goAmount < 0) {
-                                _showValidationError('GO amount cannot be negative.');
+                                _showValidationError(
+                                  'GO amount cannot be negative.',
+                                );
                                 return;
                               }
-                              
-                              context.read<TransactionBloc>().add(const TransactionsWatchStopped());
-                              context.read<GoRequestBloc>().add(const GoRequestsWatchStopped());
+
+                              context.read<TransactionBloc>().add(
+                                const TransactionsWatchStopped(),
+                              );
+                              context.read<GoRequestBloc>().add(
+                                const GoRequestsWatchStopped(),
+                              );
                               context.read<SessionBloc>().add(
                                 SessionCreateRequested(
                                   currency: _currencySymbol,
@@ -461,7 +578,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 8,
-                        shadowColor: AppTheme.primaryColor.withValues(alpha: 0.5),
+                        shadowColor: AppTheme.primaryColor.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       child: isLoading
                           ? const CircularProgressIndicator(color: Colors.black)
@@ -525,7 +644,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
           color: isSelected ? AppTheme.primaryColor : const Color(0xFF1C2026),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Colors.transparent : Colors.white.withValues(alpha: 0.05),
+            color: isSelected
+                ? Colors.transparent
+                : Colors.white.withValues(alpha: 0.05),
           ),
         ),
         child: Center(
@@ -549,7 +670,8 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
           // determine which field to set based on label content vs amount comparisons
           // since _capitalCard is shared, check label to know if it's a GO card or capital card
           final goAmounts = [100, 200, 400, 500];
-          if (goAmounts.contains(amount) && ![ 1500, 2000, 3000, 5000].contains(amount)) {
+          if (goAmounts.contains(amount) &&
+              ![1500, 2000, 3000, 5000].contains(amount)) {
             _goAmount = amount;
             _isCustomGoAmount = false;
           } else {
@@ -561,10 +683,14 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.05) : const Color(0xFF14181F),
+          color: isSelected
+              ? AppTheme.primaryColor.withValues(alpha: 0.05)
+              : const Color(0xFF14181F),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : Colors.white.withValues(alpha: 0.05),
+            color: isSelected
+                ? AppTheme.primaryColor
+                : Colors.white.withValues(alpha: 0.05),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -584,7 +710,9 @@ class _CreateSessionPageState extends State<CreateSessionPage> {
             Text(
               label,
               style: GoogleFonts.spaceMono(
-                color: isSelected ? AppTheme.primaryColor : Colors.white.withValues(alpha: 0.5),
+                color: isSelected
+                    ? AppTheme.primaryColor
+                    : Colors.white.withValues(alpha: 0.5),
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1,

@@ -11,6 +11,7 @@ import 'package:monoledger/core/widgets/overflow_safe_text.dart';
 import 'package:monoledger/features/dashboard/presentation/widgets/slide_to_confirm.dart';
 import 'package:monoledger/features/home/domain/entities/session_extensions.dart';
 import 'package:monoledger/features/home/presentation/bloc/session_bloc.dart';
+import 'package:monoledger/features/settings/presentation/cubit/locale_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:monoledger/features/transactions/presentation/bloc/transaction_bloc.dart';
 
@@ -38,7 +39,8 @@ class PaymentPadPage extends StatefulWidget {
 
 class _PaymentPadPageState extends State<PaymentPadPage> {
   final AmountPadInput _amountInput = AmountPadInput();
-  final GlobalKey<SlideToConfirmState> _slideKey = GlobalKey<SlideToConfirmState>();
+  final GlobalKey<SlideToConfirmState> _slideKey =
+      GlobalKey<SlideToConfirmState>();
 
   static const List<num> _denominations = [1, 5, 10, 20, 50, 100, 500];
 
@@ -72,8 +74,10 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
     final sessionState = context.read<SessionBloc>().state;
     if (sessionState is! SessionSuccess) return false;
 
-    final totalLiquidity = sessionState.session.activePlayers
-        .fold<double>(0, (sum, p) => sum + p.balance);
+    final totalLiquidity = sessionState.session.activePlayers.fold<double>(
+      0,
+      (sum, p) => sum + p.balance,
+    );
 
     if (totalLiquidity <= 0) return false;
     return amount > totalLiquidity * 0.5;
@@ -96,7 +100,10 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('CONFIRM', style: TextStyle(color: AppTheme.primaryColor)),
+            child: const Text(
+              'CONFIRM',
+              style: TextStyle(color: AppTheme.primaryColor),
+            ),
           ),
         ],
       ),
@@ -141,8 +148,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
     }
     if (!widget.isBankTarget &&
         widget.recipientPlayerId != null &&
-        !sessionState.session.activePlayers
-            .any((p) => p.id == widget.recipientPlayerId)) {
+        !sessionState.session.activePlayers.any(
+          (p) => p.id == widget.recipientPlayerId,
+        )) {
       return false;
     }
     return true;
@@ -152,18 +160,22 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
     if (!_canSubmitTransaction()) return;
 
     if (widget.isBankTarget) {
-      bloc.add(BankPaymentSubmitted(
-        sessionId: widget.sessionId,
-        amount: amount,
-        isPaying: widget.isPaying,
-      ));
+      bloc.add(
+        BankPaymentSubmitted(
+          sessionId: widget.sessionId,
+          amount: amount,
+          isPaying: widget.isPaying,
+        ),
+      );
     } else if (widget.recipientPlayerId != null && widget.isPaying) {
-      bloc.add(TransferSubmitted(
-        sessionId: widget.sessionId,
-        toPlayerId: widget.recipientPlayerId!,
-        amount: amount,
-        memo: 'PAYMENT',
-      ));
+      bloc.add(
+        TransferSubmitted(
+          sessionId: widget.sessionId,
+          toPlayerId: widget.recipientPlayerId!,
+          amount: amount,
+          memo: 'PAYMENT',
+        ),
+      );
     }
   }
 
@@ -174,7 +186,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
       widget.currency,
       _amountInput.raw.isEmpty ? '0' : _amountInput.raw,
     );
-    final actionColor = widget.isPaying ? AppTheme.errorColor : AppTheme.primaryColor;
+    final actionColor = widget.isPaying
+        ? AppTheme.errorColor
+        : AppTheme.primaryColor;
 
     return MultiBlocListener(
       listeners: [
@@ -191,25 +205,25 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
           listenWhen: (prev, curr) =>
               curr is TransactionSuccess || curr is TransactionError,
           listener: (context, state) {
-        if (state is TransactionSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.message,
-                style: GoogleFonts.spaceMono(color: Colors.black),
-              ),
-              backgroundColor: AppTheme.primaryColor,
-            ),
-          );
-          context.pop();
-        } else if (state is TransactionError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppTheme.errorColor,
-            ),
-          );
-        }
+            if (state is TransactionSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    state.message,
+                    style: GoogleFonts.spaceMono(color: Colors.black),
+                  ),
+                  backgroundColor: AppTheme.primaryColor,
+                ),
+              );
+              context.pop();
+            } else if (state is TransactionError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppTheme.errorColor,
+                ),
+              );
+            }
           },
         ),
       ],
@@ -227,7 +241,10 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Column(
                   children: [
                     Text(
@@ -260,7 +277,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                     child: OverflowSafeText(
                       amountLabel,
                       style: GoogleFonts.plusJakartaSans(
-                        color: amount > 0 ? Colors.white : Colors.white.withValues(alpha: 0.2),
+                        color: amount > 0
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.2),
                         fontSize: 84,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -4,
@@ -275,9 +294,13 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                   padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceContainerLow,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
+                    ),
                     border: Border(
-                      top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                      top: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
                     ),
                   ),
                   child: Column(
@@ -287,11 +310,14 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _denominations.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          separatorBuilder: (_, _) => const SizedBox(width: 8),
                           itemBuilder: (context, index) {
                             final value = _denominations[index];
                             return _DenominationChip(
-                              label: CurrencyFormatter.formatMoney(widget.currency, value),
+                              label: CurrencyFormatter.formatMoney(
+                                widget.currency,
+                                value,
+                              ),
                               onTap: () => _addDenomination(value),
                             );
                           },
@@ -328,10 +354,18 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                       Expanded(
                         child: Row(
                           children: [
-                            _numpadSpecialButton('C', Icons.clear_rounded, Colors.white.withValues(alpha: 0.2)),
+                            _numpadSpecialButton(
+                              'C',
+                              Icons.clear_rounded,
+                              Colors.white.withValues(alpha: 0.2),
+                            ),
                             _numpadButton(','),
                             _numpadButton('0'),
-                            _numpadSpecialButton('<', Icons.backspace_outlined, Colors.white),
+                            _numpadSpecialButton(
+                              '<',
+                              Icons.backspace_outlined,
+                              Colors.white,
+                            ),
                           ],
                         ),
                       ),
@@ -341,8 +375,13 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
                           final loading = state is TransactionLoading;
                           return SlideToConfirm(
                             key: _slideKey,
-                            text: widget.isPaying ? 'SLIDE TO PAY' : 'SLIDE TO RECEIVE',
+                            text: widget.isPaying
+                                ? 'SLIDE TO PAY'
+                                : 'SLIDE TO RECEIVE',
                             baseColor: actionColor,
+                            haptics: context.select(
+                              (LocaleCubit c) => c.state.hapticsEnabled,
+                            ),
                             enabled: amount > 0 && !loading,
                             onConfirmAsync: _handleSlideConfirm,
                           );
@@ -369,7 +408,9 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
           borderRadius: BorderRadius.circular(16),
           child: Container(
             decoration: BoxDecoration(
-              color: AppTheme.surfaceContainerHigh.withValues(alpha: isDecimal ? 0.35 : 0.5),
+              color: AppTheme.surfaceContainerHigh.withValues(
+                alpha: isDecimal ? 0.35 : 0.5,
+              ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
@@ -396,9 +437,7 @@ class _PaymentPadPageState extends State<PaymentPadPage> {
         child: InkWell(
           onTap: () => _onKeyPress(value),
           borderRadius: BorderRadius.circular(16),
-          child: Container(
-            child: Center(child: Icon(icon, color: color, size: 28)),
-          ),
+          child: Center(child: Icon(icon, color: color, size: 28)),
         ),
       ),
     );

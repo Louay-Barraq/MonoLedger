@@ -20,9 +20,10 @@ class GoRequestRemoteDataSourceImpl implements GoRequestRemoteDataSource {
   @override
   Future<GoSalaryRequestModel> requestCollectGo(String sessionId) async {
     try {
-      final response = await _client.rpc('request_collect_go', params: {
-        'p_session_id': sessionId,
-      });
+      final response = await _client.rpc(
+        'request_collect_go',
+        params: {'p_session_id': sessionId},
+      );
       return GoSalaryRequestModel.fromJson(response as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('request_collect_go: $e\n$st');
@@ -36,10 +37,10 @@ class GoRequestRemoteDataSourceImpl implements GoRequestRemoteDataSource {
     required bool approve,
   }) async {
     try {
-      final response = await _client.rpc('resolve_collect_go', params: {
-        'p_request_id': requestId,
-        'p_approve': approve,
-      });
+      final response = await _client.rpc(
+        'resolve_collect_go',
+        params: {'p_request_id': requestId, 'p_approve': approve},
+      );
       return GoSalaryRequestModel.fromJson(response as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('resolve_collect_go: $e\n$st');
@@ -64,10 +65,11 @@ class GoRequestRemoteDataSourceImpl implements GoRequestRemoteDataSource {
   Stream<List<GoSalaryRequestModel>> watchGoRequests(String sessionId) async* {
     yield await fetchGoRequests(sessionId);
 
-    await for (final _ in _client
-        .from('go_salary_requests')
-        .stream(primaryKey: ['id'])
-        .eq('session_id', sessionId)) {
+    await for (final _
+        in _client
+            .from('go_salary_requests')
+            .stream(primaryKey: ['id'])
+            .eq('session_id', sessionId)) {
       yield await fetchGoRequests(sessionId);
     }
   }

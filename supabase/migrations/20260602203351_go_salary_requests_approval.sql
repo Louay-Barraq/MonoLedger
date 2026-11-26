@@ -17,6 +17,7 @@ CREATE INDEX IF NOT EXISTS idx_go_salary_requests_session_status
 
 ALTER TABLE public.go_salary_requests ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS go_requests_select_session_members ON public.go_salary_requests;
 CREATE POLICY go_requests_select_session_members ON public.go_salary_requests
   FOR SELECT TO authenticated
   USING (
@@ -28,6 +29,7 @@ CREATE POLICY go_requests_select_session_members ON public.go_salary_requests
     )
   );
 
+DROP POLICY IF EXISTS go_requests_insert_own ON public.go_salary_requests;
 CREATE POLICY go_requests_insert_own ON public.go_salary_requests
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -40,7 +42,15 @@ CREATE POLICY go_requests_insert_own ON public.go_salary_requests
     AND status = 'pending'
   );
 
-ALTER PUBLICATION supabase_realtime ADD TABLE public.go_salary_requests;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'go_salary_requests'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.go_salary_requests;
+  END IF;
+END $$;
 
 CREATE OR REPLACE FUNCTION public.request_collect_go(p_session_id UUID)
 RETURNS public.go_salary_requests
@@ -153,4 +163,4 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.collect_go_salary(UUID) FROM authenticated;
 
 GRANT EXECUTE ON FUNCTION public.request_collect_go(UUID) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.resolve_collect_go(UUID, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.resolve_collect_go(UUID, BOOLEAN) TO authenticated;;

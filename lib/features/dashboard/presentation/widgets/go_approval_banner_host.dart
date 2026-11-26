@@ -45,11 +45,11 @@ class GoApprovalBannerHost extends StatelessWidget {
               amount: request.amount,
               isLoading: goState.actionInProgress,
               onApprove: () => context.read<GoRequestBloc>().add(
-                    GoResolveRequested(requestId: request.id, approve: true),
-                  ),
+                GoResolveRequested(requestId: request.id, approve: true),
+              ),
               onDecline: () => context.read<GoRequestBloc>().add(
-                    GoResolveRequested(requestId: request.id, approve: false),
-                  ),
+                GoResolveRequested(requestId: request.id, approve: false),
+              ),
             );
           },
         );

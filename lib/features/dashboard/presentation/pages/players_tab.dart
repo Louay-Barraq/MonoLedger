@@ -17,16 +17,18 @@ class PlayersTab extends StatelessWidget {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
         if (state is! SessionSuccess) {
-          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primaryColor),
+          );
         }
 
         final session = state.session;
         final currency = session.currency;
         final activePlayers = session.activePlayers;
         final banker = activePlayers.cast<Player?>().firstWhere(
-              (p) => p!.isBanker,
-              orElse: () => null,
-            );
+          (p) => p!.isBanker,
+          orElse: () => null,
+        );
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -48,14 +50,17 @@ class PlayersTab extends StatelessWidget {
               if (activePlayers.isEmpty)
                 Text(
                   'No active players',
-                  style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.5)),
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: 0.5),
+                  ),
                 )
               else
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: activePlayers.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final player = activePlayers[index];
                     return _PlayerListItem(
@@ -87,10 +92,7 @@ class _BankCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1E2430),
-            Color(0xFF14181F),
-          ],
+          colors: [Color(0xFF1E2430), Color(0xFF14181F)],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.1)),
@@ -110,7 +112,10 @@ class _BankCard extends StatelessWidget {
               color: AppTheme.primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.account_balance_rounded, color: AppTheme.primaryColor),
+            child: const Icon(
+              Icons.account_balance_rounded,
+              color: AppTheme.primaryColor,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -169,7 +174,10 @@ class _PlayerListItem extends StatelessWidget {
             backgroundColor: Colors.white.withValues(alpha: 0.05),
             child: Text(
               name.isNotEmpty ? name[0].toUpperCase() : '?',
-              style: GoogleFonts.spaceMono(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+              style: GoogleFonts.spaceMono(
+                color: AppTheme.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(width: 16),

@@ -1,4 +1,4 @@
-package com.example.monoledger
+package com.louaybarraq.monoledger
 
 import io.flutter.embedding.android.FlutterActivity
 
